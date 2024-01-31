@@ -1,65 +1,271 @@
-
 // ItemsPage.js
-import React, { useState } from 'react';
-import { Button, Modal, Input } from 'antd';
-import ItemsTable from './ItemsTable';
-import ItemsForm from './ItemsForm';
+import React, { useState, useEffect } from "react";
+import { Button, Modal, Input } from "antd";
+import ItemsTable from "./ItemsTable";
+import ItemsForm from "./ItemsForm";
+import dayjs from "dayjs";
 
-const initialItems = [
-  {
-    id: 1,
-    itemCode: 'I001',
-    itemDescription: 'Product A',
-    uom: 'Each',
-    quantityOnHand: 100,
-    location: 'Warehouse',
-    locatorCode: 'A001',
-    price: 25.99,
-    supplierDetail: 'Supplier XYZ',
-    category: 'Electronics',
-    minStockLevel: 20,
-    maxStockLevel: 150,
-    reOrderPoint: 30,
-    status: 'Active',
-    endDate: '2023-12-31',
-  },
-  // Add more dummy data as needed
-];
+const apiRequest = async (url, method, requestData) => {
+  const options = {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  if (method === "POST") {
+    options["body"] = JSON.stringify(requestData);
+  }
+
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    return data.responseData;
+  } catch (error) {
+    console.error("Error: ", error);
+  }
+};
 
 const ItemsPage = () => {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState([]);
   const [visible, setVisible] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
 
-  const handleEdit = (item) => {
-    setEditingItem(item);
+  const [selectedId, setSelectedId] = useState(null);
+  const [uoms, setUoms] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [locators, setLocators] = useState([]);
+  const [vendors, setVendors] = useState([]);
+
+  const brands = [
+    { id: 0, value: "Beiter" },
+    { id: 1, value: "Fivis" },
+    { id: 2, value: "Hoyt" },
+    { id: 3, value: "Indegeneous" },
+  ];
+  const colors = [
+    { id: 0, value: "Black" },
+    { id: 1, value: "Silver" },
+    { id: 2, value: "Multicoloured" },
+    { id: 3, value: "White" },
+  ];
+
+  const getUoms = async () => {
+    const uomResponse = await apiRequest(
+      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster",
+      "GET"
+    );
+
+    setUoms(uomResponse);
+  };
+
+  const getLocations = async () => {
+    const locationsResponse = await apiRequest(
+      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster",
+      "GET"
+    );
+    setLocations(locationsResponse);
+  };
+
+  const getLocators = async () => {
+    const locatorsResponse = await apiRequest(
+      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster",
+      "GET"
+    );
+    setLocators(locatorsResponse);
+  };
+
+  const getVendors = async () => {
+    const vendorsResponse = await apiRequest(
+      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster",
+      "GET"
+    );
+    setVendors(vendorsResponse);
+  };
+
+  const getItems = async () => {
+    try {
+      const response = await fetch(
+        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster"
+      );
+
+      const { responseData } = await response.json();
+
+      const itemList = await Promise.all(
+        responseData.map(async (item) => {
+          const uomResponse = await apiRequest(
+            "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMasterById",
+            "POST",
+            {
+              id: item.uomId,
+              userId: "string",
+            }
+          );
+
+          const locationResponse = await apiRequest(
+            "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocationMasterById",
+            "POST",
+            {
+              locationId: item.locationId,
+              userId: "string",
+            }
+          );
+
+          const locatorResponse = await apiRequest(
+            "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocatorMasterById",
+            "POST",
+            {
+              id: item.locatorId,
+              userId: "string",
+            }
+          );
+
+          const vendorResponse = await apiRequest(
+            "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getVendorMasterById",
+            "POST",
+            {
+              id: item.vendorId + 1,
+              userId: "string",
+            }
+          );
+
+          return {
+            key: item.id,
+            id: item.id,
+            itemCode: item.itemMasterCd,
+            itemDescription: item.itemMasterDesc,
+            uom: uomResponse?.uomName || "default UOM",
+            quantityOnHand: item.quantity,
+            location: locationResponse?.locationName,
+            locatorCode: locatorResponse?.location,
+            price: item.price,
+            vendorDetail: vendorResponse?.vendorName,
+            category: item.category,
+            subcategory: item.subCategory,
+            type: item.type,
+            disciplines: item.disciplines,
+            brand: brands[item.brandId]["value"],
+            colour: colors[item.colorId]["value"],
+            size: 30,
+            usageCategory: item.usageCategory,
+            reOrderPoint: 2,
+            minStockLevel: item.minStockLevel,
+            maxStockLevel: item.maxStockLevel,
+            status: item.status === "A" ? "Active" : "InActive",
+            endDate: new Date(item.endDate).toISOString().split("T")[0],
+          };
+        })
+      );
+      setItems(itemList);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const init = () => {
+    getUoms();
+    getLocations();
+    getLocators();
+    getVendors();
+    getItems();
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  const getItem = async (id) => {
+    const itemResponse = await apiRequest(
+      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMasterById",
+      "POST",
+      {
+        id: id,
+        userId: "12345",
+      }
+    );
+    return itemResponse;
+  };
+
+  const handleEdit = async ({ id }) => {
+    setSelectedId(id);
+    const item = await getItem(id);
+    const dateObject = new Date(item.endDate);
+    const year = dateObject.getFullYear();
+    const month = dateObject.getMonth(); // Months are zero-based, so add 1
+    const date = dateObject.getDate();
+    const tempItem = {
+      ...item,
+      endDate: dayjs(new Date(year, month, date)),
+    };
+    setEditingItem(tempItem);
     setVisible(true);
   };
 
-  const handleDelete = (itemId) => {
+  const handleDelete = async (itemId) => {
     // Implement delete logic here
+    await apiRequest(
+      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/deleteItemMaster",
+      "POST",
+      {
+        id: itemId,
+        userId: "12345",
+      }
+    );
+    getItems();
   };
 
-  const handleFormSubmit = (values) => {
+  const handleFormSubmit = async (values) => {
+    setEditingItem(null);
+    const tempItem = {
+      ...values,
+      uomId: Number(values.uomId),
+      createUserId: "12345",
+      endDate: values.endDate.format("DD/MM/YYYY"),
+    };
+
     if (editingItem) {
+      if (selectedId) {
+        tempItem["itemMasterId"] = selectedId;
+      }
       // Implement update logic here
+      await apiRequest(
+        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/updateItemMaster",
+        "POST",
+        tempItem
+      );
     } else {
       // Implement create logic here
+      await apiRequest(
+        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/saveItemMaster",
+        "POST",
+        tempItem
+      );
     }
+    getItems();
     setVisible(false);
   };
 
   return (
     <div>
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          marginBottom: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <Input
           placeholder="Search items"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: '200px' }}
+          style={{ width: "200px" }}
         />
-        <Button type="primary" className='saitheme-btn' onClick={() => setVisible(true)}>
+        <Button
+          type="primary"
+          className="saitheme-btn"
+          onClick={() => setVisible(true)}
+        >
           Add Item
         </Button>
       </div>
@@ -72,7 +278,7 @@ const ItemsPage = () => {
       />
 
       <Modal
-        title={editingItem ? 'Edit Item' : 'Add Item'}
+        title={editingItem ? "Edit Item" : "Add Item"}
         visible={visible}
         onCancel={() => {
           setEditingItem(null);
@@ -80,7 +286,17 @@ const ItemsPage = () => {
         }}
         footer={null}
       >
-        <ItemsForm onSubmit={handleFormSubmit} initialValues={editingItem} />
+        <ItemsForm
+          key={editingItem ? `edit-${editingItem.id}` : "add"}
+          onSubmit={handleFormSubmit}
+          initialValues={editingItem}
+          uoms={uoms}
+          locations={locations}
+          locators={locators}
+          vendors={vendors}
+          brands={brands}
+          colors={colors}
+        />
       </Modal>
     </div>
   );
