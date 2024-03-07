@@ -4,7 +4,7 @@ import { Table, Space, Button } from 'antd';
 
 const DepartmentTable = ({ departments, onEdit, onDelete }) => {
   const columns = [
-    { title: 'Department ID', dataIndex: 'departmentId', key: 'departmentId', fixed: 'left', },
+    { title: 'Department ID', dataIndex: 'id', key: 'departmentId', fixed: 'left', },
     { title: 'Department NAME', dataIndex: 'departmentName', key: 'departmentName' },
     { title: 'Location ', dataIndex: 'location', key: 'location' },
     { title: 'STATUS', dataIndex: 'status', key: 'status' },
@@ -18,7 +18,7 @@ const DepartmentTable = ({ departments, onEdit, onDelete }) => {
             Edit
           </Button>
           <Button danger onClick={() => onDelete(record.id)}>
-          InActive
+          Delete
           </Button>
         </Space>
       ),

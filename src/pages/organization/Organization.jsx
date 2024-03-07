@@ -1,175 +1,118 @@
-// OrganizationTable.js
-import React, { useState } from 'react';
-import { Table, Button, Modal, Space, Input } from 'antd';
-import OrganizationForm from './OrganizationForm';
+import React, { useState, useEffect } from "react";
+import { Button, Modal, Input } from "antd";
+import { connect } from "react-redux";
+import {
+  fetchOrganizations,
+  updateOrganization,
+  saveOrganization,
+  deleteOrganization,
+} from "../../store/actions/OrganizationActions";
+import OrganizationTable from "./OrganizationTable";
+import OrganizationForm from "./OrganizationForm";
 
-const OrganizationTable = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedOrganization, setSelectedOrganization] = useState(null);
-  const [searchText, setSearchText] = useState('');
+const OrganizationPage = ({
+  organizations,
+  fetchOrganizations,
+  updateOrganization,
+  saveOrganization,
+  deleteOrganization,
+}) => {
+  const [visible, setVisible] = useState(false);
+  const [editingOrganization, setEditingOrganization] = useState(null);
+  const [searchText, setSearchText] = useState("");
 
-  const organizations = [
-    // Sample data, replace this with your actual data
-    {
-      key: '1',
-      organizationId: '1',
-      organizationName: 'ABC Corp',
-      location: 'City',
-      locationAddress: '123 Street, City',
-      contactNo: '1234567890',
-      email: 'abc@example.com',
-      gstin: 'GST123',
-    },
-    {
-      key: '2',
-      organizationId: '2',
-      organizationName: ' Corp',
-      location: 'City',
-      locationAddress: '123 Street, City',
-      contactNo: '1234567890',
-      email: 'abc@example.com',
-      gstin: 'GST123',
-    },
-    {
-      key: '3',
-      organizationId: '3',
-      organizationName: 'ABC Corp',
-      location: 'City',
-      locationAddress: '123 Street, City',
-      contactNo: '1234567890',
-      email: 'abc@example.com',
-      gstin: 'GST123',
-    }, {
-      key: '4',
-      organizationId: '4',
-      organizationName: 'ABC Corp',
-      location: 'City',
-      locationAddress: '123 Street, City',
-      contactNo: '123567890',
-      email: 'abc@example.com',
-      gstin: 'GST123',
-    },
-    // Add more organization objects as needed
-  ];
+  useEffect(() => {
+    fetchOrganizations();
+  }, [fetchOrganizations]);
 
-
-  const filteredOrganizations = organizations.filter((org) =>
-    Object.values(org).some(
-      (value) =>
-        value &&
-        typeof value === "string" &&
-        value.toLowerCase().includes(searchText.toLowerCase())
-    )
-  );
-
-  const columns = [
-    {
-      title: 'Sub-Organization ID',
-      dataIndex: 'organizationId',
-      key: 'organizationId',
-    },
-    {
-      title: 'Sub-Organization Name',
-      dataIndex: 'organizationName',
-      key: 'organizationName',
-    },
-    {
-      title: 'Location',
-      dataIndex: 'location',
-      key: 'location',
-    },
-    {
-      title: 'Location Address',
-      dataIndex: 'locationAddress',
-      key: 'locationAddress',
-    },
-    {
-      title: 'Contact No.',
-      dataIndex: 'contactNo',
-      key: 'contactNo',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'GSTIN',
-      dataIndex: 'gstin',
-      key: 'gstin',
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (text, record) => (
-        <Space>
-          <Button type="primary" style={{backgroundColor:'#ff8a00'}} onClick={() => handleEdit(record)}>
-            Edit
-          </Button>
-          <Button danger onClick={() => handleDelete(record.key)}>
-          InActive
-          </Button>
-        </Space>
-      ),
-    },
-  ];
-
-  const showModal = () => {
-    setIsModalVisible(true);
+  const handleEdit = (organization) => {
+    console.log(organization);
+    setEditingOrganization(organization);
+    setVisible(true);
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const handleDelete = (organizationId) => {
+    deleteOrganization(organizationId);
   };
 
-  const handleEdit = (record) => {
-    setSelectedOrganization(record);
-    setIsModalVisible(true);
-  };
+  const handleFormSubmit = async (values) => {
+    try {
+      if (editingOrganization) {
+        await updateOrganization(editingOrganization.id, values);
+      } else {
+        await saveOrganization(values);
+      }
 
-  const handleDelete = (key) => {
-    // Handle delete action
-    const updatedOrganizations = organizations.filter((org) => org.key !== String(key));
-    console.log('Delete organization with key:', key);
-    console.log('Updated organizations:', updatedOrganizations);
-  };
-
-
-  const handleFormSubmit = (values) => {
-    // Handle form submission, you can send the form data to the server or perform any other action
-    console.log('Received form values:', values);
-    setIsModalVisible(false);
+      setVisible(false);
+      setEditingOrganization(null);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
     <div>
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          marginBottom: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <Input
           placeholder="Search organizations"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: '200px' }}
+          style={{ width: "200px" }}
         />
-        <Button type="primary" style={{backgroundColor:'#ff8a00'}}  onClick={showModal}>
+        <Button
+          type="primary"
+          className="saitheme-btn"
+          onClick={() => setVisible(true)}
+        >
           Add Organization
         </Button>
       </div>
-
-      <Table dataSource={filteredOrganizations} columns={columns} pagination={{ pageSize: 5 }} />
+      <OrganizationTable
+    
+        organizations={organizations.filter((organization) =>
+          Object.values(organization).some(
+            (value) =>
+              typeof value === "string" &&
+              value.toLowerCase().includes(searchText.toLowerCase())
+          ))}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
       <Modal
-        title={selectedOrganization ? 'Edit Organization' : 'Add Organization'}
-        visible={isModalVisible}
-        onCancel={handleCancel}
+        title={editingOrganization ? "Edit Organization" : "Add Organization"}
+        visible={visible}
+        onCancel={() => {
+          setEditingOrganization(null);
+          setVisible(false);
+        }}
         footer={null}
       >
         <OrganizationForm
-          initialValues={selectedOrganization}
+          key={editingOrganization ? `edit-${editingOrganization.id}` : "add"}
           onSubmit={handleFormSubmit}
+          initialValues={editingOrganization}
         />
       </Modal>
     </div>
   );
 };
 
-export default OrganizationTable;
+const mapStateToProps = (state) => ({
+  organizations: state.organizations.organizations,
+});
+
+const mapDispatchToProps = {
+  fetchOrganizations,
+  updateOrganization,
+  saveOrganization,
+  deleteOrganization,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrganizationPage);

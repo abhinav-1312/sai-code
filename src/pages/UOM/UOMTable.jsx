@@ -6,9 +6,9 @@ const UOMTable = ({ uoms, onEdit, onDelete }) => {
   const columns = [
     { title: 'UOM CODE', dataIndex: 'uomCode', key: 'uomCode', fixed: 'left', width: 120 },
     { title: 'UOM NAME', dataIndex: 'uomName', key: 'uomName' },
-    { title: 'UOM DESCRIPTION', dataIndex: 'uomDescription', key: 'uomDescription' },
+    { title: 'UOM DESCRIPTION', dataIndex: 'uomDesc', key: 'uomDescription' },
     { title: 'CLASS NAME', dataIndex: 'className', key: 'className' },
-    { title: 'BASE UOM NAME', dataIndex: 'baseUomName', key: 'baseUomName' },
+    { title: 'BASE UOM NAME', dataIndex: 'baseUom', key: 'baseUomName' },
     { title: 'END DATE', dataIndex: 'endDate', key: 'endDate' },
     {
       title: 'Actions',
@@ -20,7 +20,7 @@ const UOMTable = ({ uoms, onEdit, onDelete }) => {
             Edit
           </Button>
           <Button danger onClick={() => onDelete(record.id)}>
-          InActive
+            InActive
           </Button>
         </Space>
       ),

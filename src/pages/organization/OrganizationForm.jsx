@@ -1,59 +1,108 @@
-// OrganizationForm.js
-import React from 'react';
-import { Form, Input, Button, Row, Col } from 'antd';
+import React from "react";
+import { Form, Input, Button, Select, Row, Col } from "antd";
 
-const OrganizationForm = ({ initialValues, onSubmit }) => {
+const { Option } = Select;
+
+const OrganizationForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
-    onSubmit(values);
+    const formattedValues = {
+      ...values,
+      userId: "123457",
+    };
+    onSubmit(formattedValues);
     form.resetFields();
   };
 
   return (
     <Form
       form={form}
-      labelCol={{ span: 6 }}
-      wrapperCol={{ span: 12 }}
-      initialValues={initialValues}
       onFinish={onFinish}
+      initialValues={initialValues}
+      layout="vertical"
     >
-      <Form.Item label="Organization ID" name="organizationId">
-        <Input disabled />
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            name="organizationName"
+            label="Organization Name"
+            rules={[
+              { required: true, message: "Please enter Organization Name" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item name="parentOrgId" label="Parent Organization ID">
+            <Input />
+          </Form.Item>
+        </Col>
+      </Row>
 
-      <Form.Item label="Organization Name" name="organizationName" rules={[{ required: true }]}>
-        <Input placeholder="Enter Organization Name" />
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            name="location"
+            label="Location"
+            rules={[{ required: true, message: "Please enter Location" }]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item name="locationAddress" label="Location Address">
+            <Input />
+          </Form.Item>
+        </Col>
+      </Row>
 
-      <Form.Item label="Location" name="location" rules={[{ required: true }]}>
-        <Input placeholder="Enter Location" />
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            name="contactNo"
+            label="Contact No."
+            rules={[{ required: true, message: "Please enter Contact No." }]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Please enter Email" }]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+      </Row>
 
-      <Form.Item label="Location Address" name="locationAddress" rules={[{ required: true }]}>
-        <Input.TextArea placeholder="Enter Location Address" />
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item name="gstin" label="GSTIN">
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            name="status"
+            label="Status"
+            rules={[{ required: true, message: "Please select Status" }]}
+          >
+            <Select>
+              <Option value="Active">Active</Option>
+              <Option value="Inactive">Inactive</Option>
+            </Select>
+          </Form.Item>
+        </Col>
+      </Row>
 
-      <Form.Item label="Contact No." name="contactNo" rules={[{ required: true }]}>
-        <Input placeholder="Enter Contact No." />
-      </Form.Item>
-
-      <Form.Item label="Email" name="email" rules={[{ type: 'email', required: true }]}>
-        <Input placeholder="Enter Email" />
-      </Form.Item>
-
-      <Form.Item label="GSTIN" name="gstin" rules={[{ required: true }]}>
-        <Input placeholder="Enter GSTIN" />
-      </Form.Item>
-
-      <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Col>
-        </Row>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
       </Form.Item>
     </Form>
   );

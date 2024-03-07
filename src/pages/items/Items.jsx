@@ -38,18 +38,102 @@ const ItemsPage = () => {
   const [locators, setLocators] = useState([]);
   const [vendors, setVendors] = useState([]);
 
-  const brands = [
-    { id: 0, value: "Beiter" },
-    { id: 1, value: "Fivis" },
-    { id: 2, value: "Hoyt" },
-    { id: 3, value: "Indegeneous" },
-  ];
-  const colors = [
-    { id: 0, value: "Black" },
-    { id: 1, value: "Silver" },
-    { id: 2, value: "Multicoloured" },
-    { id: 3, value: "White" },
-  ];
+  const itemNames = {
+    "001": "Arrow Pullar",
+    "002": "Arrow Liner",
+    "003": "Arm Guard",
+    "004": "Arrow Rest Plastic",
+    "005": "Beiter Clicker",
+    "006": "Bow Guage",
+
+  };
+
+  // const types = [{ id: "9", value: "NA" }];
+  const types = {
+    9: "NA",
+    1: "Track",
+    2: "Field",
+
+  };
+  // const disciplines = [
+  //   { id: "01", value: "Archery" },
+  //   { id: "11", value: "Common Use" },
+  //   { id: "10", value: "Wrestling" },
+  // ];
+  const disciplines = {
+    "01": "Archery",
+    11: "Common Use",
+    10: "Wrestling",
+  };
+
+  // const subCategories = [
+  //   { id: "1", value: "Games" },
+  //   { id: "2", value: "Athletics" },
+  //   { id: "9", value: "NA" },
+  // ];
+  const subCategories = {
+    2: "Games",
+    1: "Athletics",
+    9: "NA",
+  };
+
+  // const categories = [
+  //   { id: "1", value: "FOP" },
+  //   { id: "2", value: "NON FOP" },
+  // ];
+  const categories = {
+    1: "FOP",
+    2: "NON FOP",
+  };
+
+  // const sizes = [
+  //   { id: "001", value: "Normal" },
+  //   { id: "003", value: "Small" },
+  // ];
+  const sizes = {
+    "001": "Normal",
+    "002": "0",
+    "003": "25",
+  };
+
+  // const usageCategories = [
+  //   { id: "2", value: "Non consumable" },
+  //   { id: "1", value: "Consumable" },
+  // ];
+  const usageCategories = {
+    2: "Non consumable",
+    1: "Consumable",
+  };
+
+  // const brands = [
+  //   { id: "001", value: "Fivics" },
+  //   { id: "002", value: "Beiter" },
+  //   { id: "003", value: "Fivis" },
+  //   { id: "004", value: "Hoyt" },
+  //   { id: "005", value: "Indegeneous" },
+  // ];
+
+  const brands = {
+    "001": "Fivics",
+    "002": "Beiter",
+    "003": "Fivis",
+    "004": "Hoyt",
+    "005": "Indegeneous",
+  };
+
+  // const colors = [
+  //   { id: "01", value: "Black" },
+  //   { id: "02", value: "Silver" },
+  //   { id: "03", value: "Multicoloured" },
+  //   { id: "04", value: "White" },
+  // ];
+  const colors = {
+    "01": "Black",
+    "02": "Silver",
+    "03": "Multicoloured",
+    "04": "White",
+    "07": "Yellow",
+  };
 
   const getUoms = async () => {
     const uomResponse = await apiRequest(
@@ -134,22 +218,30 @@ const ItemsPage = () => {
             key: item.id,
             id: item.id,
             itemCode: item.itemMasterCd,
-            itemDescription: item.itemMasterDesc,
+            itemDescription: item.itemName
+              ? itemNames[item.itemName]
+              : "Default",
             uom: uomResponse?.uomName || "default UOM",
             quantityOnHand: item.quantity,
             location: locationResponse?.locationName,
             locatorCode: locatorResponse?.location,
             price: item.price,
             vendorDetail: vendorResponse?.vendorName,
-            category: item.category,
-            subcategory: item.subCategory,
-            type: item.type,
-            disciplines: item.disciplines,
-            brand: brands[item.brandId]["value"],
-            colour: colors[item.colorId]["value"],
-            size: 30,
-            usageCategory: item.usageCategory,
-            reOrderPoint: 2,
+            category: item.category ? categories[item.category] : "Default",
+            subcategory: item.subCategory
+              ? subCategories[item.subCategory]
+              : "Default",
+            type: item.type ? types[item.type] : "Default",
+            disciplines: item.disciplines
+              ? disciplines[item.disciplines]
+              : "Default",
+            brand: item.brandId ? brands[item.brandId] : "Default",
+            colour: item.colorId ? colors[item.colorId] : "Default",
+            size: item.size ? sizes[item.size] : "Default",
+            usageCategory: item.usageCategory
+              ? usageCategories[item.usageCategory]
+              : "Default",
+            reOrderPoint: 1,
             minStockLevel: item.minStockLevel,
             maxStockLevel: item.maxStockLevel,
             status: item.status === "A" ? "Active" : "InActive",
@@ -197,6 +289,7 @@ const ItemsPage = () => {
     const tempItem = {
       ...item,
       endDate: dayjs(new Date(year, month, date)),
+      reOrderPoint: 1,
     };
     setEditingItem(tempItem);
     setVisible(true);
@@ -219,10 +312,17 @@ const ItemsPage = () => {
     setEditingItem(null);
     const tempItem = {
       ...values,
+      
       uomId: Number(values.uomId),
       createUserId: "12345",
       endDate: values.endDate.format("DD/MM/YYYY"),
+      itemName: values.itemMasterDesc,
     };
+
+    if (!tempItem.itemMasterCd) {
+      delete tempItem.itemMasterCd;
+    }
+    delete tempItem.reOrderPoint;
 
     if (editingItem) {
       if (selectedId) {
@@ -270,8 +370,16 @@ const ItemsPage = () => {
         </Button>
       </div>
       <ItemsTable
+        // items={items.filter((item) =>
+        //   item.itemDescription.toLowerCase().includes(searchText.toLowerCase()) ||
+        //   item.itemCode.toLowerCase().includes(searchText.toLowerCase())
+        // )}
         items={items.filter((item) =>
-          item.itemDescription.toLowerCase().includes(searchText.toLowerCase())
+          Object.values(item).some(
+            (value) =>
+              typeof value === "string" &&
+              value.toLowerCase().includes(searchText.toLowerCase())
+          )
         )}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -296,6 +404,13 @@ const ItemsPage = () => {
           vendors={vendors}
           brands={brands}
           colors={colors}
+          itemNames={itemNames}
+          types={types}
+          subCategories={subCategories}
+          categories={categories}
+          usageCategories={usageCategories}
+          sizes={sizes}
+          disciplines={disciplines}
         />
       </Modal>
     </div>

@@ -1,72 +1,100 @@
-// EmployeePage.js
-import React, { useState } from 'react';
-import { Button, Modal, Input } from 'antd';
-import EmployeeTable from './EmployeeTable';
-import EmployeeForm from './EmployeeForm';
+import React, { useState, useEffect } from "react";
+import { Button, Modal, Input } from "antd";
+import { connect } from "react-redux";
+import {
+  fetchEmployees,
+  updateEmployee,
+  saveEmployee,
+  deleteEmployee,
+} from "../../store/actions/EmployeeActions";
+import EmployeeTable from "./EmployeeTable";
+import EmployeeForm from "./EmployeeForm";
+import dayjs from "dayjs";
 
-const initialEmployees = [
-  {
-    id: 1,
-    employeeCode: 'E001',
-    firstName: 'John',
-    lastName: 'Doe',
-    contactNo: '9876543210',
-    email: 'john.doe@example.com',
-    department: 'IT',
-    joiningDate: '2023-01-01',
-    salaryInformation: '$60,000',
-    status: 'Active',
-  },
-  // Add more dummy data as needed
-];
-
-const EmployeePage = () => {
-  const [employees, setEmployees] = useState(initialEmployees);
+const EmployeePage = ({
+  employees,
+  fetchEmployees,
+  updateEmployee,
+  saveEmployee,
+  deleteEmployee,
+}) => {
   const [visible, setVisible] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   const handleEdit = (employee) => {
-    setEditingEmployee(employee);
+    const dateObject = new Date(employee.endDate);
+    const year = dateObject.getFullYear();
+    const month = dateObject.getMonth();
+    const date = dateObject.getDate();
+    const tempItem = {
+      ...employee,
+      endDate: dayjs(new Date(year, month, date)),
+    };
+    setEditingEmployee(tempItem);
     setVisible(true);
   };
 
   const handleDelete = (employeeId) => {
-    // Implement delete logic here
+    deleteEmployee(employeeId);
   };
 
-  const handleFormSubmit = (values) => {
-    if (editingEmployee) {
-      // Implement update logic here
-    } else {
-      // Implement create logic here
+  const handleFormSubmit = async (values) => {
+    try {
+      if (editingEmployee) {
+        await updateEmployee(editingEmployee.id, values);
+      } else {
+        await saveEmployee(values);
+      }
+
+      setVisible(false);
+      setEditingEmployee(null);
+    } catch (error) {
+      console.error("Error:", error);
     }
-    setVisible(false);
   };
 
   return (
     <div>
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          marginBottom: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <Input
           placeholder="Search employees"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: '200px' }}
+          style={{ width: "200px" }}
         />
-        <Button type="primary" className='saitheme-btn' onClick={() => setVisible(true)}>
+        <Button
+          type="primary"
+          className="saitheme-btn"
+          onClick={() => setVisible(true)}
+        >
           Add Employee
         </Button>
       </div>
       <EmployeeTable
         employees={employees.filter((employee) =>
-          employee.firstName.toLowerCase().includes(searchText.toLowerCase())
+          Object.values(employee).some(
+            (value) =>
+              typeof value === "string" &&
+              value.toLowerCase().includes(searchText.toLowerCase())
+          )
         )}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
 
       <Modal
-        title={editingEmployee ? 'Edit Employee' : 'Add Employee'}
+        title={editingEmployee ? "Edit Employee" : "Add Employee"}
         visible={visible}
         onCancel={() => {
           setEditingEmployee(null);
@@ -74,10 +102,25 @@ const EmployeePage = () => {
         }}
         footer={null}
       >
-        <EmployeeForm onSubmit={handleFormSubmit} initialValues={editingEmployee} />
+        <EmployeeForm
+          key={editingEmployee ? `edit-${editingEmployee.id}` : "add"}
+          onSubmit={handleFormSubmit}
+          initialValues={editingEmployee}
+        />
       </Modal>
     </div>
   );
 };
 
-export default EmployeePage;
+const mapStateToProps = (state) => ({
+  employees: state.employees.employees,
+});
+
+const mapDispatchToProps = {
+  fetchEmployees,
+  updateEmployee,
+  saveEmployee,
+  deleteEmployee,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(EmployeePage);

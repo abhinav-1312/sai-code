@@ -42,13 +42,13 @@ const PrintGrnform = forwardRef((props, ref) => {
 
         <Row gutter={24}>
           <Col span={8}>
-            <Form.Item label="Consignee Detail :" name="consigneeDetail">
+            <Form.Item label="CONSIGNEE DETAIL :" name="consigneeDetail">
               <Input />
             </Form.Item>
             <Form.Item label="REGIONAL CENTER CODE :" name="regionalCenterCode">
               <Input />
             </Form.Item>
-            <Form.Item label="REGIONAL CENTER NAME :" name="regionalCenterName">
+            <Form.Item label="REGIONAL CENTER NAME  :" name="regionalCenterName">
               <Input />
             </Form.Item>
             <Form.Item label="ADDRESS :" name="consigneeAddress">
@@ -64,10 +64,10 @@ const PrintGrnform = forwardRef((props, ref) => {
               <Form.Item label="CONSIGNOR DETAIL :" name="consignorDetail">
                 <Input />
               </Form.Item>
-              <Form.Item label="Supplier Code :" name="supplierCode">
+              <Form.Item label="SUPPLIER CODE :" name="supplierCode">
                 <Input />
               </Form.Item>
-              <Form.Item label="Supplier Name :" name="supplierName">
+              <Form.Item label="SUPPLIER NAME :" name="supplierName">
                 <Input />
               </Form.Item>
               <Form.Item label="Address:" name="supplierAddress">
@@ -89,13 +89,13 @@ const PrintGrnform = forwardRef((props, ref) => {
 
           {Type === '3' && (
             <Col span={8}>
-              <Form.Item label="Consignor Detail" name="consignorDetail">
+              <Form.Item label="CONSIGNOR DETAIL" name="consignorDetail">
                 <Input />
               </Form.Item>
-              <Form.Item label="Regional Center Code" name="regionalCenterCodeConsignor">
+              <Form.Item label="REGIONAL CENTER CODE" name="regionalCenterCodeConsignor">
                 <Input />
               </Form.Item>
-              <Form.Item label="Regional Center Name" name="regionalCenterNameConsignor">
+              <Form.Item label="REGIONAL CENTER NAME " name="regionalCenterNameConsignor">
                 <Input />
               </Form.Item>
               <Form.Item label="ADDRESS :" name="consignorAddress">

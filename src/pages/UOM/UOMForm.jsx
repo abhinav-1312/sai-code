@@ -1,12 +1,18 @@
 // UOMForm.js
 import React from 'react';
 import { Form, Input, Button, Row, Col, DatePicker } from 'antd';
+import moment from 'moment';
 
 const UOMForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
-    onSubmit(values);
+    const formattedValues = {
+      ...values,
+      endDate: values.endDate ? moment(values.endDate).format('DD/MM/YYYY') : null,
+      userId: '123457',
+    };
+    onSubmit(formattedValues);
     form.resetFields();
   };
 
@@ -24,7 +30,7 @@ const UOMForm = ({ onSubmit, initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item name="uomDescription" label="UOM Description" rules={[{ required: true, message: 'Please enter UOM Description' }]}>
+          <Form.Item name="uomDesc" label="UOM Description" rules={[{ required: true, message: 'Please enter UOM Description' }]}>
             <Input />
           </Form.Item>
         </Col>
@@ -37,7 +43,7 @@ const UOMForm = ({ onSubmit, initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item name="baseUomName" label="Base UOM Name" rules={[{ required: true, message: 'Please enter Base UOM Name' }]}>
+          <Form.Item name="baseUom" label="Base UOM Name" rules={[{ required: true, message: 'Please enter Base UOM Name' }]}>
             <Input />
           </Form.Item>
         </Col>

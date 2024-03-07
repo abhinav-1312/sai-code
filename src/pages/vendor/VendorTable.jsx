@@ -4,16 +4,15 @@ import { Table, Space, Button } from 'antd';
 
 const VendorTable = ({ vendors, onEdit, onDelete }) => {
   const columns = [
-    { title: 'S NO.', dataIndex: 'id', key: 'id', fixed: 'left', },
-    { title: 'VENDOR ID', dataIndex: 'vendorId', key: 'vendorId', fixed: 'left', },
+    { title: 'VENDOR ID', dataIndex: 'id', key: 'vendorId', fixed: 'left', },
     { title: 'VENDOR NAME', dataIndex: 'vendorName', key: 'vendorName', fixed: 'left', },
     { title: 'CONTACT PERSON', dataIndex: 'contactPerson', key: 'contactPerson' },
     { title: 'ADDRESS', dataIndex: 'address', key: 'address' },
     { title: 'CONTACT NO.', dataIndex: 'contactNo', key: 'contactNo' },
-    { title: 'ZIP CODE', dataIndex: 'zipCode', key: 'zipCode' },
-    { title: 'VENDOR EMAIL', dataIndex: 'vendorEmail', key: 'vendorEmail' },
-    { title: 'PAN NO.', dataIndex: 'panNo', key: 'panNo' },
-    { title: 'GSTIN NO.', dataIndex: 'gstinNo', key: 'gstinNo' },
+    { title: 'ZIP CODE', dataIndex: 'zipcode', key: 'zipCode' },
+    { title: 'VENDOR EMAIL', dataIndex: 'email', key: 'vendorEmail' },
+    { title: 'PAN NO.', dataIndex: 'pan', key: 'panNo' },
+    { title: 'GSTIN NO.', dataIndex: 'gstin', key: 'gstinNo' },
     { title: 'TYPE', dataIndex: 'type', key: 'type' },
     { title: 'APPROVAL', dataIndex: 'approval', key: 'approval' },
     { title: 'STATUS', dataIndex: 'status', key: 'status' },
@@ -27,7 +26,7 @@ const VendorTable = ({ vendors, onEdit, onDelete }) => {
             Edit
           </Button>
           <Button danger onClick={() => onDelete(record.id)}>
-            InActive
+            Delete
           </Button>
         </Space>
       ),

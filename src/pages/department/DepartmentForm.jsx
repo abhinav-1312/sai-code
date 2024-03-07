@@ -1,14 +1,17 @@
 // UserForm.js
 import React from 'react';
-import { Form, Input, Button, Select, Row, Col } from 'antd';
+import { Form, Input, Button, Row, Col } from 'antd';
 
-const { Option } = Select;
 
 const DepartmentForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
-    onSubmit(values);
+    const formattedValues = {
+      ...values,
+      userId: '123457',
+    };
+    onSubmit(formattedValues);
     form.resetFields();
   };
 
@@ -16,7 +19,7 @@ const DepartmentForm = ({ onSubmit, initialValues }) => {
     <Form form={form} onFinish={onFinish} initialValues={initialValues} layout="vertical">
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item name="departmentId" label="Department ID" rules={[{ required: true, message: 'Please enter Department ID' }]}>
+          <Form.Item name="id" label="Department ID" rules={[{ required: true, message: 'Please enter Department ID' }]}>
             <Input />
           </Form.Item>
         </Col>

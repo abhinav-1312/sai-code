@@ -22,6 +22,13 @@ const ItemsForm = ({
   vendors,
   brands,
   colors,
+  itemNames,
+  sizes,
+  categories,
+  subCategories,
+  usageCategories,
+  types,
+  disciplines,
 }) => {
   const [form] = Form.useForm();
 
@@ -29,7 +36,6 @@ const ItemsForm = ({
     onSubmit(values);
     form.resetFields();
   };
-
   return (
     <Form
       form={form}
@@ -39,12 +45,8 @@ const ItemsForm = ({
     >
       <Row gutter={16}>
         <Col span={8}>
-          <Form.Item
-            name="itemMasterCd"
-            label="Item Code"
-            rules={[{ required: true, message: "Please enter Item Code" }]}
-          >
-            <Input />
+          <Form.Item name="itemMasterCd" label="Item Code">
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -55,7 +57,15 @@ const ItemsForm = ({
               { required: true, message: "Please enter Item Description" },
             ]}
           >
-            <Input />
+            <Select>
+              {Object.entries(itemNames).map(([key, value]) => {
+                return (
+                  <Option key={key} value={key}>
+                    {value}
+                  </Option>
+                );
+              })}
+            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -152,7 +162,15 @@ const ItemsForm = ({
             label="Category"
             rules={[{ required: true, message: "Please enter Category" }]}
           >
-            <Input />
+            <Select>
+              {Object.entries(categories).map(([key, value]) => {
+                return (
+                  <Option key={key} value={key}>
+                    {value}
+                  </Option>
+                );
+              })}
+            </Select>
           </Form.Item>
         </Col>
       </Row>
@@ -164,7 +182,15 @@ const ItemsForm = ({
             label="SUB-CATEGORY"
             rules={[{ required: true, message: "Please enter SUB-CATEGORY" }]}
           >
-            <Input />
+            <Select>
+              {Object.entries(subCategories).map(([key, value]) => {
+                return (
+                  <Option key={key} value={key}>
+                    {value}
+                  </Option>
+                );
+              })}
+            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -173,7 +199,15 @@ const ItemsForm = ({
             label=" Type"
             rules={[{ required: true, message: "Please enter Item Type" }]}
           >
-            <Input />
+            <Select>
+              {Object.entries(types).map(([key, value]) => {
+                return (
+                  <Option key={key} value={key}>
+                    {value}
+                  </Option>
+                );
+              })}
+            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -182,7 +216,15 @@ const ItemsForm = ({
             label="Disciplines"
             rules={[{ required: true, message: "Please enter Disciplines" }]}
           >
-            <Input />
+            <Select>
+              {Object.entries(disciplines).map(([key, value]) => {
+                return (
+                  <Option key={key} value={key}>
+                    {value}
+                  </Option>
+                );
+              })}
+            </Select>
           </Form.Item>
         </Col>
       </Row>
@@ -195,10 +237,10 @@ const ItemsForm = ({
             rules={[{ required: true, message: "Please enter Brand " }]}
           >
             <Select>
-              {brands.map((brand, index) => {
+              {Object.entries(brands).map(([key, value]) => {
                 return (
-                  <Option key={index} value={brand.id}>
-                    {brand.value}
+                  <Option key={key} value={key}>
+                    {value}
                   </Option>
                 );
               })}
@@ -211,7 +253,15 @@ const ItemsForm = ({
             label="Size "
             rules={[{ required: true, message: "Please enter Size" }]}
           >
-            <Input />
+            <Select>
+              {Object.entries(sizes).map(([key, value]) => {
+                return (
+                  <Option key={key} value={key}>
+                    {value}
+                  </Option>
+                );
+              })}
+            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -221,10 +271,10 @@ const ItemsForm = ({
             rules={[{ required: true, message: "Please enter Colour" }]}
           >
             <Select>
-              {colors.map((color, index) => {
+              {Object.entries(colors).map(([key, value]) => {
                 return (
-                  <Option key={index} value={color.id}>
-                    {color.value}
+                  <Option key={key} value={key}>
+                    {value}
                   </Option>
                 );
               })}
@@ -274,7 +324,15 @@ const ItemsForm = ({
             label="Usage Category"
             rules={[{ required: true, message: "Please enter Category" }]}
           >
-            <Input />
+            <Select>
+              {Object.entries(usageCategories).map(([key, value]) => {
+                return (
+                  <Option key={key} value={key}>
+                    {value}
+                  </Option>
+                );
+              })}
+            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>

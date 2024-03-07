@@ -1,6 +1,7 @@
 // EmployeeForm.js
 import React from 'react';
 import { Form, Input, Button, Select, DatePicker, Row, Col } from 'antd';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -8,7 +9,14 @@ const EmployeeForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
-    onSubmit(values);
+    const formattedValues = {
+      ...values,
+      organizationId: 0,
+      departmentId:0,
+      endDate: values.endDate ? moment(values.endDate).format('DD/MM/YYYY') : null,
+      userId: '123457',
+    };
+    onSubmit(formattedValues);
     form.resetFields();
   };
 
@@ -44,7 +52,7 @@ const EmployeeForm = ({ onSubmit, initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item name="department" label="Department" rules={[{ required: true, message: 'Please enter Department' }]}>
+          <Form.Item name="departmentName" label="Department" rules={[{ required: true, message: 'Please enter Department' }]}>
             <Input />
           </Form.Item>
         </Col>
@@ -52,12 +60,12 @@ const EmployeeForm = ({ onSubmit, initialValues }) => {
 
       <Row gutter={16}>
         <Col span={8}>
-          <Form.Item name="joiningDate" label="Joining Date" rules={[{ required: true, message: 'Please select Joining Date' }]}>
+          <Form.Item name="endDate" label="Joining Date" rules={[{ required: true, message: 'Please select Joining Date' }]}>
             <DatePicker />
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item name="salaryInformation" label="Salary Information" rules={[{ required: true, message: 'Please enter Salary Information' }]}>
+          <Form.Item name="salary" label="Salary Information" rules={[{ required: true, message: 'Please enter Salary Information' }]}>
             <Input />
           </Form.Item>
         </Col>
@@ -72,7 +80,7 @@ const EmployeeForm = ({ onSubmit, initialValues }) => {
       </Row>
       <Row gutter={16}>
         <Col span={8}>
-          <Form.Item name="subOrganization" label="Sub-Organization " rules={[{ required: true, message: 'Please enter Sub-Organization ' }]}>
+          <Form.Item name="organizationName" label="Sub-Organization " rules={[{ required: true, message: 'Please enter Sub-Organization ' }]}>
             <Input />
           </Form.Item>
         </Col>

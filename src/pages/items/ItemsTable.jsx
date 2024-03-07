@@ -1,8 +1,16 @@
 // ItemsTable.js
 import React from "react";
-import { Table, Space, Button } from "antd";
+import { Table, Space, Button, Popconfirm, message } from "antd";
 
 const ItemsTable = ({ items, onEdit, onDelete }) => {
+  const confirm = (e) => {
+    message.success("Item Deleted");
+  };
+
+  const cancel = (e) => {
+    message.error("Deletion Cancelled");
+  };
+
   const columns = [
     { title: "S NO.", dataIndex: "id", key: "id", fixed: "left", width: 80 },
     {
@@ -25,7 +33,7 @@ const ItemsTable = ({ items, onEdit, onDelete }) => {
     },
     { title: "LOCATION", dataIndex: "location", key: "location" },
     {
-      title: "LOCATOR CODE/Desc",
+      title: "LOCATOR CODE",
       dataIndex: "locatorCode",
       key: "locatorCode",
     },
@@ -64,16 +72,28 @@ const ItemsTable = ({ items, onEdit, onDelete }) => {
       fixed: "right",
       render: (_, record) => (
         <Space>
-          <Button
+          {/* <Button
             type="primary"
             className="saitheme-btn"
             onClick={() => onEdit(record)}
+            disabled
           >
             Edit
-          </Button>
-          <Button danger onClick={() => onDelete(record.id)}>
-            InActive
-          </Button>
+          </Button> */}
+          <Popconfirm
+            title="Delete the item"
+            description="Are you sure to delete this item?"
+            onConfirm={(e) => {
+              onDelete(record.id);
+              confirm(e);
+            }}
+            onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger>Delete</Button>
+          </Popconfirm>
+          {/* { () => {onDelete(record.id)}} */}
         </Space>
       ),
     },
