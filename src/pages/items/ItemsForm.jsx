@@ -195,8 +195,8 @@ const ItemsForm = ({
           const data = response.data.responseData;
           console.log("ITEM DESC DATA: ", data)
           const itemDescriptionOptions = data?.map((itemDescription) => ({
-            key: itemDescription.itemName,
-            value: itemDescription.itemNameCode,
+            key: itemDescription.itemNameCode,
+            value: itemDescription.itemName
           }));
           setItemDescriptionOptions(itemDescriptionOptions);
           setItemDescriptionDisabled(false);
