@@ -193,7 +193,6 @@ const ItemsForm = ({
             }
           );
           const data = response.data.responseData;
-          console.log("ITEM DESC DATA: ", data)
           const itemDescriptionOptions = data?.map((itemDescription) => ({
             key: itemDescription.itemNameCode,
             value: itemDescription.itemName
