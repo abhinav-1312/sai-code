@@ -1,5 +1,5 @@
 // RetunNote.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -8,22 +8,20 @@ import {
   Button,
   Row,
   Col,
-  Typography,
+  AutoComplete,
   Modal,
   message,
 } from "antd";
-import { MinusCircleOutlined } from "@ant-design/icons";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
-import FormInputItem from "../../../components/FormInputItem";
-import { printOrSaveAsPDF } from "../../../utils/Functions";
+import { apiHeader } from "../../../utils/Functions";
 const dateFormat = "DD/MM/YYYY";
 
-const { Title } = Typography;
+// Hello
 
+const { Option } = Select;
 const RetunNote = () => {
-  const [buttonVisible, setButtonVisible] = useState(false)
-  const formRef = useRef()
   const [Type, setType] = useState("1");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -106,11 +104,13 @@ const RetunNote = () => {
     fetchUomMaster();
   }, []);
 
+  const token = localStorage.getItem("token")
+
   const fetchUomMaster = async () => {
     try {
       const uomMasterUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
-      const uomMaster = await axios.get(uomMasterUrl);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+      const uomMaster = await axios.get(uomMasterUrl, apiHeader("GET", token));
       const { responseData: uomMasterData } = uomMaster.data;
       setUomMaster([...uomMasterData]);
     } catch (error) {
@@ -121,8 +121,8 @@ const RetunNote = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
-      const response = await axios.get(apiUrl);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
     } catch (error) {
@@ -130,14 +130,12 @@ const RetunNote = () => {
     }
   };
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
-        userCd,
-        password
+        userCd: "dkg",
+        password: "string",
       });
 
       const { responseData } = response.data;
@@ -165,11 +163,11 @@ const RetunNote = () => {
   const handleIssueNoteNoChange = async (value) => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "ISN",
-      });
+      }, apiHeader("POST", token));
       const responseData = response.data.responseData;
       const { processData, itemList } = responseData;
       const issueNoteDt = processData?.issueNoteDt;
@@ -248,8 +246,8 @@ const RetunNote = () => {
       });
 
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveReturnNote";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveReturnNote";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       // Handle success response here
       if (
         response.status === 200 &&
@@ -266,7 +264,6 @@ const RetunNote = () => {
             returnNoteNo: processId,
           };
         });
-        setButtonVisible(true)
         setSuccessMessage(
           `Return Note successfully! Return Note : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -277,6 +274,7 @@ const RetunNote = () => {
       } else {
         // Display a generic success message if specific data is not available
         message.error("Failed to Return Note. Please try again later.");
+        console.log(response.data);
       }
     } catch (error) {
       console.error("Error saving Return Note:", error);
@@ -342,7 +340,7 @@ const RetunNote = () => {
   };
 
   return (
-    <div className="goods-receive-note-form-container" ref={formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Return Note</h1>
 
       <Form
@@ -367,21 +365,17 @@ const RetunNote = () => {
           </Col>
           <Col span={6}></Col>
           <Col span={6} offset={12}>
-            {/* <Form.Item label="RETURN NOTE NO." name="returnNoteNo">
+            <Form.Item label="RETURN NOTE NO." name="returnNoteNo">
               <Input
                 disabled
                 onChange={(e) => handleChange("returnNoteNo", e.target.value)}
               />
-            </Form.Item> */}
-            <FormInputItem label="RETURN NOTE NO." value={formData.returnNoteNo==="string" ? "not defined" : formData.returnNoteNo} />
+            </Form.Item>
           </Col>
         </Row>
 
         <Row gutter={24}>
           <Col span={8}>
-          <Title strong underline level={2} type="danger">
-              CONSIGNOR DETAIL :-
-            </Title>
             <Form.Item label="REGIONAL CENTER CODE" name="regionalCenterCd">
               <Input value={formData.regionalCenterCd} />
               <div style={{ display: "none" }}>{formData.regionalCenterCd}</div>
@@ -401,9 +395,6 @@ const RetunNote = () => {
           </Col>
 
           <Col span={8}>
-          <Title strong underline level={2} type="danger">
-              CONSIGNEE DETAIL :-
-            </Title>
             <Form.Item
               label="CONSUMER NAME :"
               name="consumerName"
@@ -433,12 +424,16 @@ const RetunNote = () => {
           </Col>
 
           <Col span={8}>
-          <Form.Item></Form.Item>
             <Form.Item label="ISSUE NOTE NO. :" name="issueNoteNo">
               <Input
                 onChange={(e) => handleIssueNoteNoChange(e.target.value)}
               />
             </Form.Item>
+            {/* <Form.Item label="ISSUE DA :" name="issueNoteDt">
+              <Input value={12233} onChange={(e)=>handleIssueNoteDtChange(e.target.value)}/>
+              {/* <DatePicker value={formData.issueNoteDt} format={dateFormat} style={{ width: '100%' }} onChange={(date, dateString) => handleChange("issueNoteDt", dateString)} /> */}
+
+            {/* </Form.Item> */}
 
             <Form.Item label="ISSUE DATE :" name="issueNoteDt">
               <Input value={formData.issueNoteDt} readOnly />
@@ -451,12 +446,93 @@ const RetunNote = () => {
         {/* Item Details */}
         <h2>ITEM DETAILS</h2>
 
+        {/* <Form.List name="itemDetails" initialValue={formData.items || [{}]}>
+          {(fields, { add, remove }) => (
+            <>
+              
+              {fields.map(({ key, name, ...restField }, index) => (
+                <div key={key} style={{ marginBottom: 16, border: '1px solid #d9d9d9', padding: 16, borderRadius: 4 }}>
+                  <Row gutter={24}>
+                    <Col span={6}>
+
+                      <Form.Item {...restField} label="S.NO." name={[name, 'srNo']}  >
+                        <Input value={formData.items?.[index]?.srNo} onChange={(e) => e.target && itemHandleChange(`srNo`, e.target.value, index)} readOnly />
+                        <span style={{ display: 'none' }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item {...restField} label="ITEM CODE" name={[name, 'itemCode']} initialValue={formData.items?.[index]?.itemCode}>
+                        <Input
+                          style={{ width: '100%' }}
+                          value={formData.items?.[index]?.itemCode}
+                          readOnly
+                        />
+                        <span style={{ display: 'none' }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item label="ITEM DESCRIPTION" name={[name, 'itemDesc']}>
+                        <Input
+                          style={{ width: '100%' }}
+                          value={formData.items?.[index]?.itemDesc}
+                          readOnly
+
+                        />
+                        <span style={{ display: 'none' }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item label="UOM" name={[name, 'uom']}>
+                        <Input
+                          style={{ width: '100%' }}
+                          value={findUomName(formData?.items?.[index]?.uom)}
+                          readOnly
+
+                        />
+                        <span style={{ display: 'none' }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    
+                    <Col span={6}>
+                      <Form.Item label="RETURN QUANTITY" name={[name, 'quantity']}>
+                        <Input value={formData.items?.[index]?.quantity} onChange={(e) => itemHandleChange(`quantity`, e.target.value, index)} />
+                        <span style={{ display: 'none' }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item label="RETURNED AFTER NO. OF DAYS" name={[name, 'noOfDays']}>
+                        <Input value={formData.issueNoteDt !== undefined ? daysDifference(formData.issueNoteDt) : ""} onChange={(e) => itemHandleChange(`noOfDays`, e.target.value, index)} readOnly />
+                        <span style={{ display: 'none' }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item label="CONDITION OF GOODS" name={[name, 'conditionOfgoods']}>
+                        <Input value={formData.items?.[index]?.conditionOfGoods} readOnly/>
+                      </Form.Item>
+                    </Col>
+                    <Col span={5}>
+                      <Form.Item label="REMARK" name={[name, 'remarks']}>
+                        <Input value={formData.items?.[index]?.remarks} readOnly/>
+                        <span style={{ display: 'none' }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={1}>
+                      <MinusCircleOutlined onClick={() => remove(name)} style={{ marginTop: 8 }} />
+                    </Col>
+                  </Row>
+                </div>
+              ))}
+            </>
+          )}
+        </Form.List> */}
+
         <Form.List name="items" initialValue={formData.items || [{}]}>
           {(fields, { add, remove }) => (
             <>
               {formData.items?.length > 0 &&
                 formData.items.map((item, key) => {
                   return (
+                    // <div className="xyz" style={{font:"150px", zIndex: "100"}}>xyz</div>
 
                     <div
                       key={key}
@@ -522,9 +598,7 @@ const RetunNote = () => {
                       >
                         <Input
                           value={formData.items?.[key]?.conditionOfGoods}
-                          onChange={(e) =>
-                            itemHandleChange(`conditionOfGoods`, e.target.value, key)
-                          }
+                          readOnly
                         />
                       </Form.Item>
 
@@ -665,7 +739,12 @@ const RetunNote = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+            <Button
+              type="primary"
+              danger
+              htmlType="save"
+              style={{ width: "200px", margin: 16 }}
+            >
               PRINT
             </Button>
           </Form.Item>

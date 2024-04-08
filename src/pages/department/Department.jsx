@@ -28,6 +28,7 @@ const DepartmentPage = ({
   }, [fetchDepartments]);
 
   const handleEdit = (department) => {
+    console.log(department);
     setEditingDepartment(department);
     setVisible(true);
   };

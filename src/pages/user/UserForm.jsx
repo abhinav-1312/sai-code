@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Select, Row, Col, DatePicker } from "antd";
 import moment from "moment";
 import axios from "axios";
+import { apiHeader } from "../../utils/Functions";
 
 const token = localStorage.getItem("token");
 const { Option } = Select;
@@ -11,12 +12,13 @@ const UserForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
   const [departments, setDepartments] = useState([]);
   const [employeeId, setEmployeeId] = useState([]);
+  const token = localStorage.getItem("token")
 
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
         const response = await axios.get(
-          "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getDeptMaster"
+          "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getDeptMaster", apiHeader("GET", token)
         );
         const data = response.data.responseData;
         setDepartments(data);
@@ -31,7 +33,7 @@ const UserForm = ({ onSubmit, initialValues }) => {
     const fetchEmployeeId = async () => {
       try {
         const response = await axios.get(
-          "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getEmpMaster"
+          "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getEmpMaster", apiHeader("GET", token)
         );
         const data = response.data.responseData;
         setEmployeeId(data);

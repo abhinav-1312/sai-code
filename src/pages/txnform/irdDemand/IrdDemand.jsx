@@ -1,17 +1,15 @@
 // DemandNoteForm.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Row, Col, DatePicker, Typography, AutoComplete } from 'antd';
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { printOrSaveAsPDF } from '../../../utils/Functions';
 const dateFormat = 'DD/MM/YYYY';
 const { Title } = Typography;
 const { TextArea } = Input;
 
 const DemandNoteForm = () => {
-  const [buttonVisible, setButtonVisible] = useState(false)
-  const formRef = useRef()
+
   const [itemData, setItemData] = useState([]);
   const [formData, setFormData] = useState({
     regionalCenterCode: '',
@@ -36,18 +34,17 @@ const DemandNoteForm = () => {
     }
   };
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
     try {
       const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate';
       const response = await axios.post(apiUrl, {
-        userCd,
-        password
+        userCd: "dkg",
+        password: "string"
       });
 
       const { responseData } = response.data;
       const { organizationDetails } = responseData;
       const { userDetails } = responseData;
+      console.log('Fetched data:', organizationDetails);
       // Update form data with fetched values
       setFormData({
         regionalCenterCode: "20",
@@ -65,10 +62,11 @@ const DemandNoteForm = () => {
 
 
   const onFinish = (values) => {
+    console.log('Received values:', values);
   };
 
   return (
-    <div className="goods-receive-note-form-container" ref={formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - INTER RD DEMAND NOTE </h1>
 
       <Form onFinish={onFinish} className="goods-receive-note-form" layout="vertical">
@@ -292,9 +290,9 @@ const DemandNoteForm = () => {
           </Button>
         </Form.Item>
         <Form.Item >
-        <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
-              PRINT
-            </Button>
+          <Button type="primary" danger htmlType="save" style={{ width: '200px', margin: 16 }}>
+            Print
+          </Button>
         </Form.Item>
 
       </div>

@@ -1,5 +1,4 @@
 import { BASE_URL } from "../../utils/BaseUrl";
-import axios from "axios"
 
 const token = localStorage.getItem("token");
 export const setUsers = (users) => ({
@@ -19,19 +18,19 @@ export const fetchUsers = () => async (dispatch) => {
 };
 
 export const updateUser = (userId, values) => async (dispatch) => {
-  console.log("Update user called: ", userId, values)
   try {
-    const updateResponse = await fetch(`https://sai-services.azurewebsites.net/sai-inv-mgmt/updateUserMaster`, {
+    const updateResponse = await fetch(`${BASE_URL}/updateUserMaster`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        'Authorization' : token
+        'Authorization' : `Bearer ${token}`
       },
       body: JSON.stringify({
         userId,
         ...values,
       }),
-    })
+    });
+
     if (updateResponse.ok) {
       alert("Users updated successfully");
       dispatch(fetchUsers());
@@ -73,7 +72,7 @@ export const saveUser = (values) => async (dispatch) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token,
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(values),
     });

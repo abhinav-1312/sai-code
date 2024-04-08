@@ -1,5 +1,5 @@
 // AcceptanceNote.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -16,23 +16,17 @@ import {
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
-import FormInputItem from "../../../components/FormInputItem";
-import { FormItemInputContext } from "antd/es/form/context";
-import { convertArrayToObject, convertEpochToDateString, fetchUomLocatorMaster, printOrSaveAsPDF } from "../../../utils/Functions";
+import { apiHeader } from "../../../utils/Functions";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Title } = Typography;
 
 const AcceptanceNote = () => {
-  const [buttonVisible, setButtonVisible] = useState(false)
-  const formRef = useRef()
   const [Type, setType] = useState("PO");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [itemData, setItemData] = useState([]);
-  const [uomMaster, setUomMaster] = useState({});
-  const [locatorMaster, setLocatorMaster] = useState({});
   const [formData, setFormData] = useState({
     genDate: "",
     genName: "",
@@ -94,32 +88,16 @@ const AcceptanceNote = () => {
     }));
   };
 
-  // const fetchUomLocatorMaster = async () => {
-  //   try {
-  //     const uomMasterUrl =
-  //       "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
-  //     const locatorMasterUrl =
-  //       "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
-  //     const uomMaster = await axios.get(uomMasterUrl);
-  //     const { responseData: uomMasterData } = uomMaster.data;
-  //     // const { responseData: locatorMasterData } = locatorMaster.data;
-  //     const uomObject = convertArrayToObject(uomMasterData, "id", "uomName");
-  //     // const locatorObj = convertArrayToObject(locatorMasterData, "id", "locatorDesc")
-  //     setUomMaster({ ...uomObject });
-  //     // setLocatorMaster({...locatorObj})
-  //   } catch (error) {
-  //     console.log("Error fetching Uom master details.", error);
-  //   }
-  // };
-
-  
-
   const itemHandleChange = (fieldName, value, index) => {
     setFormData((prevValues) => {
       const updatedItems = [...(prevValues.items || [])];
       updatedItems[index] = {
         ...updatedItems[index],
         [fieldName]: value === "" ? null : value,
+        uom: "string",
+        conditionOfGoods: "string", // Hard-coded data
+        budgetHeadProcurement: "string", // Hard-coded data
+        locatorId: "string", // Hard-coded data
       };
       return {
         ...prevValues,
@@ -129,19 +107,17 @@ const AcceptanceNote = () => {
   };
 
   useEffect(() => {
-    // fetchItemData();
-    fetchUomLocatorMaster(setUomMaster, setLocatorMaster)
+    fetchItemData();
     fetchUserDetails();
-    fetchUomLocatorMaster();
   }, []);
 
-  console.log("UOMASTEEEEZr: ", uomMaster)
+  const token = localStorage.getItem("token")
 
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
-      const response = await axios.get(apiUrl);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
     } catch (error) {
@@ -149,27 +125,25 @@ const AcceptanceNote = () => {
     }
   };
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
-
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
-        userCd: userCd,
-        password: password,
+        userCd: "dkg",
+        password: "string",
       });
 
       const { responseData } = response.data;
       const { organizationDetails } = responseData;
-      const { userDetails, locationDetails } = responseData;
+      const { userDetails } = responseData;
+      console.log("Fetched data:", organizationDetails);
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
         ceRegionalCenterCd: organizationDetails.location,
         ceRegionalCenterName: organizationDetails.organizationName,
         ceAddress: organizationDetails.locationAddr,
-        ceZipcode: locationDetails.zipcode,
+        ceZipcode: "",
         genName: userDetails.firstName,
         userId: "string",
         genDate: currentDate.format(dateFormat),
@@ -186,13 +160,14 @@ const AcceptanceNote = () => {
   const handleInspectionNOChange = async (value) => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "IRN",
-      });
+      }, apiHeader("POST", token));
       const responseData = response.data.responseData;
       const { processData, itemList } = responseData;
+      console.log("API Response:", response.data);
       setFormData((prevFormData) => ({
         ...prevFormData,
 
@@ -208,26 +183,17 @@ const AcceptanceNote = () => {
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
 
-        supplierCd: processData?.supplierCd,
-        supplierName: processData?.supplierName,
-        crAddress: processData?.crAddress,
-
-        dateOfDelivery: processData?.dateOfDelivery,
-        noaDate:convertEpochToDateString(processData?.noaDate),
-        noa: processData?.noa,
-
         items: itemList.map((item) => ({
           srNo: item.sNo,
           itemCode: item.itemCode,
           itemDesc: item.itemDesc,
           uom: item?.uom,
-          quantity: item.acceptedQuantity,
+          quantity: item.quantity,
           noOfDays: item.requiredDays,
           remarks: item.remarks,
           conditionOfGoods: item.conditionOfGoods,
           budgetHeadProcurement: item.budgetHeadProcurement,
           locatorId: item.locatorId,
-          acceptedQuantity: item.acceptedQuantity,
         })),
       }));
       // Handle response data as needed
@@ -236,23 +202,6 @@ const AcceptanceNote = () => {
       // Handle error
     }
   };
-
-  const removeItem = (index) => {
-    setFormData((prevValues) => {
-      const updatedItems = prevValues.items;
-      updatedItems.splice(index, 1);
-
-      const updatedItems1 = updatedItems.map((item, key) => {
-        return { ...item, srNo: key + 1 };
-      });
-
-      return {
-        ...prevValues,
-        items: updatedItems1,
-      };
-    });
-  };
-
   const onFinish = async (values) => {
     try {
       const formDataCopy = { ...formData };
@@ -296,8 +245,9 @@ const AcceptanceNote = () => {
       });
 
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveAcceptanceNote";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveAcceptanceNote";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
+      console.log("Received values:", values);
       if (
         response.status === 200 &&
         response.data &&
@@ -307,13 +257,9 @@ const AcceptanceNote = () => {
         // Access the specific success message data if available
         const { processId, processType, subProcessId } =
           response.data.responseData;
-        setFormData((prev) => {
-          return {
-            ...prev,
-            acptRejNoteNo: processId,
-          };
+        setFormData({
+          acptRejNoteNo: processId,
         });
-        setButtonVisible(true)
         setSuccessMessage(
           `Acceptance Note : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -338,7 +284,7 @@ const AcceptanceNote = () => {
   };
 
   return (
-    <div className="goods-receive-note-form-container" ref={formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Acceptance Note</h1>
 
       <Form
@@ -370,7 +316,12 @@ const AcceptanceNote = () => {
             </Form.Item>
           </Col>
           <Col span={6} offset={12}>
-            <FormInputItem label="ACCEPTANCE NOTE NO." value={formData.acptRejNoteNo === "string" ? "not defined" : formData.acptRejNoteNo} />
+            <Form.Item label="ACCEPTANCE NOTE NO." name="acptRejNoteNo">
+              <Input
+                disabled
+                onChange={(e) => handleChange("acptRejNoteNo", e.target.value)}
+              />
+            </Form.Item>
           </Col>
         </Row>
 
@@ -417,18 +368,27 @@ const AcceptanceNote = () => {
 
             {Type === "PO" && (
               <>
-                <FormInputItem
-                  label="SUPPLIER CODE :"
-                  value={formData.supplierCd}
-                />
-                <FormInputItem
-                  label="SUPPLIER NAME :"
-                  value={formData.supplierName}
-                />
-                <FormInputItem
-                  label="ADDRESS :"
-                  value={formData.crAddress || "Not defined"}
-                />
+                <Form.Item label="SUPPLIER CODE :" name="supplierCode">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierCode", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="SUPPLIER NAME :" name="supplierName">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierName", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="ADDRESS:" name="supplierAddress">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierAddress", e.target.value)
+                    }
+                  />
+                </Form.Item>
               </>
             )}
 
@@ -480,14 +440,10 @@ const AcceptanceNote = () => {
                 onChange={(e) => handleInspectionNOChange(e.target.value)}
               />
             </Form.Item>
-
-            <FormInputItem label="NOA NO. :" value={formData.noa} />
-
-            {/* <Form.Item label="NOA NO." name="noaNo">
+            <Form.Item label="NOA NO." name="noaNo">
               <Input onChange={(e) => handleChange("noaNo", e.target.value)} />
-            </Form.Item> */}
-
-            {/* <Form.Item label="NOA DATE" name="noaDate">
+            </Form.Item>
+            <Form.Item label="NOA DATE" name="noaDate">
               <DatePicker
                 format={dateFormat}
                 style={{ width: "100%" }}
@@ -495,9 +451,8 @@ const AcceptanceNote = () => {
                   handleChange("noaDate", dateString)
                 }
               />
-            </Form.Item> */}
-            <FormInputItem label="NOA DATE :" value={formData.noaDate} />
-            {/* <Form.Item label="DATE OF DELIVERY" name="dateOfDelivery">
+            </Form.Item>
+            <Form.Item label="DATE OF DELIVERY" name="dateOfDelivery">
               <DatePicker
                 format={dateFormat}
                 style={{ width: "100%" }}
@@ -505,9 +460,7 @@ const AcceptanceNote = () => {
                   handleChange("dateOfDelivery", dateString)
                 }
               />
-            </Form.Item> */}
-
-            <FormInputItem label="DATE OF DELIVERY" value={formData.dateOfDelivery} />
+            </Form.Item>
           </Col>
         </Row>
 
@@ -517,7 +470,7 @@ const AcceptanceNote = () => {
         <Form.List name="itemDetails" initialValue={formData.items || [{}]}>
           {(fields, { add, remove }) => (
             <>
-              {/* <Form.Item style={{ textAlign: "right" }}>
+              <Form.Item style={{ textAlign: "right" }}>
                 <Button
                   type="dashed"
                   onClick={() => add()}
@@ -526,90 +479,7 @@ const AcceptanceNote = () => {
                 >
                   ADD ITEM
                 </Button>
-              </Form.Item> */}
-              {formData?.items?.length > 0 &&
-                formData.items.map((item, key) => (
-                  <div style={{
-                    marginBottom: 16,
-                    border: "1px solid #d9d9d9",
-                    padding: 16,
-                    borderRadius: 4,
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                    gap: "20px",
-                  }}>
-                    <FormInputItem
-                      label="Serial No. :"
-                      key={key}
-                      value={item.srNo}
-                    />
-                    <FormInputItem
-                      label="Item Code :"
-                      key={key}
-                      value={item.itemCode}
-                    />
-                    <FormInputItem
-                      label="Item Description :"
-                      key={key}
-                      value={item.itemDesc}
-                    />
-                    <FormInputItem
-                      label="UOM :"
-                      key={key}
-                      value={uomMaster[item.uom]}
-                    />
-
-                    {Type !== "PO" && (
-                      <>
-                        <Form.Item label="INSPECTED QUANTITY">
-                          <Input
-                            value={item.inspectedQuantity}
-                            onChange={(e) =>
-                              itemHandleChange(
-                                "inspectedQuantity",
-                                e.target.value,
-                                key
-                              )
-                            }
-                          />
-                        </Form.Item>
-                      </>
-                    )}
-
-                    <Form.Item label="ACCEPTED QUANTITY">
-                      <Input
-                        value={item.acceptedQuantity}
-                        onChange={(e) =>
-                          itemHandleChange(
-                            "acceptedQuantity",
-                            e.target.value,
-                            key
-                          )
-                        }
-                      />
-                    </Form.Item>
-                    <Form.Item label="REMARK">
-                      <Input
-                        value={item.remarks}
-                        onChange={(e) =>
-                          itemHandleChange(
-                            "remarks",
-                            e.target.value,
-                            key
-                          )
-                        }
-                      />
-                    </Form.Item>
-
-                    <Col span={1}>
-                        <MinusCircleOutlined
-                          onClick={() => removeItem(key)}
-                          style={{ marginTop: 8 }}
-                        />
-                      </Col>
-                  </div>
-                ))}
-{/* 
+              </Form.Item>
               {fields.map(({ key, name, ...restField }, index) => (
                 <div
                   key={key}
@@ -740,11 +610,7 @@ const AcceptanceNote = () => {
                       >
                         <Input
                           onChange={(e) =>
-                            itemHandleChange(
-                              `acceptedQuantity`,
-                              e.target.value,
-                              index
-                            )
+                            itemHandleChange(`quantity`, e.target.value, index)
                           }
                         />
                       </Form.Item>
@@ -771,7 +637,7 @@ const AcceptanceNote = () => {
                     </Col>
                   </Row>
                 </div>
-              ))} */}
+              ))}
             </>
           )}
         </Form.List>
@@ -916,7 +782,12 @@ const AcceptanceNote = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+            <Button
+              type="primary"
+              danger
+              htmlType="save"
+              style={{ width: "200px", margin: 16 }}
+            >
               PRINT
             </Button>
           </Form.Item>
