@@ -292,9 +292,9 @@ const DemandNoteForm = () => {
           </Button>
         </Form.Item>
         <Form.Item >
-          <Button type="primary" danger htmlType="save" style={{ width: '200px', margin: 16 }}>
-            Print
-          </Button>
+        <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+              PRINT
+            </Button>
         </Form.Item>
 
       </div>
