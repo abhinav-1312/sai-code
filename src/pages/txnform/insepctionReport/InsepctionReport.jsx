@@ -302,6 +302,21 @@ const InsepctionReport = () => {
     setType(allValues.type);
   };
 
+  const removeItem = (index) => {
+    setFormData(prevValues=>{
+      const updatedItems = prevValues.items
+      updatedItems.splice(index, 1)
+      
+      const updatedItems1 = updatedItems.map((item, key)=>{
+        return {...item, srNo: key+1}
+      })
+
+      return {...prevValues, items: updatedItems1}
+    })
+  }
+
+  console.log("Form data: ", formData)
+
   return (
     <div className="goods-receive-note-form-container">
       {Type === "PO" && (
@@ -317,25 +332,10 @@ const InsepctionReport = () => {
       >
         <Row>
           <Col span={6} offset={18}>
-            <Form.Item label="DATE" name="inspectionRptDate">
-              <DatePicker
-                defaultValue={dayjs()}
-                format={dateFormat}
-                style={{ width: "100%" }}
-                name="inspectionRptDate"
-                onChange={(date, dateString) =>
-                  handleChange("inspectionRptDate", dateString)
-                }
-              />
-            </Form.Item>
+            <FormInputItem label="DATE :" value={formData.inspectionRptDate} />
           </Col>
           <Col span={6}>
-            <Form.Item label="TYPE" name="type">
-              <Select onChange={(value) => handleChange("type", value)}>
-                <Option value="PO">1. Purchase Order</Option>
-                <Option value="IOP">2. Inter-Org Transaction</Option>
-              </Select>
-            </Form.Item>
+            <FormDropdownItem label="TYPE" name="type" onChange={handleChange} dropdownArray={typeArray} valueField="valueField" visibleField="visibleField" />
           </Col>
           <Col span={6} offset={12}>
             <Form.Item
