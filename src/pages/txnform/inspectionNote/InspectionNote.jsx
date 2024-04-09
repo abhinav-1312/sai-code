@@ -170,9 +170,9 @@ const InspectionNote = () => {
         "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
-        processStage: "IR",
-      }, apiHeader("POST", token));
-      const responseData = response.data.responseData;
+        processStage: "IGP",
+      },  apiHeader("POST", token));
+      const {responseData} = response.data;
       const { processData, itemList } = responseData;
       console.log("API Response:", response.data);
       setFormData((prevFormData) => ({
@@ -213,6 +213,37 @@ const InspectionNote = () => {
       // Handle error
     }
   };
+
+  const fetchUomLocatorMaster = async () => {
+    try {
+      const uomMasterUrl =
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+      const locatorMasterUrl =
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+      const [uomMaster, locatorMaster] = await Promise.all([axios.get(uomMasterUrl, apiHeader("GET", token)), axios.get(locatorMasterUrl, apiHeader("GET", token))]);
+      const { responseData: uomMasterData } = uomMaster.data;
+      const { responseData: locatorMasterData } = locatorMaster.data;
+      const uomObject = convertArrayToObject(uomMasterData, "id", "uomName" )
+      const locatorObj = convertArrayToObject(locatorMasterData, "id", "locatorDesc")
+      setUomMaster({...uomObject});
+      setLocatorMaster({...locatorObj})
+    } catch (error) {
+      console.log("Error fetching Uom master details.", error);
+    }
+  };
+
+  const removeItem = (index) => {
+    setFormData(prevValues=>{
+      const updatedItems = prevValues.items
+      updatedItems.splice(index, 1)
+      
+      const updatedItems1 = updatedItems.map((item, key)=>{
+        return {...item, srNo: key+1}
+      })
+
+      return {...prevValues, items: updatedItems1}
+    })
+  }
 
   const onFinish = async (values) => {
     try {
