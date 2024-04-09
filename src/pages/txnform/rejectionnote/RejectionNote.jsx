@@ -106,6 +106,7 @@ const RejectionNote = () => {
     });
   };
   useEffect(() => {
+    fetchUomLocatorMaster(setUomMaster, setLocatorMaster);
     fetchItemData();
     fetchUserDetails();
   }, []);

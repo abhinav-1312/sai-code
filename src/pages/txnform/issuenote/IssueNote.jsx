@@ -9,22 +9,17 @@ import {
   Row,
   Col,
   Typography,
-  AutoComplete,
   message,
   Modal,
   Popover,
   Table,
-  List,
 } from "antd";
-import { itemNames, types, allDisciplines, subCategories, categories, sizes, usageCategories, brands, colors } from "../../items/KeyValueMapping";
-import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import { MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
-import ItemSearchFilter from "../../../components/ItemSearchFilter";
-import moment from "moment";
-import { apiHeader, handleSearch, handleSelectItem } from "../../../utils/Functions";
-import { primColumn } from "./ItemDetailTableColumn";
-import ItemDetailTable from "./ItemDetailTable";
+
+import { apiHeader, handleSearch, printOrSaveAsPDF } from "../../../utils/Functions";
+import FormInputItem from "../../../components/FormInputItem";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Title } = Typography;
@@ -91,8 +86,6 @@ const IssueNote = () => {
     processType: "IRP",
     interRdDemandNote: "",
   });
-
-  // const primaryColumn = primColumn(locationMaster, vendorMaster, selectedItems, setSelectedItems, setFormData)
   
   const showModal = () => {
     setIsModalOpen(true);
@@ -103,6 +96,15 @@ const IssueNote = () => {
   };
 
   const handleChange = (fieldName, value) => {
+    if(fieldName === "processType"){
+      setFormData(prevValues=>{
+        return {
+          ...prevValues,
+          processType: value,
+          type: value
+        }
+      })
+    }
     setFormData((prevValues) => ({
       ...prevValues,
       [fieldName]: value === "" ? null : value,
@@ -110,15 +112,6 @@ const IssueNote = () => {
   };
 
   const itemHandleChange = (fieldName, value, index) => {
-    console.log("Item handle change called")
-    // setItemDetail((prevValues) => {
-    //   const updatedItems = prevValues;
-    //   updatedItems[index] = {
-    //     ...updatedItems[index],
-    //     [fieldName]: value,
-    //   };
-    //   return [...updatedItems]
-    // });
 
     if(fieldName === 'quantity'){
       console.log("fieldname quantity")
@@ -218,66 +211,48 @@ const IssueNote = () => {
       dataIndex: "locationDesc",
       key: "location"
     },
-    // {
-    //   title: "LOCATOR CODE",
-    //   dataIndex: "locatorId",
-    //   key: "locatorCode",
-    // },
+
     { title: "PRICE", dataIndex: "price", key: "price" },
-    // {
-    //   title: "VENDOR DETAIL",
-    //   dataIndex: "vendorId",
-    //   key: "vendorDetail",
-    //   render: (vendorId) => vendorMaster[vendorId],
-    //   // render: (vendorId) => findColumnValue(vendorId, vendorMaster, "vendorMaster")
-    // },
+
     {
       title: "CATEGORY",
       dataIndex: "categoryDesc",
       key: "category",
-      // render: (category) => categories[category],
     },
     {
       title: "SUB-CATEGORY",
       dataIndex: "subCategoryDesc",
       key: "subCategory",
-      // render: (subCategory) => subCategories[subCategory],
     },
     {
       title: "Type",
       dataIndex: "typeDesc",
       key: "type",
-      // render: (type) => types[type],
     },
     {
       title: "Disciplines",
       dataIndex: "disciplinesDesc",
       key: "disciplines",
-      // render: (disciplines) => allDisciplines[disciplines],
     },
     {
       title: "Brand",
       dataIndex: "brandDesc",
       key: "brand",
-      // render: (brandId) => brands[brandId],
     },
     {
       title: "Size",
       dataIndex: "sizeDesc",
       key: "size",
-      // render: (size) => sizes[size],
     },
     {
       title: "Colour",
       dataIndex: "colorDesc",
       key: "colour",
-      // render: (colorId) => colors[colorId],
     },
     {
       title: "Usage Category",
       dataIndex: "usageCategoryDesc",
       key: "usageCategory",
-      // render: (usageCategory) => usageCategories[usageCategory],
     },
     {
       title: "MINIMUM STOCK LEVEL",
