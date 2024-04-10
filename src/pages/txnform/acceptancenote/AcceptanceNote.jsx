@@ -9,11 +9,10 @@ import {
   Row,
   Col,
   Typography,
-  AutoComplete,
   message,
   Modal,
 } from "antd";
-import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import { MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
 import { apiHeader, convertEpochToDateString, fetchUomLocatorMaster, printOrSaveAsPDF } from "../../../utils/Functions";
@@ -186,6 +185,14 @@ const AcceptanceNote = () => {
 
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
+
+        supplierCd: processData?.supplierCd,
+        supplierName: processData?.supplierName,
+        crAddress: processData?.crAddress,
+
+        dateOfDelivery: processData?.dateOfDelivery,
+        noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
+        noa: processData?.noa ? processData.noa : "",
 
         items: itemList.map((item) => ({
           srNo: item.sNo,

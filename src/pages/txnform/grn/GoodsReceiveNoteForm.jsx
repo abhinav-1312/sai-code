@@ -300,7 +300,14 @@ const GoodsReceiveNoteForm = () => {
         termsCondition: processData?.termsCondition,
         note: processData?.note,
 
-        items: itemList.map((item) => ({
+        supplierCode: processData?.supplierCd,
+        supplierName: processData?.supplierName,
+        crAddress: processData?.crAddress,
+        noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
+        noa: processData?.noa ? processData.noa : "",
+        dateOfDelivery: processData?.dateOfDelivery,
+
+        items: itemList?.map((item) => ({
           srNo: item?.sNo,
           itemId: item?.itemId,
           itemCode: item?.itemCode,

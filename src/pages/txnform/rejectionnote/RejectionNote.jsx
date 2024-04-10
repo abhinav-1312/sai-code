@@ -185,6 +185,14 @@ const RejectionNote = () => {
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
 
+        supplierCd: processData?.supplierCd,
+        supplierName: processData?.supplierName,
+        crAddress: processData?.crAddress,
+
+        noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
+        noa: processData?.noa ? processData.noa : "",
+        dateOfDelivery: processData?.dateOfDelivery,
+
         items: itemList.map((item) => ({
           srNo: item.sNo,
           itemCode: item.itemCode,

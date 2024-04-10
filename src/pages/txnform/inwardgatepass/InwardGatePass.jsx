@@ -1372,22 +1372,46 @@ const InwardGatePass = () => {
       console.log("Fetched data:", organizationDetails);
       const currentDate = dayjs();
       // Update form data with fetched values
-      setFormData({
-        ceRegionalCenterCd: organizationDetails.id,
-        ceRegionalCenterName: organizationDetails.location,
-        ceAddress: organizationDetails.locationAddr,
-        ceZipcode: "131021",
-        genName: userDetails.firstName,
-        noaDate: currentDate.format(dateFormat),
-        dateOfDelivery: currentDate.format(dateFormat),
-        userId: "string",
-        genDate: currentDate.format(dateFormat),
-        issueDate: currentDate.format(dateFormat),
-        approvedDate: currentDate.format(dateFormat),
-        gatePassDate: currentDate.format(dateFormat),
-        gatePassNo: "string",
-        type: "string",
-      });
+      if(processType === "IRP"){
+        setFormData({
+          crRegionalCenterCd: organizationDetails.id,
+          crRegionalCenterName: organizationDetails.location,
+          crAddress: organizationDetails.locationAddr,
+          crZipcode: locationDetails.zipcode,
+          genName: userDetails.firstName,
+          // noaDate: currentDate.format(dateFormat),
+          // dateOfDelivery: currentDate.format(dateFormat),
+          userId: "string",
+          genDate: currentDate.format(dateFormat),
+          issueDate: currentDate.format(dateFormat),
+          approvedDate: currentDate.format(dateFormat),
+          gatePassDate: currentDate.format(dateFormat),
+          gatePassNo: "Not defined",
+          processType: processType,
+          type: processType,
+          processId: "string"
+        });
+      }
+      else{
+        setFormData({
+          ceRegionalCenterCd: organizationDetails.id,
+          ceRegionalCenterName: organizationDetails.location,
+          ceAddress: organizationDetails.locationAddr,
+          ceZipcode: locationDetails.zipcode,
+          genName: userDetails.firstName,
+          // noaDate: currentDate.format(dateFormat),
+          // dateOfDelivery: currentDate.format(dateFormat),
+          userId: "string",
+          genDate: currentDate.format(dateFormat),
+          issueDate: currentDate.format(dateFormat),
+          approvedDate: currentDate.format(dateFormat),
+          gatePassDate: currentDate.format(dateFormat),
+          gatePassNo: "Not defined",
+          processType: processType,
+          type: processType,
+          processId: "string"
+        });
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
