@@ -1372,7 +1372,8 @@ const InwardGatePass = () => {
       console.log("Fetched data:", organizationDetails);
       const currentDate = dayjs();
       // Update form data with fetched values
-      if(processType === "IRP"){
+      if(processType === "IRP" || processType === "IOP"){
+        console.log("IF ME")
         setFormData({
           crRegionalCenterCd: organizationDetails.id,
           crRegionalCenterName: organizationDetails.location,
@@ -1393,6 +1394,7 @@ const InwardGatePass = () => {
         });
       }
       else{
+        console.log("ELKSE MNWW")
         setFormData({
           ceRegionalCenterCd: organizationDetails.id,
           ceRegionalCenterName: organizationDetails.location,
@@ -1591,6 +1593,41 @@ const InwardGatePass = () => {
     });
   };
 
+  const handleIssueNoteNoChange = async (_, value) => {
+    const apiUrl =
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        try{
+        const {data} = await axios.post(apiUrl, {
+          processId: value,
+          processStage: "OGP",
+        },  apiHeader("POST", token));
+
+        console.log("RESPONSE ISN: ", data)
+
+        const {responseData, responseStatus} = data
+        const {processData, itemList} = responseData
+
+        if(responseStatus.message === "Success" && responseStatus.statusCode === 200){
+          setFormData(prev=>{
+            return {
+              ...prev,
+              ...processData,
+              items: itemList.map(item=>({...item, noOfDays: item.requiredDays, srNo: item.sNo}))
+            }
+          })
+        }
+        
+      }catch(error){
+        console.log("Error occured while fetching data")
+      }
+  }
+
+  console.log("FORM DaTA ISN: ", formData)
+
+  const handleRejNoteNoChange = (_, value) => {
+    console.log("REJ: ", value)
+  }
+
   return (
     <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Inward Gate Pass</h1>
@@ -1637,41 +1674,25 @@ const InwardGatePass = () => {
         <Row gutter={24}>
           <Col span={8}>
             <Title strong level={2} underline type="danger">
-              {" "}
-              CONSIGNEE DETAIL :-
+              {
+                Type === "IRP" || Type === "IOP" ?
+                "CONSIGNOR DETAIL :-" : "CONSIGNEE DETAIL :-"
+              }
             </Title>
 
-            <Form.Item label="REGIONAL CENTER CODE" name="crRegionalCenterCd">
-              <Input value={formData.crRegionalCenterCd} />
-              <div style={{ display: "none" }}>
-                {formData.crRegionalCenterCd}
-              </div>
-            </Form.Item>
-            <Form.Item
-              label="REGIONAL CENTER NAME "
-              name="crRegionalCenterName"
-            >
-              <Input value={formData.crRegionalCenterName} />
-              <div style={{ display: "none" }}>
-                {formData.crRegionalCenterName}
-              </div>
-            </Form.Item>
-            <Form.Item label="ADDRESS :" name="crRegionalCenterCd">
-              <Input value={formData.crAddress} />
-              <div style={{ display: "none" }}>
-                {formData.crRegionalCenterCd}
-              </div>
-            </Form.Item>
-            <Form.Item label="ZIP CODE :" name="crZipcode">
-              <Input value={formData.crZipcode} />
-              <div style={{ display: "none" }}>
-                {formData.crRegionalCenterCd}
-              </div>
-            </Form.Item>
+            {/* for purchase order */}
+
+            <FormInputItem label="REGIONAL CENTER CODE :" value={Type==="IRP" || Type === "IOP" ? formData.crRegionalCenterCd : formData.ceRegionalCenterCd} readOnly={true}/>
+            <FormInputItem label="REGIONAL CENTER NAME :" value={Type==="IRP" || Type === "IOP" ? formData.crRegionalCenterName :formData.ceRegionalCenterName} readOnly={true} />
+            <FormInputItem label="ADDRESS :" value={Type==="IRP" || Type === "IOP" ? formData.crAddress : formData.ceAddress} readOnly={true} />
+            <FormInputItem label="ZIPCODE :" value={Type==="IRP" || Type === "IOP" ? formData.crZipcode : formData.ceZipcode} readOnly={true} />
           </Col>
           <Col span={8}>
             <Title strong underline level={2} type="danger">
-              CONSIGNOR DETAIL :-
+            {
+                Type === "IRP" || Type === "IOP" ?
+                "CONSIGNEE DETAIL ;-" : "CONSIGNOR DETAIL :-"
+              }
             </Title>
 
             {Type === "PO" && (
@@ -1731,7 +1752,7 @@ const InwardGatePass = () => {
 
             {Type === "IOP" && (
               <>
-                <Form.Item
+                {/* <Form.Item
                   label="REGIONAL CENTER CODE"
                   name="crRegionalCenterCd"
                 >
@@ -1740,22 +1761,11 @@ const InwardGatePass = () => {
                       handleChange("crRegionalCenterCd", e.target.value)
                     }
                   />
-                </Form.Item>
-                <Form.Item
-                  label="REGIONAL CENTER NAME "
-                  name="crRegionalCenterName"
-                >
-                  <Input
-                    onChange={(e) =>
-                      handleChange("crRegionalCenterName", e.target.value)
-                    }
-                  />
-                </Form.Item>
-                <Form.Item label="ADDRESS :" name="crAddress">
-                  <Input
-                    onChange={(e) => handleChange("crAddress", e.target.value)}
-                  />
-                </Form.Item>
+                </Form.Item> */}
+
+                <FormInputItem label="REGIONAL CENTER CODE :" value={formData.ceRegionalCenterCd} readOnly={true}/>
+                <FormInputItem label="REGIONAL CENTER NAME :" value={formData.ceRegionalCenterName} readOnly={true} />
+                <FormInputItem label="ADDRESS :" value={formData.ceAddress} readOnly={true} />
                 <Form.Item label="ZIP CODE :" name="crZipcode">
                   <Input
                     onChange={(e) => handleChange("crZipcode", e.target.value)}
@@ -1788,7 +1798,7 @@ const InwardGatePass = () => {
                   </Select>
                 </Form.Item>
 
-                <Form.Item
+                {/* <Form.Item
                   label={
                     selectedOption === "ISSUE"
                       ? "ISSUE NOTE NO."
@@ -1796,8 +1806,10 @@ const InwardGatePass = () => {
                   }
                   name="inwardGatePass"
                 >
-                  <Input />
-                </Form.Item>
+                  <Input value={1234} />
+                </Form.Item> */}
+
+                <FormInputItem label={selectedOption === "ISSUE" ? "ISSUE NOTE NO." : "REJECTION NOTE NO."} name="inwardGatePass" onChange={selectedOption==="ISSUE" ? handleIssueNoteNoChange : handleRejNoteNoChange} />
               </>
             )}
             {(Type === "IOP" || Type === "PO") && (
@@ -1875,7 +1887,7 @@ const InwardGatePass = () => {
                       }}
                     >
                       <Form.Item label="Serial No.">
-                        <Input value={item.srNo} readOnly />
+                        <Input value={item.srNo ? item.srNo : item.sNo} readOnly />
                       </Form.Item>
 
                       <Form.Item label="ITEM CODE">
@@ -1915,7 +1927,9 @@ const InwardGatePass = () => {
                           }
                         />
                       </Form.Item>
-
+                    
+                    {
+                      (Type === "IRP" || Type === "IOP") &&
                       <Form.Item label="REQUIRED FOR NO. OF DAYS">
                         <Input
                           value={item.noOfDays}

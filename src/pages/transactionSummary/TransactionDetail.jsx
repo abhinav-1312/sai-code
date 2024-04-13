@@ -127,26 +127,25 @@ const TransactionDetail = () => {
         </div>
       )}
 
-      {objectFromArr["ISN"] && (
-        <div>
-          <h2>Issue Note</h2>
-          {isnData ? (
-            <DetailData data={isnData?.data} itemList={isnData?.itemList} />
-          ) : (
-            "No data available."
-          )}
-        </div>
-      )}
-      {objectFromArr["OGP"] && (
-        <div>
-          <h2>Outward Gate Pass</h2>
-          {ogpData ? (
-            <DetailData data={ogpData?.data} itemList={ogpData?.itemList} />
-          ) : (
-            "No data available."
-          )}
-        </div>
-      )}
+      {objectFromArr["ISN"] && <div>
+        <h2>Issue Note</h2>
+        {
+          isnData ?
+          <DetailData processType={"isn"} data={isnData?.data} itemList={isnData?.itemList} /> 
+          :
+          "No data available."
+        }
+      </div>
+}
+      {objectFromArr["OGP"] && <div>
+        <h2>Outward Gate Pass</h2>
+        {
+          ogpData ?
+          <DetailData processType="ogp" data={ogpData?.data} itemList={ogpData?.itemList} /> 
+          :
+          "No data available."
+        }
+      </div>}
 
       {objectFromArr["REJ"] && (
         <div>
