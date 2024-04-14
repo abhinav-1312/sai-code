@@ -126,7 +126,7 @@ const InsepctionReport = () => {
         "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
-      setItemData(responseData);
+      // setItemData(responseData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -875,8 +875,8 @@ const InsepctionReport = () => {
           </Form.Item>
         </div>
         <Modal
-          title="Insepction Report  saved successfully"
-          visible={isModalOpen}
+          title="MIS saved successfully."
+          open={isModalOpen}
           onOk={handleOk}
         >
           {successMessage && <p>{successMessage}</p>}

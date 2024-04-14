@@ -18,11 +18,17 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { apiHeader } from "../../../utils/Functions";
 
+import FormInputItem from "../../../components/FormInputItem";
+import FormDatePickerItem from "../../../components/FormDatePickerItem";
+import { convertArrayToObject, printOrSaveAsPDF } from "../../../utils/Functions";
+
 const dateFormat = "YYYY/MM/DD";
 const { Option } = Select;
 const { Title } = Typography;
 
 const InspectionNote = () => {
+  const formRef = useRef()
+  const [buttonVisible, setButtonVisible] = useState(false)
   const token = localStorage.getItem("token")
   const [Type, setType] = useState("PO");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -142,7 +148,7 @@ const InspectionNote = () => {
       });
 
       const { responseData } = response.data;
-      const { organizationDetails } = responseData;
+      const { organizationDetails, locationDetails } = responseData;
       const { userDetails } = responseData;
       console.log("Fetched data:", organizationDetails);
       const currentDate = dayjs();

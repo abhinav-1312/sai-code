@@ -19,20 +19,20 @@ const DemandNoteForm = () => {
   });
   useEffect(() => {
 
-    fetchItemData()
+    // fetchItemData()
     fetchUserDetails()
   }, []);
 
-  const fetchItemData = async () => {
-    try {
-      const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster';
-      const response = await axios.get(apiUrl);
-      const { responseData } = response.data;
-      setItemData(responseData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  // const fetchItemData = async () => {
+  //   try {
+  //     const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster';
+  //     const response = await axios.get(apiUrl);
+  //     const { responseData } = response.data;
+  //     setItemData(responseData);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
   const fetchUserDetails = async () => {
     try {
       const userCd = localStorage.getItem("userCd")

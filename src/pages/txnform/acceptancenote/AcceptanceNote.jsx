@@ -137,7 +137,7 @@ const AcceptanceNote = () => {
       });
 
       const { responseData } = response.data;
-      const { organizationDetails } = responseData;
+      const { organizationDetails, locationDetails } = responseData;
       const { userDetails } = responseData;
       const currentDate = dayjs();
       // Update form data with fetched values

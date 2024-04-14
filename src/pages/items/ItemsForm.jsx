@@ -256,9 +256,6 @@ const ItemsForm = ({
             </Select>
           </Form.Item>
         </Col>
-      </Row>
-
-      <Row gutter={16}>
         <Col span={8}>
           <Form.Item
             name="quantity"
@@ -304,9 +301,6 @@ const ItemsForm = ({
             </Select>
           </Form.Item>
         </Col>
-      </Row>
-
-      <Row gutter={16}>
         <Col span={8}>
           <Form.Item
             name="price"
