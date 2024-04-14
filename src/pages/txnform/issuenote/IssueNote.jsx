@@ -174,7 +174,7 @@ const IssueNote = () => {
                     qtyList: newQtyList,
                     locationId: itemCodeMatch.locationId,
                     locationDesc: itemCodeMatch.locationName
-                };
+                }; 
             }
         }
         // Return undefined if no match found or newQtyList is empty
