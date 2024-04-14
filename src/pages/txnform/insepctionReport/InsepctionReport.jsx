@@ -16,6 +16,7 @@ import {
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
+import { apiHeader, fetchUomLocatorMaster } from "../../../utils/Functions";
 import { convertArrayToObject, printOrSaveAsPDF } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
 import FormDatePickerItem from "../../../components/FormDatePickerItem";
@@ -107,7 +108,6 @@ const InsepctionReport = () => {
     }));
   };
 
-
   const itemHandleChange = (fieldName, value, index) => {
     setFormData((prevValues) => {
       const updatedItems = [...(prevValues.items || [])];
@@ -121,41 +121,35 @@ const InsepctionReport = () => {
       };
     });
   };
+
+  const token = localStorage.getItem("token")
+
   useEffect(() => {
-    // fetchItemData();
-    fetchUomLocatorMaster()
+    fetchItemData();
     fetchUserDetails();
+    fetchUomLocatorMaster(setUomMaster, setLocatorMaster)
   }, []);
 
-  const fetchUomLocatorMaster = async () => {
-    try {
-      const uomMasterUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
-      const locatorMasterUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
-      const [uomMaster, locatorMaster] = await Promise.all([axios.get(uomMasterUrl), axios.get(locatorMasterUrl)]);
-      const { responseData: uomMasterData } = uomMaster.data;
-      const { responseData: locatorMasterData } = locatorMaster.data;
-      const uomObject = convertArrayToObject(uomMasterData, "id", "uomName" )
-      const locatorObj = convertArrayToObject(locatorMasterData, "id", "locatorDesc")
-      setUomMaster({...uomObject});
-      setLocatorMaster({...locatorObj})
-    } catch (error) {
-      console.log("Error fetching Uom master details.", error);
-    }
-  };
-
-  const fetchUserDetails = async () => {
-
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
-
+  const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      const response = await axios.get(apiUrl, apiHeader("GET", token));
+      const { responseData } = response.data;
+      // setItemData(responseData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const fetchUserDetails = async () => {
+    try {
+      const userCd = localStorage.getItem("userCd")
+      const password = localStorage.getItem("password")
+      const apiUrl =
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
-        password
+        password,
       });
 
       const { responseData } = response.data;
@@ -183,16 +177,18 @@ const InsepctionReport = () => {
     }
   };
 
-  const handleInwardGatePassChange = async (_fieldName, value) => {
+  const handleInwardGatePassChange = async (_, value) => {
+    console.log("VALUE: ", value)
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "IGP",
-      });
-      const {responseData} = response.data;
+      }, apiHeader("POST", token));
+      const responseData = response.data.responseData;
       const { processData, itemList } = responseData;
+      console.log("API Response:", response.data);
       setFormData((prevFormData) => ({
         ...prevFormData,
 
@@ -235,8 +231,9 @@ const InsepctionReport = () => {
       console.error("Error fetching sub process details:", error);
       // Handle error
     }
-  };
 
+  };
+  console.log("FOrmdata item: ", formData.items)
 
   const onFinish = async (values) => {
     try {
@@ -283,8 +280,9 @@ const InsepctionReport = () => {
       });
 
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveInspectionReport";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveInspectionReport";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
+      console.log("Received values:", values);
       if (
         response.status === 200 &&
         response.data &&
@@ -337,6 +335,8 @@ const InsepctionReport = () => {
     })
   }
 
+  console.log("Form data: ", formData)
+
   return (
     <div className="goods-receive-note-form-container" ref={formRef}> 
       {Type === "PO" && (
@@ -353,15 +353,9 @@ const InsepctionReport = () => {
 
         <Row>
           <Col span={6} offset={18}>
-            <FormDatePickerItem label="DATE :" defaultValue={dayjs()} name="inspectionRptDate" onChange={handleChange} />
+            <FormInputItem label="DATE :" value={formData.inspectionRptDate} />
           </Col>
           <Col span={6}>
-            {/* <Form.Item label="TYPE" name="type">
-              <Select onChange={(value) => handleChange("type", value)}>
-                <Option value="PO">1. Purchase Order</Option>
-                <Option value="IOP">2. Inter-Org Transaction</Option>
-              </Select>
-            </Form.Item> */}
             <FormDropdownItem label="TYPE" name="type" onChange={handleChange} dropdownArray={typeArray} valueField="valueField" visibleField="visibleField" />
           </Col>
           <Col span={6} offset={12}>
@@ -660,14 +654,14 @@ const InsepctionReport = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
               PRINT
             </Button>
           </Form.Item>
         </div>
         <Modal
           title="MIS saved successfully."
-          visible={isModalOpen}
+          open={isModalOpen}
           onOk={handleOk}
         >
           {successMessage && <p>{successMessage}</p>}

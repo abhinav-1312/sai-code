@@ -17,7 +17,7 @@ import "./GoodsReceiveNoteForm.css";
 import dayjs from "dayjs";
 import axios from "axios";
 import FormInputItem from "../../../components/FormInputItem";
-import { printOrSaveAsPDF } from "../../../utils/Functions";
+import { apiHeader, printOrSaveAsPDF } from "../../../utils/Functions";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Title } = Typography;
@@ -154,22 +154,23 @@ const GoodsReceiveNoteForm = () => {
     });
   };
 
+  const token = localStorage.getItem("token")
   const populateItemData = async () => {
     const itemMasterUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
     const locatorMasterUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
     const uomMasterUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
     const ohqUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary";
 
     try {
       const [itemMaster, locatorMaster, uomMaster] = await Promise.all(
         [
-          axios.get(itemMasterUrl),
-          axios.get(locatorMasterUrl),
-          axios.get(uomMasterUrl),
+          axios.get(itemMasterUrl, apiHeader("GET", token)),
+          axios.get(locatorMasterUrl, apiHeader("GET", token)),
+          axios.get(uomMasterUrl, apiHeader("GET", token)),
         ]
       );
 
@@ -196,7 +197,7 @@ const GoodsReceiveNoteForm = () => {
     const password = localStorage.getItem('password');
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -222,10 +223,11 @@ const GoodsReceiveNoteForm = () => {
           issueDate: currentDate.format(dateFormat),
           approvedDate: currentDate.format(dateFormat),
           gatePassDate: currentDate.format(dateFormat),
+          grnDate: currentDate.format(dateFormat),
           gatePassNo: "Not defined",
           processType: processType,
           type: processType,
-          processId: "string"
+          processId: "string",
         });
       }
       else{
@@ -242,6 +244,7 @@ const GoodsReceiveNoteForm = () => {
           issueDate: currentDate.format(dateFormat),
           approvedDate: currentDate.format(dateFormat),
           gatePassDate: currentDate.format(dateFormat),
+          grnDate: currentDate.format(dateFormat),
           gatePassNo: "Not defined",
           processType: processType,
           type: processType,
@@ -254,18 +257,19 @@ const GoodsReceiveNoteForm = () => {
   };
 
   console.log("Formata: ", formData)
+  const userCd = localStorage.getItem("userCd")
 
   const handleReturnNoteNoChange = async (value) => {
     try {
       const subProcessDtlUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const ohqUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getOHQ";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ";
 
       const subProcessRes = await axios.post(subProcessDtlUrl, {
         processId: value,
         processStage: Type==="IRP" ? "ISN" : "ACT",
-      });
+      }, apiHeader("POST", token));
 
       const { data: subProcess, status, statusText } = subProcessRes;
       const { responseData: subProcessData } = subProcess;
@@ -279,8 +283,8 @@ const GoodsReceiveNoteForm = () => {
 
               const ohqRes = await axios.post(ohqUrl, {
                 itemCode: itemCode,
-                userId: "string",
-              });
+                userId: userCd,
+              }, apiHeader("POST", token));
               const { data: ohqProcess } = ohqRes;
               const { responseData: ohqData } = ohqProcess;
               return {
@@ -312,7 +316,7 @@ const GoodsReceiveNoteForm = () => {
         crRegionalCenterCd: processData?.crRegionalCenterCd,
         crRegionalCenterName: processData?.crRegionalCenterName,
         // crAddress: processData?.address,
-        crZipcode: processData?.zipcode,
+        crZipcode: processData?.crZipcode,
 
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
@@ -323,8 +327,8 @@ const GoodsReceiveNoteForm = () => {
         supplierCode: processData?.supplierCd,
         supplierName: processData?.supplierName,
         crAddress: processData?.crAddress,
-        noa: processData?.noa,
-        noaDate: convertEpochToDateString(processData?.noaDate),
+        noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
+        noa: processData?.noa ? processData.noa : "",
         dateOfDelivery: processData?.dateOfDelivery,
 
         items: itemList?.map((item) => ({
@@ -432,8 +436,8 @@ const GoodsReceiveNoteForm = () => {
       });
 
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveGRN";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveGRN";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&
         response.data &&
@@ -562,6 +566,8 @@ const GoodsReceiveNoteForm = () => {
     }
   };
 
+  console.log("FORM DATAA: ", formData)
+
   return (
     <div className="goods-receive-note-form-container" ref={formRef}>
       <h1>Sports Authority of India - Goods Receive Note</h1>
@@ -575,17 +581,7 @@ const GoodsReceiveNoteForm = () => {
       >
         <Row>
           <Col span={6} offset={18}>
-            <Form.Item label="DATE" name="grnDate">
-              <DatePicker
-                defaultValue={dayjs()}
-                format={dateFormat}
-                style={{ width: "100%" }}
-                name="grnDate"
-                onChange={(date, dateString) =>
-                  handleChange("grnDate", dateString)
-                }
-              />
-            </Form.Item>
+            <FormInputItem label="DATE :" value={formData.grnDate} />
           </Col>
           <Col span={6}>
             <Form.Item label="TYPE" name="type">
@@ -720,34 +716,8 @@ const GoodsReceiveNoteForm = () => {
             )}
             {(Type === "IOP" || Type === "PO") && (
               <>
-              <FormInputItem label="NOA NO. :" value={formData.noa} />
-                {/* <Form.Item label="NOA NO." name="noaNo">
-                  <Input
-                    onChange={(e) => handleChange("noaNo", e.target.value)}
-                  />
-                </Form.Item> */}
-                {/* <Form.Item label="NOA DATE" name="noaDate">
-                  <DatePicker
-                    format={dateFormat}
-                    style={{ width: "100%" }}
-                    onChange={(date, dateString) =>
-                      handleChange("noaDate", dateString)
-                    }
-                  />
-                </Form.Item> */}
-
+                <FormInputItem label="NOA NO. :" value={formData.noa} />
                 <FormInputItem label="NOA DATE" value={formData.noaDate} />
-
-                {/* <Form.Item label="DATE OF DELIVERY" name="dateOfDelivery">
-                  <DatePicker
-                    format={dateFormat}
-                    style={{ width: "100%" }}
-                    onChange={(date, dateString) =>
-                      handleChange("dateOfDelivery", dateString)
-                    }
-                  />
-                </Form.Item> */}
-
                 <FormInputItem label="DATE OF DELIVERY" value={formData.dateOfDelivery} />
               </>
             )}
@@ -756,102 +726,6 @@ const GoodsReceiveNoteForm = () => {
 
         {/* Item Details */}
         <h2>ITEM DETAILS</h2>
-
-        {/* <Form.List name="itemDetails" initialValue={formData.items || [{}]}>
-          {(fields, { add, remove }) => (
-            <>
-              <Form.Item style={{ textAlign: 'right' }}>
-                <Button type="dashed" onClick={() => add()} style={{ marginBottom: 8 }} icon={<PlusOutlined />}>
-                  ADD ITEM
-                </Button>
-              </Form.Item>
-              {fields.map(({ key, name, ...restField }, index) => (
-                <div key={key} style={{ marginBottom: 16, border: '1px solid #d9d9d9', padding: 16, borderRadius: 4 }}>
-                  <Row gutter={24}>
-                    <Col span={6}>
-                      <Form.Item {...restField} label="S.NO." name={[name, 'srNo']}  >
-                        <Input value={formData.items?.[index]?.srNo} onChange={(e) => e.target && itemHandleChange(`srNo`, e.target.value, index)} />
-                        <span style={{ display: 'none' }}>{index + 1}</span>
-                      </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                      <Form.Item {...restField} label="ITEM CODE" name={[name, 'itemCode']} initialValue={formData.items?.[index]?.itemCode}>
-                        <AutoComplete
-                          style={{ width: '100%' }}
-                          options={itemData.map(item => ({ value: item.itemMasterCd }))}
-                          placeholder="Enter item code"
-                          filterOption={(inputValue, option) =>
-                            option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                          }
-                          value={formData.items?.[index]?.itemCode}
-                          onChange={(value) => itemHandleChange(`itemCode`, value, index)}
-                        />
-                        <span style={{ display: 'none' }}>{index + 1}</span>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={6}>
-                      <Form.Item {...restField} label="ITEM DESCRIPTION" name={[name, 'itemDesc']}>
-                        <AutoComplete
-                          style={{ width: '100%' }}
-                          options={itemData.map(item => ({ value: item.itemMasterDesc }))}
-                          placeholder="Enter item description"
-                          filterOption={(inputValue, option) =>
-                            option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                          }
-                          onChange={(value) => itemHandleChange(`itemDesc`, value, index)}
-                          value={formData.items?.[index]?.itemDesc}
-
-                        />
-                        <span style={{ display: 'none' }}>{index + 1}</span>
-                      </Form.Item>
-                    </Col>
-                    <Col span={5}>
-                      <Form.Item {...restField} label="UOM" name={[name, 'uom']}>
-                        <AutoComplete quan
-                          style={{ width: '100%' }}
-                          options={itemData.map(item => ({ value: item.uom }))}
-                          placeholder="Enter UOM"
-                          filterOption={(inputValue, option) =>
-                            option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                          }
-                          onChange={(value) => itemHandleChange(`uom`, value, index)}
-                        />
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={6}>
-                      <Form.Item {...restField} label="RECEIVED QUANTITY" name={[name, 'quantity']}>
-                        <Input value={formData.items?.[index]?.quantity} onChange={(e) => itemHandleChange(`quantity`, e.target.value, index)} />
-                        <span style={{ display: 'none' }}>{index + 1}</span>
-                      </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                      <Form.Item {...restField} label="BUDGET HEAD PROCUREMENT" name={[name, 'budgetHeadProcurement']}>
-                        <Input onChange={(e) => itemHandleChange(`budgetHeadProcurement`, e.target.value, index)} />
-                      </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                      <Form.Item {...restField} label="LOCATOR" name={[name, 'locatorId']}>
-                        <Input onChange={(e) => itemHandleChange(`locatorId`, e.target.value, index)} />
-                      </Form.Item>
-                    </Col>
-                    <Col span={5}>
-                      <Form.Item {...restField} label="REMARK" name={[name, 'remarks']}>
-                        <Input value={formData.items?.[index]?.remarks} onChange={(e) => itemHandleChange(`remarks`, e.target.value, index)} />
-                        <span style={{ display: 'none' }}>{index + 1}</span>
-                      </Form.Item>
-                    </Col>
-                    <Col span={1}>
-                      <MinusCircleOutlined onClick={() => remove(name)} style={{ marginTop: 8 }} />
-                    </Col>
-                  </Row>
-                </div>
-              ))}
-            </>
-          )}
-        </Form.List> */}
-
         <Form.List name="items" initialValue={formData.items || [{}]}>
           {(fields, { add, remove }) => (
             <>
@@ -1104,7 +978,7 @@ const GoodsReceiveNoteForm = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
               PRINT
             </Button>
           </Form.Item>

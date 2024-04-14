@@ -3,15 +3,26 @@ import html2pdf from 'html2pdf.js';
 import axios from 'axios'
 
 export const handleSearch = (searchText, itemData, setHook, setSearch=null) => {
+  console.log("SEARCHTEXT: ", searchText)
+  console.log("ITEMDATA: ", itemData)
   if(setSearch !== null)
     setSearch(searchText)
   const filtered = itemData.filter((parentObject) =>
     recursiveSearch(parentObject, searchText)
   );
+  console.log("FILTEREDDDD: ", filtered)
   setHook([...filtered]);
 };
 
-
+export const apiHeader = (method, token) => {
+  return {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+      'Authorization': `Bearer ${token}`
+    }
+  }
+}
 
 // export const handleSearch = (searchText, itemData, setHook) => {
 //   setSearch(searchText)
@@ -223,14 +234,14 @@ export const convertArrayToObject = (array, _makeKey, valueKey ) => {
 
   };
 
-
+  const token = localStorage.getItem("token")
   export const fetchUomLocatorMaster = async (setUomHook, setLocatorHook) => {
     try {
       const uomMasterUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
       const locatorMasterUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
-      const [uomMaster, locatorMaster] = await Promise.all([axios.get(uomMasterUrl), axios.get(locatorMasterUrl)]);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+      const [uomMaster, locatorMaster] = await Promise.all([axios.get(uomMasterUrl, apiHeader("GET", token)), axios.get(locatorMasterUrl, apiHeader("GET", token))]);
       const { responseData: uomMasterData } = uomMaster.data;
       const { responseData: locatorMasterData } = locatorMaster.data;
       const uomObject = convertArrayToObject(uomMasterData, "id", "uomName");

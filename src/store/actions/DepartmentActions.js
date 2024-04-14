@@ -1,5 +1,6 @@
 // DepartmentActions.js
 import { BASE_URL } from "../../utils/BaseUrl";
+import { apiHeader } from "../../utils/Functions";
 
 
 const token = localStorage.getItem("token");
@@ -11,7 +12,8 @@ export const setDepartments = (departments) => ({
 
 export const fetchDepartments = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getDeptMaster`, {headers: {Authorization:token}});
+    const response = await fetch(`${BASE_URL}/getDeptMaster`, apiHeader("GET", token));
+    console.log("Response: ", response)
     const data = await response.json();
 
     dispatch(setDepartments(data.responseData));
@@ -20,13 +22,14 @@ export const fetchDepartments = () => async (dispatch) => {
   }
 };
 
+
 export const updateDepartment = (departmentId, values) => async (dispatch) => {
   try {
     const updateResponse = await fetch(`${BASE_URL}/updateDeptMaster`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization' : token
+        'Authorization' : `Bearer ${token}`
       },
       body: JSON.stringify({
         departmentId,
@@ -52,7 +55,7 @@ export const saveDepartment = (values) => async (dispatch) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': token
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(values),
     });
@@ -75,7 +78,7 @@ export const deleteDepartment = (departmentId) => async (dispatch) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization' : token
+        'Authorization' : `Bearer ${token}`
       },
       body: JSON.stringify({
         userId: 'string', 

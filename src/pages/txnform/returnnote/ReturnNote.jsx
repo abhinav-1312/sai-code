@@ -8,16 +8,33 @@ import {
   Button,
   Row,
   Col,
+  AutoComplete,
   Typography,
   Modal,
   message,
 } from "antd";
-import { MinusCircleOutlined } from "@ant-design/icons";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
+import { apiHeader, printOrSaveAsPDF } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
-import { printOrSaveAsPDF } from "../../../utils/Functions";
 const dateFormat = "DD/MM/YYYY";
+// import {FormInputItem} from "../../../components/FormInputItem";
+// import { printOrSaveAsPDF } from "../../../utils/Functions";
+
+
+// Hello
+
+const { Option } = Select;
+// const RetunNote = () => {
+//   Modal,
+//   message,
+// } from "antd";
+// import { MinusCircleOutlined } from "@ant-design/icons";
+// import dayjs from "dayjs";
+// import axios from "axios";
+
+// const dateFormat = "DD/MM/YYYY";
 
 const { Title } = Typography;
 
@@ -106,11 +123,13 @@ const RetunNote = () => {
     fetchUomMaster();
   }, []);
 
+  const token = localStorage.getItem("token")
+
   const fetchUomMaster = async () => {
     try {
       const uomMasterUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
-      const uomMaster = await axios.get(uomMasterUrl);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+      const uomMaster = await axios.get(uomMasterUrl, apiHeader("GET", token));
       const { responseData: uomMasterData } = uomMaster.data;
       setUomMaster([...uomMasterData]);
     } catch (error) {
@@ -121,8 +140,8 @@ const RetunNote = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
-      const response = await axios.get(apiUrl);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
     } catch (error) {
@@ -130,14 +149,14 @@ const RetunNote = () => {
     }
   };
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
     try {
+      const userCd = localStorage.getItem("userCd")
+      const password = localStorage.getItem("password")
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
-        password
+        password,
       });
 
       const { responseData } = response.data;
@@ -165,11 +184,11 @@ const RetunNote = () => {
   const handleIssueNoteNoChange = async (value) => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "ISN",
-      });
+      }, apiHeader("POST", token));
       const responseData = response.data.responseData;
       const { processData, itemList } = responseData;
       const issueNoteDt = processData?.issueNoteDt;
@@ -248,8 +267,8 @@ const RetunNote = () => {
       });
 
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveReturnNote";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveReturnNote";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       // Handle success response here
       if (
         response.status === 200 &&
@@ -266,7 +285,6 @@ const RetunNote = () => {
             returnNoteNo: processId,
           };
         });
-        setButtonVisible(true)
         setSuccessMessage(
           `Return Note successfully! Return Note : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -274,9 +292,11 @@ const RetunNote = () => {
         message.success(
           `Return Note successfully! Process ID: ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
+        setButtonVisible(true)
       } else {
         // Display a generic success message if specific data is not available
         message.error("Failed to Return Note. Please try again later.");
+        console.log(response.data);
       }
     } catch (error) {
       console.error("Error saving Return Note:", error);
@@ -665,7 +685,7 @@ const RetunNote = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
               PRINT
             </Button>
           </Form.Item>

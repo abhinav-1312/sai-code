@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Input, Table } from "antd";
 import axios from "axios";
-import { handleSearch, renderLocatorOHQ } from "../../utils/Functions";
+import { apiHeader, handleSearch, renderLocatorOHQ } from "../../utils/Functions";
 
 const Ohq = () => {
   const [itemData, setItemData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const token = localStorage.getItem("token");
 
+  const userId = localStorage.getItem("userCd")
   // const [itemMasterData, setItemMasterData] = useState([])
 
   const populateItemData = async () => {
     const { data } = await axios.post(
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getOHQ",
-      { itemCode: null, userId: "string" },
-      { headers: { Authorization: token } }
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ",
+      { itemCode: null, userId },
+      apiHeader("POST", token)
     ); // sending itemCode 'null' gives all available data
     const { responseData } = data;
     setItemData([...responseData]);

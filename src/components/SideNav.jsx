@@ -47,7 +47,7 @@ const menuItems = [
   },
   { key: "4", icon: <SearchOutlined />, label: "Locators", path: "/locator" },
   {
-    key: "14",
+    key: "18",
     icon: <AccountBookOutlined />,
     label: "Department",
     path: "/department",
@@ -107,7 +107,7 @@ const menuItems = [
       { key: "8.4", label: "Issue Note", path: "/trans/issue" },
       { key: "8.5", label: "Outward Gate Pass", path: "/trans/outward" },
       { key: "8.6", label: "Inward Gate Pass", path: "/trans/inward" },
-      { key: "8.8", label: "Inspection Report", path: "/trans/inspection" },
+      { key: "8.8", label: "Inspection Note", path: "/trans/inspectionNote" },
       { key: "8.9", label: "Acceptance Note", path: "/trans/acceptance" },
       { key: "8.1", label: "GRN", path: "/trans/grn" },
       { key: "8.10", label: "Rejection Note", path: "/trans/rejection" },
@@ -164,9 +164,10 @@ const SideNav = () => {
           item.key !== "13" &&
           item.key !== "5" &&
           item.key !== "6" &&
+          item.key !== "18" &&
           item.key !== "7" &&
           item.key !== "10" &&
-          item.key !== "11" &&
+          // item.key !== "11" &&
           item.key !== "12" &&
           item.key !== "21"
         ); // Hide these menus
@@ -195,6 +196,7 @@ const SideNav = () => {
           item.key !== "17" &&
           item.key !== "4" &&
           item.key !== "14" &&
+          item.key !== "18" &&
           item.key !== "5" &&
           item.key !== "6" &&
           item.key !== "7" &&
@@ -214,6 +216,7 @@ const SideNav = () => {
           item.key !== "17" &&
           item.key !== "4" &&
           item.key !== "14" &&
+          item.key !== "18" &&
           item.key !== "5" &&
           item.key !== "6" &&
           item.key !== "7" &&

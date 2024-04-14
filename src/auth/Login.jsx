@@ -16,23 +16,26 @@ const SignIn = () => {
   const handleLogin = async (values) => {
     try {
       const response = await axios.post(
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate",
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate",
         {
           userCd: values.userCd,
           password: values.password,
         }
       );
 
+      
       const { userCd, userType } = response.data.responseData.userDetails;
       const { token } = response.data.responseData;
-
+      
       // Store user details in local storage
+      // localStorage.setItem(response)
       localStorage.setItem("userCd", userCd);
       localStorage.setItem("userType", userType);
       localStorage.setItem("password", values.password);
       localStorage.setItem("token", token);
 
       setIsLoggedIn(true);
+      console.log(isLoggedIn);
 
       if (userType === "11") {
         const userRoles = "admin";
@@ -67,7 +70,7 @@ const SignIn = () => {
 
       window.location.reload();
     } catch (error) {
-      console.log(error);
+      console.log("Error while login.", error);
       setError("Invalid User Code or Password");
     }
   };

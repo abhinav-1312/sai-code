@@ -21,24 +21,24 @@ const DemandNoteForm = () => {
   });
   useEffect(() => {
 
-    fetchItemData()
+    // fetchItemData()
     fetchUserDetails()
   }, []);
 
-  const fetchItemData = async () => {
-    try {
-      const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster';
-      const response = await axios.get(apiUrl);
-      const { responseData } = response.data;
-      setItemData(responseData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  // const fetchItemData = async () => {
+  //   try {
+  //     const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster';
+  //     const response = await axios.get(apiUrl);
+  //     const { responseData } = response.data;
+  //     setItemData(responseData);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
     try {
+      const userCd = localStorage.getItem("userCd")
+      const password = localStorage.getItem("password")
       const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate';
       const response = await axios.post(apiUrl, {
         userCd,
@@ -292,7 +292,7 @@ const DemandNoteForm = () => {
           </Button>
         </Form.Item>
         <Form.Item >
-        <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+        <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
               PRINT
             </Button>
         </Form.Item>

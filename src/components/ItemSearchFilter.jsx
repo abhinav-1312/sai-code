@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button, Table, Popover } from "antd";
+import { apiHeader } from "../utils/Functions";
 // import 'antd/dist/antd.css';
 
 const { Search } = Input;
@@ -12,12 +13,7 @@ const ItemSearchFilter = () => {
   useEffect(() => {
     // Fetch data from the API
     fetch(
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster",
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster", apiHeader("GET", token)
     )
       .then((response) => response.json())
       .then((data) => {

@@ -16,6 +16,7 @@ import {
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
+import { apiHeader } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
 import { convertArrayToObject, convertEpochToDateString, fetchUomLocatorMaster, printOrSaveAsPDF } from "../../../utils/Functions";
 const dateFormat = "DD/MM/YYYY";
@@ -111,25 +112,39 @@ const RejectionNote = () => {
     });
   };
   useEffect(() => {
-    // fetchItemData();
-    fetchUomLocatorMaster(setUomMaster, setLocatorMaster)
+    fetchUomLocatorMaster(setUomMaster, setLocatorMaster);
+    fetchItemData();
     fetchUserDetails();
   }, []);
 
-  const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
+  const token = localStorage.getItem("token")
+
+  const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      const response = await axios.get(apiUrl, apiHeader("GET", token));
+      const { responseData } = response.data;
+      setItemData(responseData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const fetchUserDetails = async () => {
+    try {
+      const userCd = localStorage.getItem("userCd")
+      const password = localStorage.getItem("password")
+      const apiUrl =
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
-        password
+        password,
       });
 
       const { responseData } = response.data;
       const { organizationDetails, locationDetails } = responseData;
       const { userDetails } = responseData;
+      console.log("Fetched data:", organizationDetails);
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
@@ -153,13 +168,14 @@ const RejectionNote = () => {
   const handleInspectionNOChange = async (value) => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "IRN",
-      });
+      }, apiHeader("POST", token));
       const responseData = response.data.responseData;
       const { processData, itemList } = responseData;
+      console.log("API Response:", response.data);
       setFormData((prevFormData) => ({
         ...prevFormData,
 
@@ -179,8 +195,8 @@ const RejectionNote = () => {
         supplierName: processData?.supplierName,
         crAddress: processData?.crAddress,
 
-        noa: processData?.noa,
-        noaDate: convertEpochToDateString(processData?.noaDate),
+        noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
+        noa: processData?.noa ? processData.noa : "",
         dateOfDelivery: processData?.dateOfDelivery,
 
         items: itemList.map((item) => ({
@@ -203,7 +219,6 @@ const RejectionNote = () => {
       // Handle error
     }
   };
-
   const onFinish = async () => {
     try {
       const formDataCopy = { ...formData };
@@ -248,8 +263,8 @@ const RejectionNote = () => {
       });
 
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveRejectionNote";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveRejectionNote";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&
         response.data &&
@@ -838,7 +853,7 @@ const RejectionNote = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
               PRINT
             </Button>
           </Form.Item>

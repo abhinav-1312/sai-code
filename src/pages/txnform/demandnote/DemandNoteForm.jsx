@@ -26,41 +26,9 @@ const DemandNoteForm = () => {
   });
   useEffect(() => {
     // Fetch data from API to prefill form fields
-    fetchItemData()
+    // fetchItemData()
     fetchData();
   }, []);
-
-
-  // const printOrSaveAsPDF = (formRef) => {
-
-  //   const input = formRef.current;
-  //   if (input === null) {
-  //     return;
-  //   }
-  //   // Apply custom styles for Ant Design components to ensure proper rendering
-  //   const styleSheet = document.createElement("style");
-  //   styleSheet.type = "text/css";
-  //   styleSheet.innerText = `
-  //     .ant-input {
-  //       width: 100%;
-  //     }
-  //   `;
-  //   document.head.appendChild(styleSheet);
-
-  //   const options = {
-  //     margin: 5,
-  //     filename: 'form.pdf',
-  //     html2canvas: { scale: 0.8 },
-  //   };
-
-  //   html2pdf(input, options).then((pdf) => {
-  //     const blob = pdf.output('bloburl');
-  //     window.open(blob, '_blank');
-  //   });
-  // };
-
-
-
 
   const fetchItemData = async () => {
     try {
@@ -74,16 +42,20 @@ const DemandNoteForm = () => {
   };
 
   const fetchData = async () => {
+    console.log("Fetch data called")
     try {
-      const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate';
+      const userCd = localStorage.getItem("userCd")
+      const password = localStorage.getItem("password")
+      const apiUrl = 'https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate';
       const response = await axios.post(apiUrl, {
-        userCd: "dkg",
-        password: "string"
+        userCd,
+        password
       });
 
       const { responseData } = response.data;
       const { organizationDetails } = responseData;
       const { userDetails } = responseData;
+      console.log('Fetched data:', responseData);
       const {locationDetails} = responseData
       // Update form data with fetched values
       setFormData({
@@ -91,7 +63,7 @@ const DemandNoteForm = () => {
         regionalCenterName: organizationDetails.organizationName,
         consignorAddress: organizationDetails.locationAddr,
         consignorZipCode: locationDetails.zipcode,
-        // firstName: userDetails.firstName,
+        firstName: userDetails.firstName,
         // lastName: userDetails.lastName
 
       });
@@ -100,9 +72,10 @@ const DemandNoteForm = () => {
     }
   };
 
+  const token = localStorage.getItem("token")
 
   const onFinish = async (values) => {
-    const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/saveDemand';
+    const apiUrl = 'https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveDemand';
 
     try {
       // Transforming form data to match API payload
@@ -134,7 +107,8 @@ const DemandNoteForm = () => {
       // Making a POST request to the API endpoint using Axios
       const response = await axios.post(apiUrl, payload, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
       // Handle successful response here, if needed
@@ -399,7 +373,7 @@ const DemandNoteForm = () => {
             </Button> */}
           {/* </Form.Item> */}
           <Form.Item>
-            <Button onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+            <Button onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
               PRINT
             </Button>
           </Form.Item>

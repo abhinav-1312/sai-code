@@ -7,6 +7,7 @@ import {
 } from "./trnSummaryData";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { apiHeader } from "../../utils/Functions";
 
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
@@ -92,15 +93,17 @@ const TransactionSummary = () => {
     }
   };
 
-  const [itemData, setItemData] = useState([])
-  const [filteredData, setFilteredData] = useState([])
+  console.log("Show txn: ", showTxn);
+
+  const [itemData, setItemData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
 
   const populateData = async () => {
     try {
       const { data } = await axios.post(
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary",
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary",
         { startDate: null, endDate: null, itemCode: null, txnType: null },
-        { headers: { Authorization: token } }
+        apiHeader("POST", token)
       );
       const { responseData } = data;
       setFilteredData([...responseData]);
@@ -126,9 +129,9 @@ const TransactionSummary = () => {
       console.log("Form data copy: ", formDataCopy);
 
       const { data } = await axios.post(
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary",
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary",
         formDataCopy,
-        { headers: { Authorization: token } }
+        apiHeader("POST", token)
       );
       const { responseData } = data;
       console.log("resposnedata: ", responseData);

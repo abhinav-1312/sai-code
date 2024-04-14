@@ -1,5 +1,6 @@
 // LocationActions.js
 import { BASE_URL } from "../../utils/BaseUrl";
+import { apiHeader } from "../../utils/Functions";
 
 const token = localStorage.getItem("token");
 
@@ -10,7 +11,7 @@ export const setLocations = (locations) => ({
 
 export const fetchLocations = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getLocationMaster`, {headers: {Authorization: token}});
+    const response = await fetch(`${BASE_URL}/getLocationMaster`, apiHeader("GET", token) );
     const data = await response.json();
 
     dispatch(setLocations(data.responseData));
@@ -25,7 +26,7 @@ export const updateLocation = (locationId, values) => async (dispatch) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization' : token
+        'Authorization' : `Bearer ${token}`
       },
       body: JSON.stringify({
         locationId,
@@ -47,11 +48,11 @@ export const updateLocation = (locationId, values) => async (dispatch) => {
 
 export const saveLocation = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`https://sai-services.azurewebsites.net/sai-inv-mgmt/master/saveLocationMaster`, {
+    const createResponse = await fetch(`https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/saveLocationMaster`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization' : token
+        'Authorization' : `Bearer ${token}`
       },
       body: JSON.stringify(values),
     });
@@ -74,7 +75,7 @@ export const deleteLocation = (locationId) => async (dispatch) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization' : token
+        'Authorization' :`Bearer ${token}`
       },
       body: JSON.stringify({
         userId: 'string', 

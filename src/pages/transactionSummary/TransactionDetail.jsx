@@ -3,6 +3,7 @@ import { Button, Form, Input } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DetailData from "./detailData/DetailData";
+import { apiHeader } from "../../utils/Functions";
 
 const TransactionDetail = () => {
   const navigate = useNavigate();
@@ -29,11 +30,11 @@ const TransactionDetail = () => {
   console.log("Return data: ", igpData);
   const populateData = async () => {
     const trnDetailUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/txns/getTxnDtls";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnDtls";
     const { data } = await axios.post(
       trnDetailUrl,
       { processId: trnNo },
-      { headers: { Authorization: token } }
+      apiHeader("POST", token)
     );
     const { responseData } = data;
     const {
@@ -122,7 +123,7 @@ const TransactionDetail = () => {
         <h2>Issue Note</h2>
         {
           isnData ?
-          <DetailData data={isnData?.data} itemList={isnData?.itemList} /> 
+          <DetailData processType={"isn"} data={isnData?.data} itemList={isnData?.itemList} /> 
           :
           "No data available."
         }

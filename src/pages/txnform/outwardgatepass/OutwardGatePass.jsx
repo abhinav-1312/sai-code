@@ -28,6 +28,7 @@ import {
 import dayjs from "dayjs";
 import axios from "axios";
 import moment from "moment";
+import { apiHeader } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
 import { printOrSaveAsPDF } from "../../../utils/Functions";
 const dateFormat = "DD/MM/YYYY";
@@ -147,17 +148,20 @@ const OutwardGatePass = () => {
     });
   };
 
+  const token = localStorage.getItem("token")
+  const userCd = localStorage.getItem("userCd")
+
   const populateItemData = async () => {
     const itemMasterUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
     const locatorMasterUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
     const uomMasterUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
     const vendorMasteUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster";
     const locationMasterUrl =
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster";
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster";
     try {
       const [
         itemMaster,
@@ -166,11 +170,11 @@ const OutwardGatePass = () => {
         vendorMaster,
         locationMaster,
       ] = await Promise.all([
-        axios.get(itemMasterUrl),
-        axios.get(locatorMasterUrl),
-        axios.get(uomMasterUrl),
-        axios.get(vendorMasteUrl),
-        axios.get(locationMasterUrl),
+        axios.get(itemMasterUrl, apiHeader("GET", token)),
+        axios.get(locatorMasterUrl, apiHeader("GET", token)),
+        axios.get(uomMasterUrl, apiHeader("GET", token)),
+        axios.get(vendorMasteUrl, apiHeader("GET", token)),
+        axios.get(locationMasterUrl, apiHeader("GET", token)),
       ]);
 
       const { responseData: itemMasterData } = itemMaster.data;
@@ -198,8 +202,8 @@ const OutwardGatePass = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
-      const response = await axios.get(apiUrl);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
     } catch (error) {
@@ -207,28 +211,27 @@ const OutwardGatePass = () => {
     }
   };
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
     try {
+      const userCd = localStorage.getItem("userCd")
+      const password = localStorage.getItem("password")
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
-        password
-      });
+        password,
+      }, apiHeader("POST", token));
 
       const { responseData } = response.data;
+      console.log("Response data: ", responseData);
       const { organizationDetails, userDetails, locationDetails } = responseData;
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
-        crRegionalCenterCd: organizationDetails.id,
-        crRegionalCenterName: organizationDetails.location,
-        crAddress: organizationDetails.locationAddr,
-        crZipcode: locationDetails.zipcode,
+        // crRegionalCenterCd: organizationDetails.crRegionalCenterCd,
+        // crRegionalCenterName: organizationDetails.location,
+        // crAddress: organizationDetails.locationAddr,
+        // crZipcode: "131021",
         genName: userDetails.firstName,
-        noaDate: currentDate.format(dateFormat),
-        dateOfDelivery: currentDate.format(dateFormat),
         userId: "string",
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
@@ -240,98 +243,17 @@ const OutwardGatePass = () => {
       console.error("Error fetching data:", error);
     }
   };
-
-  const handleReturnNoteNoChange = async (value) => {
-    try{
-      const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
-      const response = await axios.post(apiUrl, {
-        processId: value,
-        processStage: "REJ",
-      });
-      const responseData = response.data.responseData;
-      const { processData, itemList } = responseData;
-
-      setFormData(prev=>{
-        return {
-          ...prev,
-          genName: processData?.genName,
-          genDate: processData?.genDate,
-          issueDate: processData?.issueDate,
-          issueName: processData?.issueName,
-          approvedDate: processData?.approvedDate,
-          approvedName: processData?.approvedName,
-          processId: processData.processId,
-          type: processData?.type,
-          typeOfNote: processData?.typeOfNote,
-
-
-          inspectionRptNo: processData?.inspectionRptNo,
-          acptRejNoteNo: processData?.acptRejNoteNo,
-          acptRejNoteDT: processData?.acptRejNoteDT,
-          dateOfDelivery: processData?.dateOfDelivery,
-          ceRegionalCenterCd: processData?.crRegionalCenterCd,
-          ceRegionalCenterName: processData?.crRegionalCenterName,
-          ceAddress: processData?.crAddress,
-          ceZipcode: processData?.crZipcode,
-          crRegionalCenterCd: processData?.ceRegionalCenterCd,
-          crRegionalCenterName: processData?.ceRegionalCenterName,
-          crAddress: processData?.ceAddress,
-          crZipcode: processData?.ceZipcode,
-          consumerName: processData?.consumerName,
-          supplierName: processData?.supplierName,
-          supplierCd: processData?.supplierCd,
-          address: processData?.address,
-          contactNo: processData?.contactNo,
-          note: processData?.note,
-          noaDate: convertEpochToDateString(processData?.noaDate),
-          noa: processData?.noa,
-          conditionOfGoods: processData?.conditionOfGoods,
-          challanNo: processData?.challanNo,
-          modeOfDelivery: processData?.modeOfDelivery,
-
-          items: itemList.map(item=>(
-            {
-              id: item?.id,
-              itemId: item?.id,
-              srNo: item?.sNo,
-              itemCode: item?.itemCode,
-              itemDesc: item?.itemDesc,
-              uom: item?.uom,
-              quantity: item?.quantity,
-              noOfDays: 12,
-              inspectedQuantity: item?.inspectedQuantity,
-              acceptedQuantity: item?.acceptedQuantity,
-              rejectedQuantity: item?.rejectedQuantity,
-              requiredDays: item?.requiredDays,
-              remarks: item?.remarks,
-              processId: item?.processId,
-              processType: item?.processType,
-              processStage: item?.processStage,
-              conditionOfGoods: item?.conditionOfGoods,
-              budgetHeadProcurement: item?.budgetHeadProcurement,
-              locatorId: item?.locatorId,
-            }
-          ))
-        }
-      } )
-
-    }catch (error) {
-      console.error("Error fetching sub process details:", error);
-    }
-  }
-
   const handleIssueNoteNoChange = async (value) => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "ISN",
-      });
+      }, apiHeader("POST", token));
       const responseData = response.data.responseData;
       const { processData, itemList } = responseData;
-
+      console.log("API Response:", response.data);
       setFormData((prevFormData) => ({
         ...prevFormData,
 
@@ -424,8 +346,9 @@ const OutwardGatePass = () => {
       });
 
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveOutwardGatePass";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveOutwardGatePass";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
+      console.log("API Response:", response.data);
       if (
         response.status === 200 &&
         response.data &&
@@ -471,6 +394,91 @@ const OutwardGatePass = () => {
   const handleSelectChange = (value) => {
     setSelectedOption(value);
   };
+
+  const handleReturnNoteNoChange = async (value) => {
+    console.log("VALUEEE: ", value)
+    try{
+      const apiUrl =
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+      const response = await axios.post(apiUrl, {
+        processId: value,
+        processStage: "REJ",
+      }, apiHeader("POST", token));
+      const {responseData} = response.data;
+      const { processData, itemList } = responseData;
+
+      console.log("PRocess dataaa: ", responseData)
+
+      if(responseData !== null){
+        setFormData(prev=>{
+          return {
+            ...prev,
+            genName: processData?.genName,
+            genDate: processData?.genDate,
+            issueDate: processData?.issueDate,
+            issueName: processData?.issueName,
+            approvedDate: processData?.approvedDate,
+            approvedName: processData?.approvedName,
+            processId: processData?.processId,
+            type: processData?.type,
+            typeOfNote: processData?.typeOfNote,
+  
+  
+            inspectionRptNo: processData?.inspectionRptNo,
+            acptRejNoteNo: processData?.acptRejNoteNo,
+            acptRejNoteDT: processData?.acptRejNoteDT,
+            dateOfDelivery: processData?.dateOfDelivery,
+            ceRegionalCenterCd: processData?.crRegionalCenterCd,
+            ceRegionalCenterName: processData?.crRegionalCenterName,
+            ceAddress: processData?.crAddress,
+            ceZipcode: processData?.crZipcode,
+            crRegionalCenterCd: processData?.ceRegionalCenterCd,
+            crRegionalCenterName: processData?.ceRegionalCenterName,
+            crAddress: processData?.ceAddress,
+            crZipcode: processData?.ceZipcode,
+            consumerName: processData?.consumerName,
+            supplierName: processData?.supplierName,
+            supplierCd: processData?.supplierCd,
+            address: processData?.address,
+            contactNo: processData?.contactNo,
+            note: processData?.note,
+            noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
+            noa: processData?.noa ? processData.noa : "",
+            conditionOfGoods: processData?.conditionOfGoods,
+            challanNo: processData?.challanNo,
+            modeOfDelivery: processData?.modeOfDelivery,
+  
+            items: itemList.map(item=>(
+              {
+                id: item?.id,
+                itemId: item?.id,
+                srNo: item?.sNo,
+                itemCode: item?.itemCode,
+                itemDesc: item?.itemDesc,
+                uom: item?.uom,
+                quantity: item?.quantity,
+                noOfDays: 12,
+                inspectedQuantity: item?.inspectedQuantity,
+                acceptedQuantity: item?.acceptedQuantity,
+                rejectedQuantity: item?.rejectedQuantity,
+                requiredDays: item?.requiredDays,
+                remarks: item?.remarks,
+                processId: item?.processId,
+                processType: item?.processType,
+                processStage: item?.processStage,
+                conditionOfGoods: item?.conditionOfGoods,
+                budgetHeadProcurement: item?.budgetHeadProcurement,
+                locatorId: item?.locatorId,
+              }
+            ))
+          }
+        })
+      }
+
+    }catch (error) {
+      console.error("Error fetching sub process details:", error);
+    }
+  }
 
   const findColumnValue = (id, dataSource, sourceName) => {
     const foundObject = dataSource.find((obj) => obj.id === parseInt(id));
@@ -813,7 +821,7 @@ const OutwardGatePass = () => {
 
                       {
 
-                         Type === "IRP" && 
+                        (Type === "IRP" || Type === "IOP" ) && 
                         <Form.Item label="REQUIRED FOR NO. OF DAYS">
                         <Input
                           value={item.noOfDays}
@@ -988,7 +996,7 @@ const OutwardGatePass = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
               PRINT
             </Button>
           </Form.Item>

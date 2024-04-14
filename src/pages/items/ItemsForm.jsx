@@ -11,6 +11,7 @@ import {
   InputNumber,
 } from "antd";
 import axios from "axios";
+import { apiHeader } from "../../utils/Functions";
 
 const { Option } = Select;
 
@@ -71,25 +72,17 @@ const ItemsForm = ({
     setItemDescriptionDisabled(true);
   };
 
-  const test = async () => {
-    console.log("Test called")
-    try{
-      const url = "https://sai-services.azurewebsites.net/sai-inv-mgmt/genparam/getAllSubCategoriesByDtls"
-      const url1 = "https://sai-services.azurewebsites.net/sai-inv-mgmt/genparam/getAllSubCategoriesByDtls?categoryCode=2"
-      const response = await axios.post(url1)
-      console.log("Test response: ",response)
-    }catch(error){
-      console.log("Error in test: ", error)
-    }
-  }
-
-  test()
-
   useEffect(() => {
     if (selectedCategory) {
       const fetchSubCategories = async () => {
         try {
-          const response = await axios.post(`https://sai-services.azurewebsites.net/sai-inv-mgmt/genparam/getAllSubCategoriesByDtls?categoryCode=${selectedCategory}`)
+          const response = await axios.post(
+            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllSubCategoriesByDtls",
+            {
+              categoryCode: selectedCategory,
+            },
+            apiHeader("POST", token)
+          );
           const data = response.data.responseData;
           // Assuming the response contains an array of subcategory options
           const subcategoryOptions = data.map((subcategory) => ({
@@ -111,19 +104,15 @@ const ItemsForm = ({
       const fetchTypes = async () => {
         try {
           const response = await axios.post(
-            "https://sai-services.azurewebsites.net/sai-inv-mgmt/genparam/getAllItemTypeByDtls",
+            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllItemTypeByDtls",
             {
               categoryCode: selectedCategory,
               subCategoryCode: selectedSubCategory,
             },
-            {
-              headers: {
-                Authorization: token,
-              },
-            }
+            apiHeader("POST", token)
           );
           const data = response.data.responseData;
-          const typeOptions = data?.map((type) => ({
+          const typeOptions = data.map((type) => ({
             key: type.typeCode,
             value: type.typeDesc,
           }));
@@ -141,24 +130,17 @@ const ItemsForm = ({
     if (selectedType) {
       const fetchDisciplines = async () => {
         try {
-          const url = "https://sai-services.azurewebsites.net/sai-inv-mgmt/genparam/getAllDisciplineByDtls"
-          const response = await axios.post(`${url}?categoryCode=${selectedCategory}&subCategoryCode=${selectedSubCategory}&typeCode=${selectedType}`)
-          // const response = await axios.post(
-          //   "https://sai-services.azurewebsites.net/sai-inv-mgmt/genparam/getAllDisciplineByDtls",
-          //   {
-          //     categoryCode: selectedCategory,
-          //     subCategoryCode: selectedSubCategory,
-          //     typeCode: selectedType,
-          //   },
-          //   {
-          //     headers: {
-          //       Authorization: token,
-          //     },
-          //   }
-          // );
+          const response = await axios.post(
+            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllDisciplineByDtls",
+            {
+              categoryCode: selectedCategory,
+              subCategoryCode: selectedSubCategory,
+              typeCode: selectedType,
+            },
+            apiHeader("POST", token)
+          );
           const data = response.data.responseData;
-          console.log("discipline data: ", data)
-          const disciplineOptions = data?.map((discipline) => ({
+          const disciplineOptions = data.map((discipline) => ({
             key: discipline.disciplineCode,
             value: discipline.disciplineName,
           }));
@@ -176,26 +158,20 @@ const ItemsForm = ({
     if (selectedDiscipline) {
       const fetchItemDescriptions = async () => {
         try {
-          const url = "https://sai-services.azurewebsites.net/sai-inv-mgmt/genparam/getAllItemNamesByDtls"
-          // const response = await axios.post(`${url}?categoryCode=${selectedCategory}&subCategoryCode=${selectedSubCategory}&typeCode=${selectedType}&disciplineCode=${selectedDiscipline}`)
           const response = await axios.post(
-            "https://sai-services.azurewebsites.net/sai-inv-mgmt/genparam/getAllItemNamesByDtls",
+            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllItemNamesByDtls",
             {
               categoryCode: selectedCategory,
               subCategoryCode: selectedSubCategory,
               typeCode: selectedType,
               disciplineCode: selectedDiscipline,
             },
-            {
-              headers: {
-                Authorization: token,
-              },
-            }
+            apiHeader("POST", token)
           );
           const data = response.data.responseData;
-          const itemDescriptionOptions = data?.map((itemDescription) => ({
-            key: itemDescription.itemNameCode,
-            value: itemDescription.itemName
+          const itemDescriptionOptions = data.map((itemDescription) => ({
+            key: itemDescription.itemName,
+            value: itemDescription.itemNameCode,
           }));
           setItemDescriptionOptions(itemDescriptionOptions);
           setItemDescriptionDisabled(false);
@@ -215,6 +191,7 @@ const ItemsForm = ({
 
   const onFinish = (values) => {
     values = { ...values, itemMasterDesc: values.itemMasterDesc[0] };
+    console.log("Values: ", values);
     onSubmit(values);
     form.resetFields();
   };
@@ -223,10 +200,10 @@ const ItemsForm = ({
   //   setItemDescVal(value)
   // }
   const onChange = (value) => {
-    // console.log(`selected ${value}`);
+    console.log(`selected ${value}`);
   };
   const onSearch = (value) => {
-    // console.log("search:", value);
+    console.log("search:", value);
   };
 
   const filterOption = (input, option) =>
@@ -374,7 +351,6 @@ const ItemsForm = ({
             </Select>
           </Form.Item>
         </Col>
-
         <Col span={8}>
           <Form.Item
             name="quantity"
@@ -441,7 +417,6 @@ const ItemsForm = ({
             </Select>
           </Form.Item>
         </Col>
-
         <Col span={8}>
           <Form.Item
             name="price"

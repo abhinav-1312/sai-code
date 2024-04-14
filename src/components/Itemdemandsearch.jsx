@@ -14,6 +14,7 @@ import {
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import moment from "moment";
+import { apiHeader } from "../utils/Functions";
 const { TextArea } = Input;
 const { Search } = Input;
 
@@ -26,12 +27,7 @@ const ItemDemandSearch = () => {
   useEffect(() => {
     // Fetch data from the API
     fetch(
-      "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster",
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
+      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster", apiHeader("GET", token)
     )
       .then((response) => response.json())
       .then((data) => {

@@ -9,22 +9,16 @@ import {
   Row,
   Col,
   Typography,
-  AutoComplete,
   message,
   Modal,
   Popover,
   Table,
-  List,
 } from "antd";
-import { itemNames, types, allDisciplines, subCategories, categories, sizes, usageCategories, brands, colors } from "../../items/KeyValueMapping";
-import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import { MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
-import ItemSearchFilter from "../../../components/ItemSearchFilter";
-import moment from "moment";
-import { handleSearch, handleSelectItem, printOrSaveAsPDF } from "../../../utils/Functions";
-import { primColumn } from "./ItemDetailTableColumn";
-import ItemDetailTable from "./ItemDetailTable";
+
+import { apiHeader, handleSearch, printOrSaveAsPDF } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
@@ -95,7 +89,7 @@ const IssueNote = () => {
     interRdDemandNote: "",
   });
 
-  // const primaryColumn = primColumn(locationMaster, vendorMaster, selectedItems, setSelectedItems, setFormData)
+  console.log("FORMdATA ISSUE NOTE: ", formData)
   
   const showModal = () => {
     setIsModalOpen(true);
@@ -106,6 +100,24 @@ const IssueNote = () => {
   };
 
   const handleChange = (fieldName, value) => {
+    if(fieldName === "interRdDemandNote"){
+      setFormData(prevValues=>{
+        return {
+          ...prevValues,
+          interRdDemandNote: value,
+          demandNoteNo: value
+        }
+      })
+    }
+    if(fieldName === "processType"){
+      setFormData(prevValues=>{
+        return {
+          ...prevValues,
+          processType: value,
+          type: value
+        }
+      })
+    }
     setFormData((prevValues) => ({
       ...prevValues,
       [fieldName]: value === "" ? null : value,
@@ -113,14 +125,6 @@ const IssueNote = () => {
   };
 
   const itemHandleChange = (fieldName, value, index) => {
-    // setItemDetail((prevValues) => {
-    //   const updatedItems = prevValues;
-    //   updatedItems[index] = {
-    //     ...updatedItems[index],
-    //     [fieldName]: value,
-    //   };
-    //   return [...updatedItems]
-    // });
 
     if(fieldName === 'quantity'){
       // const formItemQuantity = formData.items[index]
@@ -245,73 +249,55 @@ const IssueNote = () => {
       title: "UOM DESCRIPTION",
       dataIndex: "uomDtls",
       key: "uomDtls",
-      render: (uomDtls) => uomDtls.baseUom
+      render: (uomDtls) => uomDtls?.baseUom
     },
     {
       title: "LOCATION",
       dataIndex: "locationDesc",
       key: "location"
     },
-    // {
-    //   title: "LOCATOR CODE",
-    //   dataIndex: "locatorId",
-    //   key: "locatorCode",
-    // },
+
     { title: "PRICE", dataIndex: "price", key: "price" },
-    // {
-    //   title: "VENDOR DETAIL",
-    //   dataIndex: "vendorId",
-    //   key: "vendorDetail",
-    //   render: (vendorId) => vendorMaster[vendorId],
-    //   // render: (vendorId) => findColumnValue(vendorId, vendorMaster, "vendorMaster")
-    // },
+
     {
       title: "CATEGORY",
       dataIndex: "categoryDesc",
       key: "category",
-      // render: (category) => categories[category],
     },
     {
       title: "SUB-CATEGORY",
       dataIndex: "subCategoryDesc",
       key: "subCategory",
-      // render: (subCategory) => subCategories[subCategory],
     },
     {
       title: "Type",
       dataIndex: "typeDesc",
       key: "type",
-      // render: (type) => types[type],
     },
     {
       title: "Disciplines",
       dataIndex: "disciplinesDesc",
       key: "disciplines",
-      // render: (disciplines) => allDisciplines[disciplines],
     },
     {
       title: "Brand",
       dataIndex: "brandDesc",
       key: "brand",
-      // render: (brandId) => brands[brandId],
     },
     {
       title: "Size",
       dataIndex: "sizeDesc",
       key: "size",
-      // render: (size) => sizes[size],
     },
     {
       title: "Colour",
       dataIndex: "colorDesc",
       key: "colour",
-      // render: (colorId) => colors[colorId],
     },
     {
       title: "Usage Category",
       dataIndex: "usageCategoryDesc",
       key: "usageCategory",
-      // render: (usageCategory) => usageCategories[usageCategory],
     },
     {
       title: "MINIMUM STOCK LEVEL",
@@ -385,17 +371,20 @@ const IssueNote = () => {
     }
   ]
 
+  const token = localStorage.getItem("token")
+  const userCd = localStorage.getItem("userCd")
+  const password = localStorage.getItem("password")
   const populateItemData = async() => {
-    const itemMasterUrl = "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster"
-    const ohqUrl = "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getOHQ"
-    const vendorMasteUrl = "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster"
-    const locationMasterUrl = "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster"
+    const itemMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster"
+    const ohqUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ"
+    const vendorMasteUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster"
+    const locationMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster"
     try{
       const [itemMaster, ohq, vendorMaster, locationMaster] = await Promise.all([
-        axios.get(itemMasterUrl),
-        axios.post(ohqUrl, {itemCode:null, user: "string"}),
-        axios.get(vendorMasteUrl),
-        axios.get(locationMasterUrl)
+        axios.get(itemMasterUrl, apiHeader("GET", token)),
+        axios.post(ohqUrl, {itemCode:null, user: userCd}, apiHeader("GET", token)),
+        axios.get(vendorMasteUrl, apiHeader("GET", token)),
+        axios.get(locationMasterUrl, apiHeader("GET", token))
       ])
 
       
@@ -673,7 +662,7 @@ const IssueNote = () => {
     const password = localStorage.getItem('password');
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password
@@ -722,6 +711,26 @@ const IssueNote = () => {
     }
   };
 
+  const handleCeRccChange = async (value) => {
+    const url = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOrgMasterById"
+    const {data} = await axios.post(url, {id: value, userId: userCd}, apiHeader("POST", token))
+
+    console.log("RESPONSE RCC: ", data)
+    const {responseStatus, responseData} = data
+
+    if(responseStatus.message === "Success" && responseStatus.statusCode === 200){
+      setFormData(prev=>{
+        return {
+          ...prev,
+          ceRegionalCenterCd: responseData.id,
+          ceRegionalCenterName: responseData.organizationName,
+          ceAddress: responseData.locationAddr,
+
+        }
+      })
+    }
+  }
+
   const onFinish = async () => {
 
     try {
@@ -764,8 +773,8 @@ const IssueNote = () => {
       });
 
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveIssueNote";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveIssueNote";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&
         response.data &&
@@ -853,14 +862,6 @@ const IssueNote = () => {
           </Col>
 
           <Col span={6} offset={12}>
-            {/* <Form.Item label="ISSUE NOTE NO." name="issueNoteNo">
-              <Input
-                value={formData.issueNoteNo}
-                onChange={(e) => handleChange("issueNoteNo", e.target.value)}
-                disabled
-              />
-              <div style={{ display: "none" }}>{formData.issueNoteNo}</div>
-            </Form.Item> */}
             <FormInputItem label="ISSUE NOTE NO. :" value={formData.issueNoteNo  === "string" ? "not defined" : formData.issueNoteNo} disabled={true} />
           </Col>
         </Row>
@@ -933,32 +934,26 @@ const IssueNote = () => {
                   label="REGIONAL CENTER CODE :"
                   name="ceRegionalCenterCd"
                 >
-                  <Input
+                  <Input value={formData?.ceRegionalCenterCd}
                     onChange={(e) =>
-                      handleChange("ceRegionalCenterCd", e.target.value)
+                      // handleChange("ceRegionalCenterCd", e.target.value)
+                      handleCeRccChange(e.target.value)
                     }
                   />
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                   label="REGIONAL CENTER NAME  :"
                   name="ceRegionalCenterName"
                 >
-                  <Input
+                  <Input value={formData?.ceRegionalCenterName}
                     onChange={(e) =>
                       handleChange("ceRegionalCenterName", e.target.value)
                     }
                   />
-                </Form.Item>
-                <Form.Item label="ADDRESS :" name="ceAddress">
-                  <Input
-                    onChange={(e) => handleChange("ceAddress", e.target.value)}
-                  />
-                </Form.Item>
-                <Form.Item label="ZIP CODE :" name="ceZipcode">
-                  <Input
-                    onChange={(e) => handleChange("ceZipcode", e.target.value)}
-                  />
-                </Form.Item>
+                </Form.Item> */}
+                <FormInputItem label="REGIONAL CENTER NAME" value={formData.ceRegionalCenterName} />
+                <FormInputItem label="ADDRESS" value={formData.ceAddress} />
+                <FormInputItem label="ZIPCODE" value={formData.ceZipcode} />
               </>
             )}
           </Col>

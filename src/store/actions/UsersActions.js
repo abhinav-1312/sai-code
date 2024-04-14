@@ -1,15 +1,17 @@
-import { BASE_URL } from "../../utils/BaseUrl";
+// import { BASE_URL } from "../../utils/BaseUrl";
+import {BASE_URL} from "../../utils/BaseUrl"
+import {apiHeader} from "../../utils/Functions"
 import axios from "axios"
 
-const token = localStorage.getItem("token");
 export const setUsers = (users) => ({
   type: "SET_USERS",
   payload: users,
 });
 
+const token = localStorage.getItem("token");
 export const fetchUsers = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getUserMaster`, {headers: {Authorization : token}});
+    const response = await fetch(`${BASE_URL}/getUserMaster`, apiHeader("GET", token));
     const data = await response.json();
 
     dispatch(setUsers(data.responseData));
@@ -19,19 +21,19 @@ export const fetchUsers = () => async (dispatch) => {
 };
 
 export const updateUser = (userId, values) => async (dispatch) => {
-  console.log("Update user called: ", userId, values)
   try {
-    const updateResponse = await fetch(`https://sai-services.azurewebsites.net/sai-inv-mgmt/updateUserMaster`, {
+    const updateResponse = await fetch(`${BASE_URL}/updateUserMaster`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        'Authorization' : token
+        'Authorization' : `Bearer ${token}`
       },
       body: JSON.stringify({
         userId,
         ...values,
       }),
-    })
+    });
+
     if (updateResponse.ok) {
       alert("Users updated successfully");
       dispatch(fetchUsers());
@@ -73,7 +75,7 @@ export const saveUser = (values) => async (dispatch) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token,
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(values),
     });
@@ -105,7 +107,7 @@ export const deleteUser = (userId) => async (dispatch) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        'Authorization' : token
+        'Authorization' : `Bearer ${token}`
       },
       body: JSON.stringify({
         userId: "string",

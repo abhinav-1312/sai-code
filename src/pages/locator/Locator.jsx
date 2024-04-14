@@ -26,6 +26,7 @@ const LocatorPage = ({
   }, [fetchLocators]);
 
   const handleEdit = (locator) => {
+    console.log(locator);
     setEditingLocator(locator);
     setVisible(true);
   };

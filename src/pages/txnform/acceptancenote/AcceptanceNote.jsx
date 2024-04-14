@@ -9,16 +9,14 @@ import {
   Row,
   Col,
   Typography,
-  AutoComplete,
   message,
   Modal,
 } from "antd";
-import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import { MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
+import { apiHeader, convertEpochToDateString, fetchUomLocatorMaster, printOrSaveAsPDF } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
-import { FormItemInputContext } from "antd/es/form/context";
-import { convertArrayToObject, convertEpochToDateString, fetchUomLocatorMaster, printOrSaveAsPDF } from "../../../utils/Functions";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Title } = Typography;
@@ -94,26 +92,6 @@ const AcceptanceNote = () => {
     }));
   };
 
-  // const fetchUomLocatorMaster = async () => {
-  //   try {
-  //     const uomMasterUrl =
-  //       "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
-  //     const locatorMasterUrl =
-  //       "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
-  //     const uomMaster = await axios.get(uomMasterUrl);
-  //     const { responseData: uomMasterData } = uomMaster.data;
-  //     // const { responseData: locatorMasterData } = locatorMaster.data;
-  //     const uomObject = convertArrayToObject(uomMasterData, "id", "uomName");
-  //     // const locatorObj = convertArrayToObject(locatorMasterData, "id", "locatorDesc")
-  //     setUomMaster({ ...uomObject });
-  //     // setLocatorMaster({...locatorObj})
-  //   } catch (error) {
-  //     console.log("Error fetching Uom master details.", error);
-  //   }
-  // };
-
-  
-
   const itemHandleChange = (fieldName, value, index) => {
     setFormData((prevValues) => {
       const updatedItems = [...(prevValues.items || [])];
@@ -129,19 +107,18 @@ const AcceptanceNote = () => {
   };
 
   useEffect(() => {
-    // fetchItemData();
     fetchUomLocatorMaster(setUomMaster, setLocatorMaster)
+    fetchItemData();
     fetchUserDetails();
-    fetchUomLocatorMaster();
   }, []);
 
-  console.log("UOMASTEEEEZr: ", uomMaster)
+  const token = localStorage.getItem("token")
 
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
-      const response = await axios.get(apiUrl);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
     } catch (error) {
@@ -149,20 +126,19 @@ const AcceptanceNote = () => {
     }
   };
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
-
     try {
+      const userCd = localStorage.getItem("userCd")
+      const password = localStorage.getItem("password")
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
-        userCd: userCd,
-        password: password,
+        userCd,
+        password,
       });
 
       const { responseData } = response.data;
-      const { organizationDetails } = responseData;
-      const { userDetails, locationDetails } = responseData;
+      const { organizationDetails, locationDetails } = responseData;
+      const { userDetails } = responseData;
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
@@ -186,11 +162,11 @@ const AcceptanceNote = () => {
   const handleInspectionNOChange = async (value) => {
     try {
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "IRN",
-      });
+      }, apiHeader("POST", token));
       const responseData = response.data.responseData;
       const { processData, itemList } = responseData;
       setFormData((prevFormData) => ({
@@ -213,8 +189,8 @@ const AcceptanceNote = () => {
         crAddress: processData?.crAddress,
 
         dateOfDelivery: processData?.dateOfDelivery,
-        noaDate:convertEpochToDateString(processData?.noaDate),
-        noa: processData?.noa,
+        noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
+        noa: processData?.noa ? processData.noa : "",
 
         items: itemList.map((item) => ({
           srNo: item.sNo,
@@ -222,6 +198,7 @@ const AcceptanceNote = () => {
           itemDesc: item.itemDesc,
           uom: item?.uom,
           quantity: item.acceptedQuantity,
+          inspectedQuantity: item.inspectedQuantity,
           noOfDays: item.requiredDays,
           remarks: item.remarks,
           conditionOfGoods: item.conditionOfGoods,
@@ -295,9 +272,11 @@ const AcceptanceNote = () => {
         }
       });
 
+      
+
       const apiUrl =
-        "https://sai-services.azurewebsites.net/sai-inv-mgmt/saveAcceptanceNote";
-      const response = await axios.post(apiUrl, formDataCopy);
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveAcceptanceNote";
+      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&
         response.data &&
@@ -482,31 +461,7 @@ const AcceptanceNote = () => {
             </Form.Item>
 
             <FormInputItem label="NOA NO. :" value={formData.noa} />
-
-            {/* <Form.Item label="NOA NO." name="noaNo">
-              <Input onChange={(e) => handleChange("noaNo", e.target.value)} />
-            </Form.Item> */}
-
-            {/* <Form.Item label="NOA DATE" name="noaDate">
-              <DatePicker
-                format={dateFormat}
-                style={{ width: "100%" }}
-                onChange={(date, dateString) =>
-                  handleChange("noaDate", dateString)
-                }
-              />
-            </Form.Item> */}
             <FormInputItem label="NOA DATE :" value={formData.noaDate} />
-            {/* <Form.Item label="DATE OF DELIVERY" name="dateOfDelivery">
-              <DatePicker
-                format={dateFormat}
-                style={{ width: "100%" }}
-                onChange={(date, dateString) =>
-                  handleChange("dateOfDelivery", dateString)
-                }
-              />
-            </Form.Item> */}
-
             <FormInputItem label="DATE OF DELIVERY" value={formData.dateOfDelivery} />
           </Col>
         </Row>
@@ -561,33 +516,11 @@ const AcceptanceNote = () => {
 
                     {Type !== "PO" && (
                       <>
-                        <Form.Item label="INSPECTED QUANTITY">
-                          <Input
-                            value={item.inspectedQuantity}
-                            onChange={(e) =>
-                              itemHandleChange(
-                                "inspectedQuantity",
-                                e.target.value,
-                                key
-                              )
-                            }
-                          />
-                        </Form.Item>
+                        <FormInputItem label="INSPECTED QUANTITY" value = {item.inspectedQuantity} />
                       </>
                     )}
 
-                    <Form.Item label="ACCEPTED QUANTITY">
-                      <Input
-                        value={item.acceptedQuantity}
-                        onChange={(e) =>
-                          itemHandleChange(
-                            "acceptedQuantity",
-                            e.target.value,
-                            key
-                          )
-                        }
-                      />
-                    </Form.Item>
+                    <FormInputItem label="ACCEPTED QUANTITY" value={item.acceptedQuantity} />
                     <Form.Item label="REMARK">
                       <Input
                         value={item.remarks}
@@ -609,169 +542,6 @@ const AcceptanceNote = () => {
                       </Col>
                   </div>
                 ))}
-{/* 
-              {fields.map(({ key, name, ...restField }, index) => (
-                <div
-                  key={key}
-                  style={{
-                    marginBottom: 16,
-                    border: "1px solid #d9d9d9",
-                    padding: 16,
-                    borderRadius: 4,
-                  }}
-                >
-                  <Row gutter={24}>
-                    <Col span={6}>
-                      <Form.Item
-                        {...restField}
-                        label="S.NO."
-                        name={[name, "srNo"]}
-                      >
-                        <Input
-                          value={formData.items?.[index]?.srNo}
-                          onChange={(e) =>
-                            e.target &&
-                            itemHandleChange(`srNo`, e.target.value, index)
-                          }
-                        />
-                        <span style={{ display: "none" }}>{index + 1}</span>
-                      </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                      <Form.Item
-                        {...restField}
-                        label="ITEM CODE"
-                        name={[name, "itemCode"]}
-                        initialValue={formData.items?.[index]?.itemCode}
-                      >
-                        <AutoComplete
-                          style={{ width: "100%" }}
-                          options={itemData.map((item) => ({
-                            value: item.itemMasterCd,
-                          }))}
-                          placeholder="Enter item code"
-                          filterOption={(inputValue, option) =>
-                            option.value
-                              .toUpperCase()
-                              .indexOf(inputValue.toUpperCase()) !== -1
-                          }
-                          value={formData.items?.[index]?.itemCode}
-                          onChange={(value) =>
-                            itemHandleChange(`itemCode`, value, index)
-                          }
-                        />
-                        <span style={{ display: "none" }}>{index + 1}</span>
-                      </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                      <Form.Item
-                        {...restField}
-                        label="ITEM DESCRIPTION"
-                        name={[name, "itemDesc"]}
-                      >
-                        <AutoComplete
-                          style={{ width: "100%" }}
-                          options={itemData.map((item) => ({
-                            value: item.itemMasterDesc,
-                          }))}
-                          placeholder="Enter item description"
-                          filterOption={(inputValue, option) =>
-                            option.value
-                              .toUpperCase()
-                              .indexOf(inputValue.toUpperCase()) !== -1
-                          }
-                          onChange={(value) =>
-                            itemHandleChange(`itemDesc`, value, index)
-                          }
-                          value={formData.items?.[index]?.itemDesc}
-                        />
-                        <span style={{ display: "none" }}>{index + 1}</span>
-                      </Form.Item>
-                    </Col>
-                    <Col span={5}>
-                      <Form.Item
-                        {...restField}
-                        label="UOM"
-                        name={[name, "uom"]}
-                      >
-                        <AutoComplete
-                          style={{ width: "100%" }}
-                          options={itemData.map((item) => ({
-                            value: item.uom,
-                          }))}
-                          placeholder="Enter UOM"
-                          filterOption={(inputValue, option) =>
-                            option.value
-                              .toUpperCase()
-                              .indexOf(inputValue.toUpperCase()) !== -1
-                          }
-                          onChange={(value) =>
-                            itemHandleChange(`uom`, value, index)
-                          }
-                        />
-                      </Form.Item>
-                    </Col>
-                    {Type !== "PO" && (
-                      <Col span={6}>
-                        <Form.Item
-                          {...restField}
-                          label="INSPECTED QUANTITY "
-                          name={[name, "inspectionquantity"]}
-                        >
-                          <Input
-                            value={formData.items?.[index]?.quantity}
-                            onChange={(e) =>
-                              itemHandleChange(
-                                `inspectionquantity`,
-                                e.target.value,
-                                index
-                              )
-                            }
-                          />
-                          <span style={{ display: "none" }}>{index + 1}</span>
-                        </Form.Item>
-                      </Col>
-                    )}
-                    <Col span={6}>
-                      <Form.Item
-                        {...restField}
-                        label="ACCEPTED QUANTITY"
-                        name={[name, "quantity"]}
-                      >
-                        <Input
-                          onChange={(e) =>
-                            itemHandleChange(
-                              `acceptedQuantity`,
-                              e.target.value,
-                              index
-                            )
-                          }
-                        />
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={5}>
-                      <Form.Item
-                        {...restField}
-                        label="REMARK"
-                        name={[name, "remarks"]}
-                      >
-                        <Input
-                          onChange={(e) =>
-                            itemHandleChange(`remarks`, e.target.value, index)
-                          }
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={1}>
-                      <MinusCircleOutlined
-                        onClick={() => remove(name)}
-                        style={{ marginTop: 8 }}
-                      />
-                    </Col>
-                  </Row>
-                </div>
-              ))} */}
             </>
           )}
         </Form.List>
@@ -916,7 +686,7 @@ const AcceptanceNote = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger htmlType="save" style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
               PRINT
             </Button>
           </Form.Item>
