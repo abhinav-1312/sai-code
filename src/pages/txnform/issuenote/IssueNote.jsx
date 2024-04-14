@@ -147,16 +147,44 @@ const IssueNote = () => {
     })
   };
 
+  // const mergeItemMasterAndOhq = (itemMasterArr, ohqArr) => {
+  //   const arr = itemMasterArr.map(item=>{
+  //     const itemCodeMatch = ohqArr.find(itemOhq=>itemOhq.itemCode === item.itemMasterCd)
+  //     if(itemCodeMatch){
+  //       const newQtyList = itemCodeMatch.qtyList.filter(obj=>obj.quantity !== 0)
+  //       if(newQtyList.length > 0)
+  //         return {...item, qtyList:newQtyList, locationId: itemCodeMatch.locationId, locationDesc: itemCodeMatch.locationName}
+  //       else return null
+  //     }
+  //     else return null
+
+      
+  //   })
+  //   return arr
+  // }
+
   const mergeItemMasterAndOhq = (itemMasterArr, ohqArr) => {
-    return itemMasterArr.map(item=>{
-      const itemCodeMatch = ohqArr.find(itemOhq=>itemOhq.itemCode === item.itemMasterCd)
-      if(itemCodeMatch){
-        const newQtyList = itemCodeMatch.qtyList.filter(obj=>obj.quantity !== 0)
-        if(newQtyList.length > 0)
-          return {...item, qtyList:newQtyList, locationId: itemCodeMatch.locationId, locationDesc: itemCodeMatch.locationName}
-      }
-    })
-  }
+    const arr = itemMasterArr.map(item => {
+        const itemCodeMatch = ohqArr.find(itemOhq => itemOhq.itemCode === item.itemMasterCd);
+        if (itemCodeMatch) {
+            const newQtyList = itemCodeMatch.qtyList.filter(obj => obj.quantity !== 0);
+            if (newQtyList.length > 0) {
+                return {
+                    ...item,
+                    qtyList: newQtyList,
+                    locationId: itemCodeMatch.locationId,
+                    locationDesc: itemCodeMatch.locationName
+                }; 
+            }
+        }
+        // Return undefined if no match found or newQtyList is empty
+        return undefined;
+    }).filter(Boolean); // Filter out undefined values
+    return arr;
+};
+
+
+
 
   const renderLocatorISN = (obj, rowRecord) => {
     return (
@@ -195,6 +223,9 @@ const IssueNote = () => {
       />
     )
   }
+
+  console.log("ITEMDATA: ", data)
+  console.log("Filtereddata: ", filteredData)
 
   const tableColumns =  [
     { title: "S NO.", dataIndex: "id", key: "id", fixed: "left", width: 80 },
@@ -369,6 +400,7 @@ const IssueNote = () => {
 
       
       const {responseData : itemMasterData} = itemMaster.data
+      console.log("Itemmasterdata: ", itemMasterData)
       // const {responseData : locatorMasterData} = locatorMaster.data
       // const {responseData : uomMasterData} = uomMaster.data
       const {responseData: ohqData} = ohq.data
