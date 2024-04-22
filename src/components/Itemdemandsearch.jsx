@@ -10,9 +10,10 @@ import {
   Select,
   Table,
   Popover,
+  message,
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
-import axios from "axios";
+import axios, { Axios } from "axios";
 import moment from "moment";
 import { apiHeader } from "../utils/Functions";
 const { TextArea } = Input;
@@ -24,17 +25,23 @@ const ItemDemandSearch = () => {
   const [searchValue, setSearchValue] = useState("");
   const [selectedItems, setSelectedItems] = useState([]); // State to hold selected item data
   const token = localStorage.getItem("token");
+
+  const populateItemData = async () => {
+    try{
+      const {data} = await axios.get("/master/getItemMaster", apiHeader("GET", token))
+      const {responseData} = data
+      setFilteredData(responseData)
+      setData(responseData)
+    }
+    catch(error){
+      console.log("Error fetching data.", error)
+      message.error("Error fetching data. Please try again.")
+    }
+  }
+
   useEffect(() => {
     // Fetch data from the API
-    fetch(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster", apiHeader("GET", token)
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data.responseData);
-        setFilteredData(data.responseData); // Initially set filtered data to all data
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+    populateItemData()
   }, []);
 
   const handleSearch = (value) => {

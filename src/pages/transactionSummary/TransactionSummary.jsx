@@ -101,7 +101,7 @@ const TransactionSummary = () => {
   const populateData = async () => {
     try {
       const { data } = await axios.post(
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary",
+        "/txns/getTxnSummary",
         { startDate: null, endDate: null, itemCode: null, txnType: null },
         apiHeader("POST", token)
       );
@@ -129,7 +129,7 @@ const TransactionSummary = () => {
       console.log("Form data copy: ", formDataCopy);
 
       const { data } = await axios.post(
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary",
+        "/txns/getTxnSummary",
         formDataCopy,
         apiHeader("POST", token)
       );

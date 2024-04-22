@@ -11,6 +11,8 @@ import {
 import LocationTable from "./LocationTable";
 import LocationForm from "./LocationForm";
 import dayjs from "dayjs";
+import axios from "axios";
+import { apiHeader } from "../../utils/Functions";
 
 const apiRequest = async (url, method, requestData) => {
   const token = localStorage.getItem("token");
@@ -22,14 +24,14 @@ const apiRequest = async (url, method, requestData) => {
     },
   };
 
-  if (method === "POST") {
-    options["body"] = JSON.stringify(requestData);
-  }
+  // if (method === "POST") {
+  //   options["body"] = JSON.stringify(requestData);
+  // }
 
   try {
-    const response = await fetch(url, options);
-    const data = await response.json();
-    return data.responseData;
+    const {data} = await axios.post(url, requestData, apiHeader("POST", token));
+    const {responseData} = data
+    return responseData;
   } catch (error) {
     console.error("Error: ", error);
   }
@@ -54,7 +56,7 @@ const LocationPage = ({
 
   const getLocation = async (id) => {
     const itemResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMasterById",
+      "/master/getLocationMasterById",
       "POST",
       {
         locationId: id,
@@ -65,7 +67,9 @@ const LocationPage = ({
   };
 
   const handleEdit = async (location) => {
+    console.log("location: ", location)
     const locationObject = await getLocation(location);
+    console.log("locationObject: ", locationObject)
     const dateObject = new Date(locationObject.endDate);
     const year = dateObject.getFullYear();
     const month = dateObject.getMonth(); // Months are zero-based, so add 1

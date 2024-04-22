@@ -11,10 +11,10 @@ export const setUsers = (users) => ({
 const token = localStorage.getItem("token");
 export const fetchUsers = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getUserMaster`, apiHeader("GET", token));
-    const data = await response.json();
+    const {data} = await axios.get("/master/getUserMaster", apiHeader("GET", token));
+    const {responseData} = data
 
-    dispatch(setUsers(data.responseData));
+    dispatch(setUsers(responseData));
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -22,26 +22,11 @@ export const fetchUsers = () => async (dispatch) => {
 
 export const updateUser = (userId, values) => async (dispatch) => {
   try {
-    const updateResponse = await fetch(`${BASE_URL}/updateUserMaster`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId,
-        ...values,
-      }),
-    });
-
-    if (updateResponse.ok) {
-      alert("Users updated successfully");
-      dispatch(fetchUsers());
-    } else {
-      alert("Update Failed");
-      console.error("Update failed:", updateResponse.statusText);
-    }
+    const updateResponse = await axios.post("/master/updateUserMaster", {userId, ...values}, apiHeader("POST", token))
+    alert("Users updated successfully");
+    dispatch(fetchUsers());
   } catch (error) {
+    alert("Update Failed");
     console.error("Error:", error);
   }
 };
@@ -71,16 +56,9 @@ export const updateUser = (userId, values) => async (dispatch) => {
 
 export const saveUser = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`${BASE_URL}/saveUserMaster`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(values),
-    });
+    const {data} = await axios.post("/master/saveUserMaster", {...values}, apiHeader("POST", token))
 
-    const responseData = await createResponse.json();
+    const {responseData} = data;
 
     if (responseData && responseData.responseStatus && responseData.responseStatus.statusCode === 200) {
       alert("Users Added Successfully");
@@ -100,29 +78,14 @@ export const saveUser = (values) => async (dispatch) => {
 };
 
 
-
+const userCd = localStorage.getItem("userCd")
 export const deleteUser = (userId) => async (dispatch) => {
   try {
-    const deleteResponse = await fetch(`${BASE_URL}/deleteUserMaster`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId: "string",
-        id: userId,
-      }),
-    });
-
-    if (deleteResponse.ok) {
-      alert("Users deleted successfully");
-      dispatch(fetchUsers());
-    } else {
-      alert("failed to delete Users");
-      console.error("Delete failed:", deleteResponse.statusText);
-    }
+    const deleteResponse = await axios.post("/master/deleteUserMaster", {userId: userCd, id: userId}, apiHeader("POST", token))
+    alert("Users deleted successfully");
+    dispatch(fetchUsers());
   } catch (error) {
+    alert("failed to delete Users");
     console.error("Error:", error);
   }
 };

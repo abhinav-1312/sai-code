@@ -30,7 +30,7 @@ const TransactionDetail = () => {
   console.log("Return data: ", igpData);
   const populateData = async () => {
     const trnDetailUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnDtls";
+      "/txns/getTxnDtls";
     const { data } = await axios.post(
       trnDetailUrl,
       { processId: trnNo },

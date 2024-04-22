@@ -157,13 +157,13 @@ const GoodsReceiveNoteForm = () => {
   const token = localStorage.getItem("token")
   const populateItemData = async () => {
     const itemMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      "/master/getItemMaster";
     const locatorMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+      "/master/getLocatorMaster";
     const uomMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+      "/master/getUOMMaster";
     const ohqUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary";
+      "/txns/getTxnSummary";
 
     try {
       const [itemMaster, locatorMaster, uomMaster] = await Promise.all(
@@ -197,7 +197,7 @@ const GoodsReceiveNoteForm = () => {
     const password = localStorage.getItem('password');
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -215,7 +215,7 @@ const GoodsReceiveNoteForm = () => {
           crRegionalCenterName: organizationDetails.location,
           crAddress: organizationDetails.locationAddr,
           crZipcode: locationDetails.zipcode,
-          genName: userDetails.firstName,
+          genName: userDetails.firstName + " " + userDetails.lastName,
           // noaDate: currentDate.format(dateFormat),
           // dateOfDelivery: currentDate.format(dateFormat),
           userId: "string",
@@ -236,7 +236,7 @@ const GoodsReceiveNoteForm = () => {
           ceRegionalCenterName: organizationDetails.location,
           ceAddress: organizationDetails.locationAddr,
           ceZipcode: locationDetails.zipcode,
-          genName: userDetails.firstName,
+          genName: userDetails.firstName + " " + userDetails.lastName,
           noaDate: currentDate.format(dateFormat),
           dateOfDelivery: currentDate.format(dateFormat),
           userId: "string",
@@ -262,9 +262,9 @@ const GoodsReceiveNoteForm = () => {
   const handleReturnNoteNoChange = async (value) => {
     try {
       const subProcessDtlUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const ohqUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ";
+        "/master/getOHQ";
 
       const subProcessRes = await axios.post(subProcessDtlUrl, {
         processId: value,
@@ -436,7 +436,7 @@ const GoodsReceiveNoteForm = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveGRN";
+        "/saveGRN";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&

@@ -1,4 +1,5 @@
 // DepartmentActions.js
+import axios from "axios";
 import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
@@ -12,11 +13,10 @@ export const setDepartments = (departments) => ({
 
 export const fetchDepartments = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getDeptMaster`, apiHeader("GET", token));
-    console.log("Response: ", response)
-    const data = await response.json();
+    const {data} = await axios.get(`/master/getDeptMaster`, apiHeader("GET", token));
+    const {responseData} = data;
 
-    dispatch(setDepartments(data.responseData));
+    dispatch(setDepartments(responseData));
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -25,24 +25,15 @@ export const fetchDepartments = () => async (dispatch) => {
 
 export const updateDepartment = (departmentId, values) => async (dispatch) => {
   try {
-    const updateResponse = await fetch(`${BASE_URL}/updateDeptMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        departmentId,
-        ...values,
-      }),
-    });
-
-    if (updateResponse.ok) {
+    const {data} = await axios.post("/master/updateDeptMaster", {departmentId, ...values}, apiHeader("POST", token))
+    // console.log("UPDATE RESPONSE: ", updateResponse)
+    const {responseStatus} = data
+    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
       alert('Department updated successfully')
       dispatch(fetchDepartments()); 
     } else {
       alert('Update Failed')
-      console.error('Update failed:', updateResponse.statusText);
+      console.error('Update failed:', data);
     }
   } catch (error) {
     console.error('Error:', error);
@@ -51,47 +42,32 @@ export const updateDepartment = (departmentId, values) => async (dispatch) => {
 
 export const saveDepartment = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`${BASE_URL}/saveDeptMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (createResponse.ok) {
-      alert('Department Added Successfully')
-      dispatch(fetchDepartments());
+    const {data} = await axios.post("/master/saveDeptMaster", {...values}, apiHeader("POST", token))
+    const {responseStatus} = data
+    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
+      alert('Department added successfully')
+      dispatch(fetchDepartments()); 
     } else {
-      alert('Department Added Failed')
-      console.error('Create failed:', createResponse.statusText);
+      alert('Update Failed')
+      console.error('Deparment addition failed:', data);
     }
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
+const userCd = localStorage.getItem("userCd")
+
 export const deleteDepartment = (departmentId) => async (dispatch) => {
   try {
-    const deleteResponse = await fetch(`${BASE_URL}/deleteDeptMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId: 'string', 
-        departmentId,
-      }),
-    });
-
-    if (deleteResponse.ok) {
+    const {data} = await axios.post("/master/deleteDeptMaster", {userId: userCd, departmentId}, apiHeader("POST", token))
+    const {responseStatus} = data
+    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
       alert('Department deleted successfully')
       dispatch(fetchDepartments()); 
     } else {
-      alert('failed to delete department')
-      console.error('Delete failed:', deleteResponse.statusText);
+      alert('Deletion Failed')
+      console.error('Deparment deletion failed:', data);
     }
   } catch (error) {
     console.error('Error:', error);

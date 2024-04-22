@@ -375,10 +375,10 @@ const IssueNote = () => {
   const userCd = localStorage.getItem("userCd")
   const password = localStorage.getItem("password")
   const populateItemData = async() => {
-    const itemMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster"
-    const ohqUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ"
-    const vendorMasteUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster"
-    const locationMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster"
+    const itemMasterUrl = "/master/getItemMaster"
+    const ohqUrl = "/master/getOHQ"
+    const vendorMasteUrl = "/master/getVendorMaster"
+    const locationMasterUrl = "/master/getLocationMaster"
     try{
       const [itemMaster, ohq, vendorMaster, locationMaster] = await Promise.all([
         axios.get(itemMasterUrl, apiHeader("GET", token)),
@@ -662,7 +662,7 @@ const IssueNote = () => {
     const password = localStorage.getItem('password');
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password
@@ -678,7 +678,7 @@ const IssueNote = () => {
       //   crRegionalCenterName: organizationDetails.organizationName,
       //   crAddress: organizationDetails.locationAddr,
       //   crZipcode: locationDetails.zipcode,
-      //   genName: userDetails.firstName,
+      //   genName: userDetails.firstName + " " + userDetails.lastName,
       //   userId: "string",
       //   issueNoteNo: "string",
       //   genDate: currentDate.format(dateFormat),
@@ -696,7 +696,7 @@ const IssueNote = () => {
           crRegionalCenterName: organizationDetails.organizationName,
           crAddress: organizationDetails.locationAddr,
           crZipcode: locationDetails.zipcode,
-          genName: userDetails.firstName,
+          genName: userDetails.firstName + " " + userDetails.lastName,
           userId: "string",
           issueNoteNo: "string",
           genDate: currentDate.format(dateFormat),
@@ -712,7 +712,7 @@ const IssueNote = () => {
   };
 
   const handleCeRccChange = async (value) => {
-    const url = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOrgMasterById"
+    const url = "/master/getOrgMasterById"
     const {data} = await axios.post(url, {id: value, userId: userCd}, apiHeader("POST", token))
 
     console.log("RESPONSE RCC: ", data)
@@ -773,7 +773,7 @@ const IssueNote = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveIssueNote";
+        "/saveIssueNote";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&

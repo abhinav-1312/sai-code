@@ -16,7 +16,7 @@ const SignIn = () => {
   const handleLogin = async (values) => {
     try {
       const response = await axios.post(
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate",
+        "/login/authenticate",
         {
           userCd: values.userCd,
           password: values.password,

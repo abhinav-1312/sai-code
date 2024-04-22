@@ -53,7 +53,7 @@ const ItemsPage = () => {
 
   const getUoms = async () => {
     const uomResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster",
+      "/master/getUOMMaster",
       "GET"
     );
 
@@ -61,7 +61,7 @@ const ItemsPage = () => {
   };
   const getBrands = async () => {
     const brandsResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllBrands",
+      "/genparam/getAllBrands",
       "GET"
     );
 
@@ -69,7 +69,7 @@ const ItemsPage = () => {
   };
   const getSizes = async () => {
     const sizesResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllSizes",
+      "/genparam/getAllSizes",
       "GET"
     );
 
@@ -77,7 +77,7 @@ const ItemsPage = () => {
   };
   const getColors = async () => {
     const colorsResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllColors",
+      "/genparam/getAllColors",
       "GET"
     );
 
@@ -85,7 +85,7 @@ const ItemsPage = () => {
   };
   const getUsageCategories = async () => {
     const usageCategoriesRespone = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllUsageCategories",
+      "/genparam/getAllUsageCategories",
       "GET"
     );
 
@@ -93,7 +93,7 @@ const ItemsPage = () => {
   };
   const getCategories = async () => {
     const categoriesRespone = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllCategories",
+      "/genparam/getAllCategories",
       "GET"
     );
 
@@ -102,7 +102,7 @@ const ItemsPage = () => {
 
   const getLocations = async () => {
     const locationsResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster",
+      "/master/getLocationMaster",
       "GET"
     );
     setLocations(locationsResponse);
@@ -110,7 +110,7 @@ const ItemsPage = () => {
 
   const getLocators = async () => {
     const locatorsResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster",
+      "/master/getLocatorMaster",
       "GET"
     );
     setLocators(locatorsResponse);
@@ -118,7 +118,7 @@ const ItemsPage = () => {
 
   const getVendors = async () => {
     const vendorsResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster",
+      "/master/getVendorMaster",
       "GET"
     );
     setVendors(vendorsResponse);
@@ -129,7 +129,7 @@ const ItemsPage = () => {
   const getItems = async () => {
     try {
       const response = await fetch(
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster", apiHeader("GET", token)
+        "/master/getItemMaster", apiHeader("GET", token)
       );
 
       const { responseData } = await response.json();
@@ -137,7 +137,7 @@ const ItemsPage = () => {
       const itemList = await Promise.all(
         responseData.map(async (item) => {
           // const uomResponse = await apiRequest(
-          //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMasterById",
+          //   "/master/getUOMMasterById",
           //   "POST",
           //   {
           //     id: item.uomId,
@@ -146,7 +146,7 @@ const ItemsPage = () => {
           // );
 
           // const locationResponse = await apiRequest(
-          //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMasterById",
+          //   "/master/getLocationMasterById",
           //   "POST",
           //   {
           //     locationId: item.locationId,
@@ -155,7 +155,7 @@ const ItemsPage = () => {
           // );
 
           // const locatorResponse = await apiRequest(
-          //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMasterById",
+          //   "/master/getLocatorMasterById",
           //   "POST",
           //   {
           //     id: item.locatorId,
@@ -164,7 +164,7 @@ const ItemsPage = () => {
           // );
 
           const vendorResponse = await apiRequest(
-            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMasterById",
+            "/master/getVendorMasterById",
             "POST",
             {
               id: item.vendorId,
@@ -227,7 +227,7 @@ const ItemsPage = () => {
 
   const getItem = async (id) => {
     const itemResponse = await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMasterById",
+      "/master/getItemMasterById",
       "POST",
       {
         id: id,
@@ -257,7 +257,7 @@ const ItemsPage = () => {
   const handleDelete = async (itemId) => {
     // Implement delete logic here
     await apiRequest(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/deleteItemMaster",
+      "/master/deleteItemMaster",
       "POST",
       {
         id: itemId,
@@ -306,14 +306,14 @@ const ItemsPage = () => {
       }
 
       const data = await apiRequest(
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/updateItemMaster",
+        "/master/updateItemMaster",
         "POST",
         tempItem
       );
     } else {
       // Implement create logic here
       const data = await apiRequest(
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/saveItemMaster",
+        "/master/saveItemMaster",
         "POST",
         tempItem
       );

@@ -111,7 +111,7 @@
 //   const userCd = localStorage.getItem("userCd")
 
 //   const searchVendor = async (value) => {
-//     const vendorByIdUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMasterById"
+//     const vendorByIdUrl = "/master/getVendorMasterById"
 //     try{
 //       const response = await axios.post(vendorByIdUrl, {userId: userCd, id: value}, apiHeader("POST", token))
 //       const {responseStatus, responseData} = response.data
@@ -373,11 +373,11 @@
 
 //   const populateItemData = async () => {
 //     const itemMasterUrl =
-//       "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+//       "/master/getItemMaster";
 //     const locatorMasterUrl =
-//       "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+//       "/master/getLocatorMaster";
 //     const uomMasterUrl =
-//       "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+//       "/master/getUOMMaster";
 //     try {
 //       const [itemMaster, locatorMaster, uomMaster] = await Promise.all([
 //         axios.get(itemMasterUrl, apiHeader("GET", token)),
@@ -408,7 +408,7 @@
 //   const fetchItemData = async () => {
 //     try {
 //       const apiUrl =
-//         "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+//         "/master/getItemMaster";
 //       const response = await axios.get(apiUrl, apiHeader("GET", token));
 //       const { responseData } = response.data;
 //       setItemData(responseData);
@@ -421,14 +421,14 @@
 //       // const userCd = localStorage.getItem("userCd")
 //       // const password = localStorage.getItem("password")
 //       // const apiUrl =
-//       //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+//       //   "/login/authenticate";
 //   const fetchUserDetails = async (processType=null) => {
 //     console.log("ProcessTypee: ", processType)
 //     const userCd = localStorage.getItem('userCd');
 //     const password = localStorage.getItem('password');
 //     try {
 //       const apiUrl =
-//       "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+//       "/login/authenticate";
 //       const response = await axios.post(apiUrl, {
 //         userCd,
 //         password,
@@ -446,7 +446,7 @@
 //           crRegionalCenterName: organizationDetails.location,
 //           crAddress: organizationDetails.locationAddr,
 //           crZipcode: locationDetails.zipcode,
-//           genName: userDetails.firstName,
+//           genName: userDetails.firstName + " " + userDetails.lastName,
 //           // noaDate: currentDate.format(dateFormat),
 //           // dateOfDelivery: currentDate.format(dateFormat),
 //           userId: "string",
@@ -466,7 +466,7 @@
 //           ceRegionalCenterName: organizationDetails.location,
 //           ceAddress: organizationDetails.locationAddr,
 //           ceZipcode: locationDetails.zipcode,
-//           genName: userDetails.firstName,
+//           genName: userDetails.firstName + " " + userDetails.lastName,
 //           noaDate: currentDate.format(dateFormat),
 //           dateOfDelivery: currentDate.format(dateFormat),
 //           userId: "string",
@@ -488,7 +488,7 @@
 //   const handleInwardGatePassChange = async (value) => {
 //     try {
 //       const apiUrl =
-//         "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+//         "/getSubProcessDtls";
 //       const response = await axios.post(apiUrl, {
 //         processId: value,
 //         processStage: "OGP",
@@ -590,13 +590,13 @@
 //       });
 
 //       // const apiUrl =
-//       //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveInwardGatePass";
+//       //   "/saveInwardGatePass";
 //         // console.log("API Response:", response.data);
 //         // in processType PO, we need to pass "NA" in approved name
 //         const aprName = formDataCopy.approvedName === "" ? "NA" : formDataCopy.approvedName 
         
 //         const apiUrl =
-//         "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveInwardGatePass";
+//         "/saveInwardGatePass";
 //         // const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token) );
 //       const response = await axios.post(apiUrl, {...formDataCopy, approvedName: aprName}, apiHeader("POST", token));
 //       if (
@@ -1239,7 +1239,7 @@ const InwardGatePass = () => {
   const token = localStorage.getItem("token")
 
   const searchVendor = async (value) => {
-    const vendorByIdUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMasterById"
+    const vendorByIdUrl = "/master/getVendorMasterById"
     try{
       const response = await axios.post(vendorByIdUrl, {userId: userCd, id: value}, apiHeader("POST", token))
       const {responseStatus, responseData} = response.data
@@ -1508,10 +1508,10 @@ const InwardGatePass = () => {
   }
 
   const populateItemData = async() => {
-    const itemMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster"
-    const ohqUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ"
-    const vendorMasteUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster"
-    const locationMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster"
+    const itemMasterUrl = "/master/getItemMaster"
+    const ohqUrl = "/master/getOHQ"
+    const vendorMasteUrl = "/master/getVendorMaster"
+    const locationMasterUrl = "/master/getLocationMaster"
     try{
       const [itemMaster, ohq, vendorMaster, locationMaster] = await Promise.all([
         axios.get(itemMasterUrl, apiHeader("GET", token)),
@@ -1561,7 +1561,7 @@ const InwardGatePass = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+        "/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
@@ -1575,7 +1575,7 @@ const InwardGatePass = () => {
     const password = localStorage.getItem('password');
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -1594,7 +1594,7 @@ const InwardGatePass = () => {
           crRegionalCenterName: organizationDetails.location,
           crAddress: organizationDetails.locationAddr,
           crZipcode: locationDetails.zipcode,
-          genName: userDetails.firstName,
+          genName: userDetails.firstName + " " + userDetails.lastName,
           // noaDate: currentDate.format(dateFormat),
           // dateOfDelivery: currentDate.format(dateFormat),
           userId: "string",
@@ -1615,7 +1615,7 @@ const InwardGatePass = () => {
           ceRegionalCenterName: organizationDetails.location,
           ceAddress: organizationDetails.locationAddr,
           ceZipcode: locationDetails.zipcode,
-          genName: userDetails.firstName,
+          genName: userDetails.firstName + " " + userDetails.lastName,
           // noaDate: currentDate.format(dateFormat),
           // dateOfDelivery: currentDate.format(dateFormat),
           userId: "string",
@@ -1637,7 +1637,7 @@ const InwardGatePass = () => {
   const handleInwardGatePassChange = async (value) => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "OGP",
@@ -1734,7 +1734,7 @@ const InwardGatePass = () => {
       const aprName = formDataCopy.approvedName === "" ? "NA" : formDataCopy.approvedName 
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveInwardGatePass";
+        "/saveInwardGatePass";
       const response = await axios.post(apiUrl, {...formDataCopy, approvedName: aprName}, apiHeader("POST", token));
       if (
         response.status === 200 &&
@@ -1800,7 +1800,7 @@ const InwardGatePass = () => {
 
   const handleIssueNoteNoChange = async (_, value) => {
     const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
         try{
         const {data} = await axios.post(apiUrl, {
           processId: value,

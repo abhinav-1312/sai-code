@@ -127,7 +127,7 @@ const InspectionNote = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+        "/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
@@ -141,7 +141,7 @@ const InspectionNote = () => {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -158,7 +158,7 @@ const InspectionNote = () => {
         ceRegionalCenterName: organizationDetails.organizationName,
         ceAddress: organizationDetails.locationAddr,
         ceZipcode: locationDetails.zipcode,
-        genName: userDetails.firstName,
+        genName: userDetails.firstName + " " + userDetails.lastName,
         userId: "string",
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
@@ -174,7 +174,7 @@ const InspectionNote = () => {
   const handleInwardGatePassChange = async (_fieldName, value) => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "IGP",
@@ -238,9 +238,9 @@ const InspectionNote = () => {
   const fetchUomLocatorMaster = async () => {
     try {
       const uomMasterUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+        "/master/getUOMMaster";
       const locatorMasterUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+        "/master/getLocatorMaster";
       const [uomMaster, locatorMaster] = await Promise.all([axios.get(uomMasterUrl, apiHeader("GET", token)), axios.get(locatorMasterUrl, apiHeader("GET", token))]);
       const { responseData: uomMasterData } = uomMaster.data;
       const { responseData: locatorMasterData } = locatorMaster.data;
@@ -310,7 +310,7 @@ const InspectionNote = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveNewInspectionReport";
+        "/saveNewInspectionReport";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       console.log("Received values:", values);
       if (

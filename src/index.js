@@ -5,6 +5,9 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import store from './store/store';
+import axios from 'axios';
+
+axios.defaults.baseURL = "https://sai-services.azurewebsites.net/sai-inv-mgmt"
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

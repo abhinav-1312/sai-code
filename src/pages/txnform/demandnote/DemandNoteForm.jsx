@@ -46,7 +46,7 @@ const DemandNoteForm = () => {
     try {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
-      const apiUrl = 'https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate';
+      const apiUrl = '/login/authenticate';
       const response = await axios.post(apiUrl, {
         userCd,
         password
@@ -75,7 +75,7 @@ const DemandNoteForm = () => {
   const token = localStorage.getItem("token")
 
   const onFinish = async (values) => {
-    const apiUrl = 'https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveDemand';
+    const apiUrl = '/saveDemand';
 
     try {
       // Transforming form data to match API payload

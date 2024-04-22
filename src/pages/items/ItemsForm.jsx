@@ -77,7 +77,7 @@ const ItemsForm = ({
       const fetchSubCategories = async () => {
         try {
           const response = await axios.post(
-            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllSubCategoriesByDtls",
+            "/genparam/getAllSubCategoriesByDtls",
             {
               categoryCode: selectedCategory,
             },
@@ -104,7 +104,7 @@ const ItemsForm = ({
       const fetchTypes = async () => {
         try {
           const response = await axios.post(
-            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllItemTypeByDtls",
+            "/genparam/getAllItemTypeByDtls",
             {
               categoryCode: selectedCategory,
               subCategoryCode: selectedSubCategory,
@@ -131,7 +131,7 @@ const ItemsForm = ({
       const fetchDisciplines = async () => {
         try {
           const response = await axios.post(
-            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllDisciplineByDtls",
+            "/genparam/getAllDisciplineByDtls",
             {
               categoryCode: selectedCategory,
               subCategoryCode: selectedSubCategory,
@@ -159,7 +159,7 @@ const ItemsForm = ({
       const fetchItemDescriptions = async () => {
         try {
           const response = await axios.post(
-            "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/genparam/getAllItemNamesByDtls",
+            "/genparam/getAllItemNamesByDtls",
             {
               categoryCode: selectedCategory,
               subCategoryCode: selectedSubCategory,
