@@ -20,7 +20,7 @@ const apiRequest = async (url, method, requestData) => {
     method: method,
     headers: {
       "Content-Type": "application/json",
-      Authorization: token,
+      "Authorization": token,
     },
   };
 
@@ -55,16 +55,17 @@ const LocationPage = ({
   console.log(editingLocation);
 
   const getLocation = async (id) => {
+    const userCd = localStorage.getItem("userCd")
     const itemResponse = await apiRequest(
       "/master/getLocationMasterById",
       "POST",
       {
         locationId: id,
-        userId: "12345",
+        userId: userCd,
       }
     );
     return itemResponse;
-  };
+  }
 
   const handleEdit = async (location) => {
     console.log("location: ", location)
@@ -145,6 +146,7 @@ const LocationPage = ({
         onCancel={() => {
           setEditingLocation(null);
           setVisible(false);
+          console.log("Clicked")
         }}
         footer={null}
       >

@@ -148,7 +148,7 @@ const RejectionNote = () => {
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
-        ceRegionalCenterCd: organizationDetails.location,
+        ceRegionalCenterCd: organizationDetails.id,
         ceRegionalCenterName: organizationDetails.organizationName,
         ceAddress: organizationDetails.locationAddr,
         ceZipcode: locationDetails.zipcode,
@@ -187,6 +187,11 @@ const RejectionNote = () => {
         ceRegionalCenterName: processData?.ceRegionalCenterName,
         ceAddress: processData?.ceAddress,
         ceZipcode: processData?.ceZipcode,
+
+        crRegionalCenterCd: processData?.crRegionalCenterCd,
+        crRegionalCenterName: processData?.crRegionalCenterName,
+        crAddress: processData?.crAddress,
+        crZipcode: processData?.crZipcode,
 
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
@@ -367,11 +372,32 @@ const RejectionNote = () => {
         <Row gutter={24}>
           <Col span={8}>
             <Title strong level={2} underline type="danger">
-              {" "}
-              CONSIGNEE DETAIL :-
+
+              {Type === "IOP" ? "CONSIGNOR DETAIL :-" : "CONSIGNEE DETAIL :-"} 
             </Title>
 
-            <Form.Item label="REGIONAL CENTER CODE" name="ceRegionalCenterCd">
+            {
+              Type === "IOP" && 
+              <>
+                <FormInputItem label="REGIONAL CENTER CODE" value={formData.crRegionalCenterCd} />
+                <FormInputItem label="REGIONAL CENTER NAME" value={formData.crRegionalCenterName} />
+                <FormInputItem label="ADDRESS" value={formData.crAddress} />
+                <FormInputItem label="ZIPCODE" value={formData.crZipcode} />
+              </>
+            }
+
+            {
+              Type === "PO" &&
+              <>
+                <FormInputItem label="REGIONAL CENTER CODE" value={formData.ceRegionalCenterCd} />
+                <FormInputItem label="REGIONAL CENTER NAME" value={formData.ceRegionalCenterName} />
+                <FormInputItem label="ADDRESS" value={formData.ceAddress} />
+                <FormInputItem label="ZIPCODE" value={formData.ceZipcode} />
+              </>
+
+            }
+
+            {/* <Form.Item label="REGIONAL CENTER CODE" name="ceRegionalCenterCd">
               <Input value={formData.ceRegionalCenterCd} />
               <div style={{ display: "none" }}>
                 {formData.ceRegionalCenterCd}
@@ -397,25 +423,34 @@ const RejectionNote = () => {
               <div style={{ display: "none" }}>
                 {formData.ceZipcode}
               </div>
-            </Form.Item>
+            </Form.Item> */}
           </Col>
 
           <Col span={8}>
-            <Title strong underline level={2} type="danger">
-              CONSIGNOR DETAIL :-
+          <Title strong underline level={2} type="danger">
+            {Type === "IOP" ? "CONSIGNEE DETAIL :-" : "CONSIGNOR DETAIL :-"}
             </Title>
 
             {Type === "PO" && (
-              <> 
-              <FormInputItem label="SUPPLIER CODE :" value={formData.supplierCd} />
-              <FormInputItem label="SUPPLIER NAME :" value={formData.supplierName} />
-              <FormInputItem label="ADDRESS :" value={formData.crAddress || "Not defined"} />
-            </>
+              <>
+                <FormInputItem
+                  label="SUPPLIER CODE :"
+                  value={formData.supplierCd}
+                />
+                <FormInputItem
+                  label="SUPPLIER NAME :"
+                  value={formData.supplierName}
+                />
+                <FormInputItem
+                  label="ADDRESS :"
+                  value={formData.crAddress || "Not defined"}
+                />
+              </>
             )}
 
             {Type === "IOP" && (
               <>
-                <Form.Item
+                {/* <Form.Item
                   label="REGIONAL CENTER CODE"
                   name="crRegionalCenterCd"
                 >
@@ -444,7 +479,11 @@ const RejectionNote = () => {
                   <Input
                     onChange={(e) => handleChange("crZipcode", e.target.value)}
                   />
-                </Form.Item>
+                </Form.Item> */}
+                 <FormInputItem label="REGIONAL CENTER CODE" value={formData.ceRegionalCenterCd} />
+                <FormInputItem label="REGIONAL CENTER NAME" value={formData.ceRegionalCenterName} />
+                <FormInputItem label="ADDRESS" value={formData.ceAddress} />
+                <FormInputItem label="ZIPCODE" value={formData.ceZipcode} />
               </>
             )}
           </Col>
@@ -475,9 +514,14 @@ const RejectionNote = () => {
                 }
               />
             </Form.Item> */}
-            <FormInputItem label="NOA :" value={formData.noa} />
-            <FormInputItem label="NOA DATE :" value={formData.noaDate} />
-            <FormInputItem label="DATE OF DELIVERY :" value={formData.dateOfDelivery} />
+            {
+              Type === "PO" &&
+              <>
+                <FormInputItem label="NOA :" value={formData.noa} />
+                <FormInputItem label="NOA DATE :" value={formData.noaDate} />
+                <FormInputItem label="DATE OF DELIVERY :" value={formData.dateOfDelivery} />
+              </>
+            }
           </Col>
         </Row>
 

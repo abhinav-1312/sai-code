@@ -152,7 +152,7 @@ const InspectionNote = () => {
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
-        ceRegionalCenterCd: organizationDetails.location,
+        ceRegionalCenterCd: organizationDetails.id,
         ceRegionalCenterName: organizationDetails.organizationName,
         ceAddress: organizationDetails.locationAddr,
         ceZipcode: locationDetails.zipcode,
@@ -175,7 +175,7 @@ const InspectionNote = () => {
         "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
-        processStage: "IGP",
+        processStage: "IR",
       },  apiHeader("POST", token));
       const {responseData} = response.data;
       const { processData, itemList } = responseData;
@@ -423,9 +423,14 @@ const InspectionNote = () => {
 
 
             <FormInputItem label={Type === "PO" ? "MIS NO. :" : "Inward Gate Pass No. :"} name="inwardGatePass" onChange={handleInwardGatePassChange} />
-            <FormInputItem label = "CHALLAN / INVOICE NO. :" value={formData.challanNo} readOnly={true} />
-            <FormInputItem label = "MODE OF DELIVERY :" value={formData.modeOfDelivery} readOnly={true} />
-            <FormInputItem label = "DATE OF DELIVERY :" value={formData.dateOfDeliveryDate} readOnly={true} />
+            {
+              Type === "PO" &&
+              <>
+                <FormInputItem label = "CHALLAN / INVOICE NO. :" value={formData.challanNo} readOnly={true} />
+                <FormInputItem label = "MODE OF DELIVERY :" value={formData.modeOfDelivery} readOnly={true} />
+                <FormInputItem label = "DATE OF DELIVERY :" value={formData.dateOfDeliveryDate} readOnly={true} />
+              </>
+            }
             <FormDatePickerItem label="DATE OF INSPECTION :" name="dateOfInspectionDate" onChange={handleChange} />
             <FormInputItem label="TYPE OF INSPECTION :" name="typeOfInspection" onChange={handleChange} />
           </Col>
