@@ -1,3 +1,4 @@
+import axios from "axios";
 import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
@@ -10,10 +11,10 @@ export const setUOM = (UOMs) => ({
 
 export const fetchUOM = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getUOMMaster`, apiHeader("GET", token));
-    const data = await response.json();
+    const {data} = await axios.get(`/master/getUOMMaster`, apiHeader("GET", token));
+    const {responseData} = data;
 
-    dispatch(setUOM(data.responseData));
+    dispatch(setUOM(responseData));
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -21,25 +22,9 @@ export const fetchUOM = () => async (dispatch) => {
 
 export const updateUOM = (uomId, values) => async (dispatch) => {
   try {
-    const updateResponse = await fetch(`${BASE_URL}/updateUOMMaster`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        uomId,
-        ...values,
-      }),
-    });
-
-    if (updateResponse.ok) {
-      alert("UOM updated successfully");
-      dispatch(fetchUOM());
-    } else {
-      alert("Update Failed");
-      console.error("Update failed:", updateResponse.statusText);
-    }
+    const {data} = await axios.post('/master/updateUOMMaster', {uomId, ...values}, apiHeader("POST", token))
+    alert("UOM updated successfully");
+    dispatch(fetchUOM());
   } catch (error) {
     console.error("Error:", error);
   }
@@ -47,48 +32,20 @@ export const updateUOM = (uomId, values) => async (dispatch) => {
 
 export const saveUOM = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`${BASE_URL}/saveUOMMaster`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (createResponse.ok) {
-      alert("UOM Added Successfully");
+    const {data} = await axios.post('/master/saveUOMMaster', values, apiHeader("POST", token))
+    alert("UOM Added Successfully");
       dispatch(fetchUOM());
-    } else {
-      alert("UOM Added Failed");
-      console.error("Create failed:", createResponse.statusText);
-    }
   } catch (error) {
     console.error("Error:", error);
   }
 };
 
 export const deleteUOM = (uomId) => async (dispatch) => {
+  const userCd = localStorage.getItem("userCd")
   try {
-    const deleteResponse = await fetch(`${BASE_URL}/deleteUOMMaster`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId: "string",
-        id: uomId,
-      }),
-    });
-
-    if (deleteResponse.ok) {
-      alert("UOM deleted successfully");
-      dispatch(fetchUOM());
-    } else {
-      alert("failed to delete UOM");
-      console.error("Delete failed:", deleteResponse.statusText);
-    }
+    const {data} = await axios.post('/master/deleteUOMMaster', {userId: userCd, id: uomId})
+    alert("UOM deleted successfully");
+    dispatch(fetchUOM());
   } catch (error) {
     console.error("Error:", error);
   }

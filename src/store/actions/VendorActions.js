@@ -1,3 +1,4 @@
+import axios from "axios";
 import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
@@ -10,9 +11,7 @@ export const setVendors = (vendors) => ({
 
 export const fetchVendors = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getVendorMaster`, apiHeader("GET", token));
-    const data = await response.json();
-
+    const {data} = await axios.get('/master/getVendorMaster', apiHeader("GET", token))
     dispatch(setVendors(data.responseData));
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -21,25 +20,9 @@ export const fetchVendors = () => async (dispatch) => {
 
 export const updateVendor = (vendorId, values) => async (dispatch) => {
   try {
-    const updateResponse = await fetch(`${BASE_URL}/updateVendorMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        vendorId,
-        ...values,
-      }),
-    });
-
-    if (updateResponse.ok) {
-      alert('Vendors updated successfully')
-      dispatch(fetchVendors()); 
-    } else {
-      alert('Update Failed')
-      console.error('Update failed:', updateResponse.statusText);
-    }
+    const {data} = await axios.post('/master/updateVendorMaster', {vendorId, ...values}, apiHeader("POST", token))
+    alert('Vendors updated successfully')
+    dispatch(fetchVendors()); 
   } catch (error) {
     console.error('Error:', error);
   }
@@ -47,48 +30,20 @@ export const updateVendor = (vendorId, values) => async (dispatch) => {
 
 export const saveVendor = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`${BASE_URL}/saveVendorMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (createResponse.ok) {
-      alert('Vendors Added Successfully')
-      dispatch(fetchVendors());
-    } else {
-      alert('Vendors Added Failed')
-      console.error('Create failed:', createResponse.statusText);
-    }
+    const {data} = await axios.post('/master/saveVendorMaster', values, apiHeader("POST", token))
+    alert('Vendors Added Successfully')
+    dispatch(fetchVendors());
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
 export const deleteVendor = (vendorId) => async (dispatch) => {
+  const userCd = localStorage.getItem("userCd")
   try {
-    const deleteResponse = await fetch(`${BASE_URL}/deleteVendorMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId: 'string',
-        id: vendorId,
-      }),
-    });
-
-    if (deleteResponse.ok) {
-      alert('Vendors deleted successfully')
-      dispatch(fetchVendors()); 
-    } else {
-      alert('failed to delete Vendors')
-      console.error('Delete failed:', deleteResponse.statusText);
-    }
+    const {data} = await axios.post("/master/deleteVendorMaster", {userId: userCd, id: vendorId}, apiHeader("POST", token))
+    alert('Vendors deleted successfully')
+    dispatch(fetchVendors()); 
   } catch (error) {
     console.error('Error:', error);
   }

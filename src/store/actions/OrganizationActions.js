@@ -1,3 +1,4 @@
+import axios from "axios";
 import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
@@ -9,9 +10,7 @@ export const setOrganizations = (organizations) => ({
 
 export const fetchOrganizations = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getOrgMaster`, apiHeader("GET", token) );
-    const data = await response.json();
-
+    const {data} = await axios.get(`/master/getOrgMaster`, apiHeader("GET", token));
     dispatch(setOrganizations(data.responseData));
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -20,25 +19,9 @@ export const fetchOrganizations = () => async (dispatch) => {
 
 export const updateOrganization = (organizationId, values) => async (dispatch) => {
   try {
-    const updateResponse = await fetch(`${BASE_URL}/updateOrgMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        organizationId,
-        ...values,
-      }),
-    });
-
-    if (updateResponse.ok) {
-      alert('Organizations updated successfully')
-      dispatch(fetchOrganizations()); 
-    } else {
-      alert('Update Failed')
-      console.error('Update failed:', updateResponse.statusText);
-    }
+    const {data} = await axios.post('/master/updateOrgMaster', {organizationId, ...values}, apiHeader("POST", token))
+    alert('Organizations updated successfully')
+    dispatch(fetchOrganizations()); 
   } catch (error) {
     console.error('Error:', error);
   }
@@ -46,22 +29,9 @@ export const updateOrganization = (organizationId, values) => async (dispatch) =
 
 export const saveOrganization = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`${BASE_URL}/saveOrgMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (createResponse.ok) {
-      alert('Organizations Added Successfully')
-      dispatch(fetchOrganizations()); 
-    } else {
-      alert('Organizations Added Failed')
-      console.error('Create failed:', createResponse.statusText);
-    }
+    const {data} = await axios.post('/master/saveOrgMaster', values, apiHeader("POST", token))
+    alert('Organizations Added Successfully')
+    dispatch(fetchOrganizations()); 
   } catch (error) {
     console.error('Error:', error);
   }
@@ -69,25 +39,10 @@ export const saveOrganization = (values) => async (dispatch) => {
 
 export const deleteOrganization = (organizationId) => async (dispatch) => {
   try {
-    const deleteResponse = await fetch(`${BASE_URL}/deleteOrgMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId: "12345",
-        id:organizationId,
-      }),
-    });
-
-    if (deleteResponse.ok) {
-      alert('Organizations deleted successfully')
-      dispatch(fetchOrganizations()); // Refresh the organization list after deletion
-    } else {
-      alert('failed to delete Organizations')
-      console.error('Delete failed:', deleteResponse.statusText);
-    }
+    const userCd = localStorage.getItem("userCd")
+    const {data} = await axios.post('/master/deleteOrgMaster', {userId: userCd, id: organizationId})
+    alert('Organizations deleted successfully')
+    dispatch(fetchOrganizations()); // Refresh the organization list after deletion
   } catch (error) {
     console.error('Error:', error);
   }
