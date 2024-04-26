@@ -1,4 +1,5 @@
 // LocatorActions.js
+import axios from "axios";
 import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 const token = localStorage.getItem("token");
@@ -10,10 +11,10 @@ export const setLocators = (locators) => ({
 
 export const fetchLocators = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getLocatorMaster`, apiHeader("GET", token));
-    const data = await response.json();
+    const {data} = await axios.get(`/master/getLocatorMaster`, apiHeader("GET", token));
+    const {responseData} = data
 
-    dispatch(setLocators(data.responseData));
+    dispatch(setLocators(responseData));
   } catch (error) {
     console.error('Error fetching locator data:', error);
   }
@@ -21,25 +22,9 @@ export const fetchLocators = () => async (dispatch) => {
 
 export const updateLocator = (locatorId, values) => async (dispatch) => {
   try {
-    const updateResponse = await fetch(`${BASE_URL}/updateLocatorMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        locatorMasterId: locatorId,
-        ...values,
-      }),
-    });
-
-    if (updateResponse.ok) {
-      alert('Locator updated successfully')
-      dispatch(fetchLocators());
-    } else {
-      alert('Update Failed')
-      console.error('Update failed:', updateResponse.statusText);
-    }
+    const {data} = await axios.post('/master/updateLocatorMaster', {...values, locatorMasterId: locatorId}, apiHeader("POST", token))
+    alert('Locator updated successfully')
+    dispatch(fetchLocators());
   } catch (error) {
     console.error('Error:', error);
   }
@@ -47,48 +32,20 @@ export const updateLocator = (locatorId, values) => async (dispatch) => {
 
 export const saveLocator = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`${BASE_URL}/saveLocatorMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (createResponse.ok) {
-      alert('Locator Added Successfully')
-      dispatch(fetchLocators()); 
-    } else {
-      alert('Locator Added Failed')
-      console.error('Create failed:', createResponse.statusText);
-    }
+    const {data} = await axios.post('/master/saveLocatorMaster', values, apiHeader("POST", token))
+    alert('Locator Added Successfully')
+    dispatch(fetchLocators()); 
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
 export const deleteLocator = (locatorId) => async (dispatch) => {
+  const userCd = localStorage.getItem("userCd")
   try {
-    const deleteResponse = await fetch(`${BASE_URL}/deleteLocatorMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId: 'string', 
-        id: locatorId,
-      }),
-    });
-
-    if (deleteResponse.ok) {
-      alert('Locator deleted successfully')
+    const {data} = await axios.post('/master/deleteLocatorMaster', {userId: userCd, id: locatorId})
+    alert('Locator deleted successfully')
       dispatch(fetchLocators()); 
-    } else {
-      alert('failed to delete Locator')
-      console.error('Delete failed:', deleteResponse.statusText);
-    }
   } catch (error) {
     console.error('Error:', error);
   }

@@ -11,6 +11,7 @@ import {
   subCategories,
 } from "./KeyValueMapping";
 import { apiHeader } from "../../utils/Functions";
+import axios from "axios";
 
 const apiRequest = async (url, method, requestData) => {
   const token = localStorage.getItem("token");
@@ -22,16 +23,26 @@ const apiRequest = async (url, method, requestData) => {
     },
   };
 
-  if (method === "POST") {
-    options["body"] = JSON.stringify(requestData);
+  if(method === "GET"){
+    try{
+      const {data} = await axios.get(url, apiHeader("GET", token))
+      const {responseData} = data
+      console.log("RESPONSE DATA: ", responseData)
+      return responseData
+    }
+    catch(error){
+      console.log("Error", error)
+    }
   }
-
-  try {
-    const response = await fetch(url, options);
-    const data = await response.json();
-    return data.responseData;
-  } catch (error) {
-    console.error("Error: ", error);
+  else{
+    try {
+  
+      const {data} = await axios.post(url, requestData, apiHeader("POST", token));
+      const {responseData} = data
+      return responseData;
+    } catch (error) {
+      console.error("Error: ", error);
+    }
   }
 };
 
@@ -127,12 +138,13 @@ const ItemsPage = () => {
   const token = localStorage.getItem("token")
 
   const getItems = async () => {
+    console.log("GETITEMS")
     try {
-      const response = await fetch(
+      const {data} = await axios.get(
         "/master/getItemMaster", apiHeader("GET", token)
       );
 
-      const { responseData } = await response.json();
+      const { responseData } = await data;
 
       const itemList = await Promise.all(
         responseData.map(async (item) => {
