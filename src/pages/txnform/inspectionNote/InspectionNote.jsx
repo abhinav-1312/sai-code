@@ -97,7 +97,6 @@ const InspectionNote = () => {
   };
 
   const handleChange = (fieldName, value) => {
-    console.log("HandleChange called: ", fieldName, value)
     setFormData((prevValues) => ({
       ...prevValues,
       [fieldName]: value === "" ? null : value,
@@ -150,7 +149,6 @@ const InspectionNote = () => {
       const { responseData } = response.data;
       const { organizationDetails, locationDetails } = responseData;
       const { userDetails } = responseData;
-      console.log("Fetched data:", organizationDetails);
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
@@ -202,7 +200,7 @@ const InspectionNote = () => {
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
 
-        supplierCd: processData?.supplierCode,
+        supplierCd: processData?.supplierCd,
         supplierName: processData?.supplierName,
         address: processData?.crAddress,
 
@@ -233,7 +231,6 @@ const InspectionNote = () => {
     }
   };
 
-  console.log("FOrmDataaaaaa: ", formData)
 
   const fetchUomLocatorMaster = async () => {
     try {
@@ -252,6 +249,8 @@ const InspectionNote = () => {
       console.log("Error fetching Uom master details.", error);
     }
   };
+
+  console.log("SUPPLIER CD: ", formData.supplierCd)
 
   const removeItem = (index) => {
     setFormData(prevValues=>{
@@ -312,7 +311,6 @@ const InspectionNote = () => {
       const apiUrl =
         "/saveNewInspectionReport";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
-      console.log("Received values:", values);
       if (
         response.status === 200 &&
         response.data &&
@@ -345,8 +343,6 @@ const InspectionNote = () => {
       message.error("Failed to Inspection Note . Please try again later.");
     }
   };
-
-  console.log("FROMDATAA: ", formData.dateOfInspectionDate)
 
   // ... (other JSX and return statement)
   const handleValuesChange = (_, allValues) => {
