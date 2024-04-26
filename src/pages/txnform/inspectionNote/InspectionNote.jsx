@@ -175,10 +175,11 @@ const InspectionNote = () => {
         "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
-        processStage: "IR",
+        processStage: "IGP",
       },  apiHeader("POST", token));
       const {responseData} = response.data;
       const { processData, itemList } = responseData;
+      console.log("PRocess data: ", processData)
       setFormData((prevFormData) => ({
         ...prevFormData,
 
@@ -200,7 +201,7 @@ const InspectionNote = () => {
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
 
-        supplierCd: processData?.supplierCd,
+        supplierCd: processData?.supplierCode,
         supplierName: processData?.supplierName,
         address: processData?.crAddress,
 
