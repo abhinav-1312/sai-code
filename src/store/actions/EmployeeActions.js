@@ -1,3 +1,4 @@
+import axios from "axios";
 import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
@@ -10,10 +11,9 @@ export const setEmployees = (employees) => ({
 
 export const fetchEmployees = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getEmpMaster`, apiHeader("GET", token));
-    const data = await response.json();
-
-    dispatch(setEmployees(data.responseData));
+    const {data} = await axios.get("/master/getEmpMaster", apiHeader("GET", token));
+    const {responseData} = data
+    dispatch(setEmployees(responseData));
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -21,24 +21,14 @@ export const fetchEmployees = () => async (dispatch) => {
 
 export const updateEmployee = (employeeId, values) => async (dispatch) => {
   try {
-    const updateResponse = await fetch(`${BASE_URL}/updateEmpMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        employeeId,
-        ...values,
-      }),
-    });
-
-    if (updateResponse.ok) {
+    const {data} = await axios.post("/master/updateEmpMaster", {...values, employeeId}, apiHeader("POST", token))
+    const {responseStatus} = data
+    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
       alert('Employee updated successfully')
       dispatch(fetchEmployees()); 
     } else {
       alert('Update Failed')
-      console.error('Update failed:', updateResponse.statusText);
+      console.error('Update failed:', data);
     }
   } catch (error) {
     console.error('Error:', error);
@@ -47,47 +37,35 @@ export const updateEmployee = (employeeId, values) => async (dispatch) => {
 
 export const saveEmployee = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`${BASE_URL}/saveEmpMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify(values),
-    });
+    const {data} = await axios.post("/master/saveEmpMaster", {...values}, apiHeader("POST", token))
 
-    if (createResponse.ok) {
+    const {responseStatus} = data
+    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
       alert("Employee Added successfully")
       dispatch(fetchEmployees()); 
     } else {
       alert("something went wrong")
-      console.error('Create failed:', createResponse.statusText);
+      console.error('Create failed:', data);
     }
   } catch (error) {
+    alert("something went wrong. Please try again.")
     console.error('Error:', error);
   }
 };
 
+const userCd = localStorage.getItem("userCd")
+
 export const deleteEmployee = (employeeId) => async (dispatch) => {
   try {
-    const deleteResponse = await fetch(`${BASE_URL}/deleteEmpMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId: 'string', 
-        id: employeeId,
-      }),
-    });
+    const {data} = await axios.post("/master/deleteEmpMaster", {usrId: userCd, employeeId},  apiHeader("POST", token))
 
-    if (deleteResponse.ok) {
+    const {responseStatus} = data
+    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
       alert("Employee deleted successfully")
       dispatch(fetchEmployees());
     } else {
       alert("Failed to delete employee")
-      console.error('Delete failed:', deleteResponse.statusText);
+      console.error('Delete failed:', data);
     }
   } catch (error) {
     console.error('Error:', error);

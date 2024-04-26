@@ -117,7 +117,7 @@ const AcceptanceNote = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+        "/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
@@ -130,7 +130,7 @@ const AcceptanceNote = () => {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -142,11 +142,11 @@ const AcceptanceNote = () => {
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
-        ceRegionalCenterCd: organizationDetails.location,
+        ceRegionalCenterCd: organizationDetails.id,
         ceRegionalCenterName: organizationDetails.organizationName,
         ceAddress: organizationDetails.locationAddr,
-        ceZipcode: "",
-        genName: userDetails.firstName,
+        ceZipcode: locationDetails.zipcode,
+        genName: userDetails.firstName + " " + userDetails.lastName,
         userId: "string",
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
@@ -162,7 +162,7 @@ const AcceptanceNote = () => {
   const handleInspectionNOChange = async (value) => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "IRN",
@@ -187,6 +187,9 @@ const AcceptanceNote = () => {
         supplierCd: processData?.supplierCd,
         supplierName: processData?.supplierName,
         crAddress: processData?.crAddress,
+        crRegionalCenterCd: processData?.crRegionalCenterCd,
+        crRegionalCenterName: processData?.crRegionalCenterName,
+        crZipcode: processData?.crZipcode,
 
         dateOfDelivery: processData?.dateOfDelivery,
         noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
@@ -257,7 +260,7 @@ const AcceptanceNote = () => {
       
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveAcceptanceNote";
+        "/saveAcceptanceNote";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&
@@ -339,11 +342,31 @@ const AcceptanceNote = () => {
         <Row gutter={24}>
           <Col span={8}>
             <Title strong level={2} underline type="danger">
-              {" "}
-              CONSIGNEE DETAIL :-
+              {Type === "IOP" ? "CONSIGNOR DETAIL :-" : "CONSIGNEE DETAIL :-"}
             </Title>
 
-            <Form.Item label="REGIONAL CENTER CODE" name="ceRegionalCenterCd">
+            {
+              Type === "IOP" && 
+              <>
+                <FormInputItem label="REGIONAL CENTER CODE" value={formData.crRegionalCenterCd} />
+                <FormInputItem label="REGIONAL CENTER NAME" value={formData.crRegionalCenterName} />
+                <FormInputItem label="ADDRESS" value={formData.crAddress} />
+                <FormInputItem label="ZIPCODE" value={formData.crZipcode} />
+              </>
+            }
+
+            {
+              Type === "PO" &&
+              <>
+                <FormInputItem label="REGIONAL CENTER CODE" value={formData.ceRegionalCenterCd} />
+                <FormInputItem label="REGIONAL CENTER NAME" value={formData.ceRegionalCenterName} />
+                <FormInputItem label="ADDRESS" value={formData.ceAddress} />
+                <FormInputItem label="ZIPCODE" value={formData.ceZipcode} />
+              </>
+
+            }
+
+            {/* <Form.Item label="REGIONAL CENTER CODE" name="ceRegionalCenterCd">
               <Input value={formData.ceRegionalCenterCd} />
               <div style={{ display: "none" }}>
                 {formData.ceRegionalCenterCd}
@@ -369,12 +392,12 @@ const AcceptanceNote = () => {
               <div style={{ display: "none" }}>
                 {formData.ceRegionalCenterCd}
               </div>
-            </Form.Item>
+            </Form.Item> */}
           </Col>
 
           <Col span={8}>
             <Title strong underline level={2} type="danger">
-              CONSIGNOR DETAIL :-
+            {Type === "IOP" ? "CONSIGNEE DETAIL :-" : "CONSIGNOR DETAIL :-"}
             </Title>
 
             {Type === "PO" && (
@@ -405,7 +428,7 @@ const AcceptanceNote = () => {
 
             {Type === "IOP" && (
               <>
-                <Form.Item
+                {/* <Form.Item
                   label="REGIONAL CENTER CODE"
                   name="crRegionalCenterCd"
                 >
@@ -434,7 +457,11 @@ const AcceptanceNote = () => {
                   <Input
                     onChange={(e) => handleChange("crZipcode", e.target.value)}
                   />
-                </Form.Item>
+                </Form.Item> */}
+                 <FormInputItem label="REGIONAL CENTER CODE" value={formData.ceRegionalCenterCd} />
+                <FormInputItem label="REGIONAL CENTER NAME" value={formData.ceRegionalCenterName} />
+                <FormInputItem label="ADDRESS" value={formData.ceAddress} />
+                <FormInputItem label="ZIPCODE" value={formData.ceZipcode} />
               </>
             )}
           </Col>
@@ -451,10 +478,16 @@ const AcceptanceNote = () => {
                 onChange={(e) => handleInspectionNOChange(e.target.value)}
               />
             </Form.Item>
-
-            <FormInputItem label="NOA NO. :" value={formData.noa} />
-            <FormInputItem label="NOA DATE :" value={formData.noaDate} />
-            <FormInputItem label="DATE OF DELIVERY" value={formData.dateOfDelivery} />
+            
+            {
+              Type === "PO" &&
+              <>
+                <FormInputItem label="NOA NO. :" value={formData.noa} />
+                <FormInputItem label="NOA DATE :" value={formData.noaDate} />
+                <FormInputItem label="DATE OF DELIVERY" value={formData.dateOfDelivery} />
+              
+              </>
+            }
           </Col>
         </Row>
 

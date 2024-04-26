@@ -1,4 +1,5 @@
 // LocationActions.js
+import axios from "axios";
 import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
@@ -11,10 +12,10 @@ export const setLocations = (locations) => ({
 
 export const fetchLocations = () => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}/getLocationMaster`, apiHeader("GET", token) );
-    const data = await response.json();
+    const {data} = await axios.get("/master/getLocationMaster", apiHeader("GET", token) );
+    const {responseData} = data;
 
-    dispatch(setLocations(data.responseData));
+    dispatch(setLocations(responseData));
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -22,75 +23,36 @@ export const fetchLocations = () => async (dispatch) => {
 
 export const updateLocation = (locationId, values) => async (dispatch) => {
   try {
-    const updateResponse = await fetch(`${BASE_URL}/updateLocationMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        locationId,
-        ...values,
-      }),
-    });
+    const updateResponse = await axios.post("/master/updateLocationMaster", {locationId, ...values}, apiHeader("POST", token)) 
 
-    if (updateResponse.ok) {
-      alert('Location updated successfully')
-      dispatch(fetchLocations()); 
-    } else {
-      alert('Update Failed')
-      console.error('Update failed:', updateResponse.statusText);
-    }
+    // if (updateResponse.ok) {
+    //   alert('Location updated successfully')
+    //   dispatch(fetchLocations()); 
+    // } else {
+    //   alert('Update Failed')
+    //   console.error('Update failed:', updateResponse.statusText);
+    // }
   } catch (error) {
+    alert('Update Failed')
     console.error('Error:', error);
   }
 };
 
 export const saveLocation = (values) => async (dispatch) => {
   try {
-    const createResponse = await fetch(`https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/saveLocationMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : `Bearer ${token}`
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (createResponse.ok) {
-      alert('Location Added Successfully')
-      dispatch(fetchLocations()); 
-    } else {
-      alert('Location Added Failed')
-      console.error('Create failed:', createResponse.statusText);
-    }
+    const createResponse = await axios.post(`/master/saveLocationMaster`, {...values}, apiHeader("POST", token))
   } catch (error) {
+    alert('Location Added Failed')
     console.error('Error:', error);
   }
 };
 
+const userCd = localStorage.getItem("userCd")
 export const deleteLocation = (locationId) => async (dispatch) => {
   try {
-    const deleteResponse = await fetch(`${BASE_URL}/deleteLocationMaster`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' :`Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userId: 'string', 
-        locationId,
-      }),
-    });
-
-    if (deleteResponse.ok) {
-      alert('Location deleted successfully')
-      dispatch(fetchLocations());
-    } else {
-      alert('failed to delete Location')
-      console.error('Delete failed:', deleteResponse.statusText);
-    }
+    const deleteResponse = await axios.post(`/master/deleteLocationMaster`, {userId: userCd, locationId}, apiHeader("POST", token))
   } catch (error) {
+    alert('failed to delete Location')
     console.error('Error:', error);
   }
 };

@@ -52,7 +52,7 @@ const EmployeeForm = ({ onSubmit, initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item name="departmentName" label="Department" rules={[{ required: true, message: 'Please enter Department' }]}>
+          <Form.Item name="departmentId" label="Department" rules={[{ required: true, message: 'Please enter Department' }]}>
             <Input />
           </Form.Item>
         </Col>
@@ -66,7 +66,7 @@ const EmployeeForm = ({ onSubmit, initialValues }) => {
         </Col>
         <Col span={8}>
           <Form.Item name="salary" label="Salary Information" rules={[{ required: true, message: 'Please enter Salary Information' }]}>
-            <Input />
+            <Input type='number' />
           </Form.Item>
         </Col>
         <Col span={8}>

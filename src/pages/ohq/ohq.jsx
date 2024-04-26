@@ -13,7 +13,7 @@ const Ohq = () => {
 
   const populateItemData = async () => {
     const { data } = await axios.post(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ",
+      "/master/getOHQ",
       { itemCode: null, userId },
       apiHeader("POST", token)
     ); // sending itemCode 'null' gives all available data

@@ -39,7 +39,7 @@ const DemandNoteForm = () => {
     try {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
-      const apiUrl = 'https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate';
+      const apiUrl = '/login/authenticate';
       const response = await axios.post(apiUrl, {
         userCd,
         password
@@ -68,7 +68,7 @@ const DemandNoteForm = () => {
   const token = localStorage.getItem("token")
 
   const onFinish = async (values) => {
-    const apiUrl = 'https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveDemand';
+    const apiUrl = '/saveDemand';
 
     try {
       // Transforming form data to match API payload
@@ -118,7 +118,7 @@ const DemandNoteForm = () => {
     <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Demand Note</h1>
 
-      <Form onFinish={onFinish} className="goods-receive-note-form" layout="vertical">
+      <Form onFinish={onFinish} className="goods-receive-note-form formInsideContainer" layout="vertical">
         <Row>
           <Col span={6} offset={18}>
             <Form.Item label="DATE" name="date">

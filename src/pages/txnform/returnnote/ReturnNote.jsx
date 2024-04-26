@@ -127,7 +127,7 @@ const RetunNote = () => {
   const fetchUomMaster = async () => {
     try {
       const uomMasterUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+        "/master/getUOMMaster";
       const uomMaster = await axios.get(uomMasterUrl, apiHeader("GET", token));
       const { responseData: uomMasterData } = uomMaster.data;
       setUomMaster([...uomMasterData]);
@@ -139,7 +139,7 @@ const RetunNote = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+        "/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
@@ -152,7 +152,7 @@ const RetunNote = () => {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -168,7 +168,7 @@ const RetunNote = () => {
         // regionalCenterName: organizationDetails.location,
         // address: organizationDetails.locationAddr,
         // zipcode: "131021",
-        genName: userDetails.firstName,
+        genName: userDetails.firstName + " " + userDetails.lastName,
         userId: "string",
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
@@ -183,7 +183,7 @@ const RetunNote = () => {
   const handleIssueNoteNoChange = async (value) => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "ISN",
@@ -266,7 +266,7 @@ const RetunNote = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveReturnNote";
+        "/saveReturnNote";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       // Handle success response here
       if (

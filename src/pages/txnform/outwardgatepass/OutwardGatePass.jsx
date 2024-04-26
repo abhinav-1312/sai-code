@@ -31,6 +31,7 @@ import moment from "moment";
 import { apiHeader } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
 import { printOrSaveAsPDF } from "../../../utils/Functions";
+import FormDatePickerItem from "../../../components/FormDatePickerItem";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Text, Title } = Typography;
@@ -131,15 +132,15 @@ const OutwardGatePass = () => {
 
   const populateItemData = async () => {
     const itemMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      "/master/getItemMaster";
     const locatorMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+      "/master/getLocatorMaster";
     const uomMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+      "/master/getUOMMaster";
     const vendorMasteUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster";
+      "/master/getVendorMaster";
     const locationMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster";
+      "/master/getLocationMaster";
     try {
       const [
         itemMaster,
@@ -180,7 +181,7 @@ const OutwardGatePass = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+        "/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
@@ -193,7 +194,7 @@ const OutwardGatePass = () => {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -209,7 +210,7 @@ const OutwardGatePass = () => {
         // crRegionalCenterName: organizationDetails.location,
         // crAddress: organizationDetails.locationAddr,
         // crZipcode: "131021",
-        genName: userDetails.firstName,
+        genName: userDetails.firstName + " " + userDetails.lastName,
         userId: "string",
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
@@ -224,7 +225,7 @@ const OutwardGatePass = () => {
   const handleIssueNoteNoChange = async (value) => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "ISN",
@@ -324,7 +325,7 @@ const OutwardGatePass = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveOutwardGatePass";
+        "/saveOutwardGatePass";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       console.log("API Response:", response.data);
       if (
@@ -371,11 +372,13 @@ const OutwardGatePass = () => {
     setSelectedOption(value);
   };
 
+  console.log("FOrmData: ", formData)
+
   const handleReturnNoteNoChange = async (value) => {
     console.log("VALUEEE: ", value)
     try{
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "REJ",
@@ -719,7 +722,7 @@ const OutwardGatePass = () => {
                 )}
               </>
             )}
-            {(Type === "IOP" || Type === "PO") && (
+            {(Type === "PO") && (
               <>
                 <Form.Item label="NOA NO." name="noaNo">
                   <Input
@@ -746,9 +749,18 @@ const OutwardGatePass = () => {
                 </Form.Item>
               </>
             )}
+
+            {/* {
+              Type === "IOP" && 
+              <>
+                <FormInputItem label="NOA NO :" name="noa" onChange={handleChange} />
+                <FormDatePickerItem label="NOA DATE :" name="noaDate" onChange={handleChange} />
+                <FormDatePickerItem label="DATE OF DELIVERY :" name="dateOfDelivery" onChange={handleChange} />
+              </>
+            } */}
           </Col>
         </Row>
-        {(Type === "IOP" || Type === "PO") && (
+        {(Type === "PO") && (
           <Row gutter={24}>
             <Col span={8}>
               <Form.Item label=" CHALLAN / INVOICE NO. :" name="challanNo">
@@ -768,6 +780,16 @@ const OutwardGatePass = () => {
             </Col>
           </Row>
         )}
+        {/* {(Type === "IOP") && (
+          <Row gutter={24}>
+            <Col span={8}>
+            <FormInputItem label="CHALLAN / INVOICE NO. :" name="challanNo" onChange={handleChange} />
+            </Col>
+            <Col span={8}>
+              <FormInputItem label="MODE OF DELIVERY :" name="modeOfDelivery" onChange={handleChange} />
+            </Col>
+          </Row>
+        )} */}
         {/* Item Details */}
         <h2>ITEM DETAILS</h2>
 

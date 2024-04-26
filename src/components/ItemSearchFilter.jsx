@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Input, Button, Table, Popover } from "antd";
+import { Input, Button, Table, Popover, message } from "antd";
 import { apiHeader } from "../utils/Functions";
+import axios from "axios";
 // import 'antd/dist/antd.css';
 
 const { Search } = Input;
@@ -10,17 +11,22 @@ const ItemSearchFilter = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const token = localStorage.getItem("token");
+  const populateItemData = async () => {
+    try{
+      const {data} = await axios.get("/master/getItemMaster", apiHeader("GET", token))
+      const {responseData} = data
+      setFilteredData(responseData)
+      setData(responseData)
+    }
+    catch(error){
+      console.log("Error fetching data.", error)
+      message.error("Error fetching data. Please try again.")
+    }
+  }
+
   useEffect(() => {
     // Fetch data from the API
-    fetch(
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster", apiHeader("GET", token)
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data.responseData);
-        setFilteredData(data.responseData); // Initially set filtered data to all data
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+    populateItemData()
   }, []);
 
   const handleSearch = (value) => {

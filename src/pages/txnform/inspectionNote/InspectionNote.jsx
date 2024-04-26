@@ -127,7 +127,7 @@ const InspectionNote = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+        "/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
@@ -141,7 +141,7 @@ const InspectionNote = () => {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -150,15 +150,14 @@ const InspectionNote = () => {
       const { responseData } = response.data;
       const { organizationDetails, locationDetails } = responseData;
       const { userDetails } = responseData;
-      console.log("Fetched data:", organizationDetails);
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
-        ceRegionalCenterCd: organizationDetails.location,
+        ceRegionalCenterCd: organizationDetails.id,
         ceRegionalCenterName: organizationDetails.organizationName,
         ceAddress: organizationDetails.locationAddr,
-        ceZipcode: "",
-        genName: userDetails.firstName,
+        ceZipcode: locationDetails.zipcode,
+        genName: userDetails.firstName + " " + userDetails.lastName,
         userId: "string",
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
@@ -173,10 +172,10 @@ const InspectionNote = () => {
   const handleInwardGatePassChange = async (value) => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
-        processStage: "IGP",
+        processStage: "IR",
       },  apiHeader("POST", token));
       const {responseData} = response.data;
       const { processData, itemList } = responseData;
@@ -200,9 +199,8 @@ const InspectionNote = () => {
 
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
-
-        supplierCode: processData?.supplierCode,
-        supplierName: processData?.supplierCode,
+        supplierCd: processData?.supplierCd,
+        supplierName: processData?.supplierName,
         address: processData?.crAddress,
 
         items: itemList.map((item) => ({
@@ -225,14 +223,13 @@ const InspectionNote = () => {
     }
   };
 
-  console.log("FOrmDataaaaaa: ", formData)
 
   const fetchUomLocatorMaster = async () => {
     try {
       const uomMasterUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+        "/master/getUOMMaster";
       const locatorMasterUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+        "/master/getLocatorMaster";
       const [uomMaster, locatorMaster] = await Promise.all([axios.get(uomMasterUrl, apiHeader("GET", token)), axios.get(locatorMasterUrl, apiHeader("GET", token))]);
       const { responseData: uomMasterData } = uomMaster.data;
       const { responseData: locatorMasterData } = locatorMaster.data;
@@ -244,6 +241,8 @@ const InspectionNote = () => {
       console.log("Error fetching Uom master details.", error);
     }
   };
+
+  console.log("SUPPLIER CD: ", formData.supplierCd)
 
   const removeItem = (index) => {
     setFormData(prevValues=>{
@@ -301,9 +300,8 @@ const InspectionNote = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveNewInspectionReport";
+        "/saveNewInspectionReport";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
-      console.log("Received values:", values);
       if (
         response.status === 200 &&
         response.data &&
@@ -412,9 +410,14 @@ const InspectionNote = () => {
 
 
             <FormInputItem label={Type === "PO" ? "MIS NO. :" : "Inward Gate Pass No. :"} name="inwardGatePass" onChange={handleInwardGatePassChange} />
-            <FormInputItem label = "CHALLAN / INVOICE NO. :" value={formData.challanNo} readOnly={true} />
-            <FormInputItem label = "MODE OF DELIVERY :" value={formData.modeOfDelivery} readOnly={true} />
-            <FormInputItem label = "DATE OF DELIVERY :" value={formData.dateOfDeliveryDate} readOnly={true} />
+            {
+              Type === "PO" &&
+              <>
+                <FormInputItem label = "CHALLAN / INVOICE NO. :" value={formData.challanNo} readOnly={true} />
+                <FormInputItem label = "MODE OF DELIVERY :" value={formData.modeOfDelivery} readOnly={true} />
+                <FormInputItem label = "DATE OF DELIVERY :" value={formData.dateOfDeliveryDate} readOnly={true} />
+              </>
+            }
             <FormDatePickerItem label="DATE OF INSPECTION :" name="dateOfInspectionDate" onChange={handleChange} />
             <FormInputItem label="TYPE OF INSPECTION :" name="typeOfInspection" onChange={handleChange} />
           </Col>

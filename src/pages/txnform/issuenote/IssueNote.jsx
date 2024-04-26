@@ -341,10 +341,10 @@ const IssueNote = () => {
   const userCd = localStorage.getItem("userCd")
   const password = localStorage.getItem("password")
   const populateItemData = async() => {
-    const itemMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster"
-    const ohqUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ"
-    const vendorMasteUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster"
-    const locationMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster"
+    const itemMasterUrl = "/master/getItemMaster"
+    const ohqUrl = "/master/getOHQ"
+    const vendorMasteUrl = "/master/getVendorMaster"
+    const locationMasterUrl = "/master/getLocationMaster"
     try{
       const [itemMaster, ohq, vendorMaster, locationMaster] = await Promise.all([
         axios.get(itemMasterUrl, apiHeader("GET", token)),
@@ -628,7 +628,7 @@ const IssueNote = () => {
   const fetchUserDetails = async () => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password
@@ -640,28 +640,46 @@ const IssueNote = () => {
       // Get current date
       const currentDate = dayjs();
       // Update form data with fetched values
-      setFormData({
-        crRegionalCenterCd: organizationDetails.id,
-        crRegionalCenterName: organizationDetails.organizationName,
-        crAddress: organizationDetails.locationAddr,
-        crZipcode: locationDetails.zipcode,
-        genName: userDetails.firstName,
-        userId: "string",
-        type: "",
-        issueNoteNo: "string",
-        genDate: currentDate.format(dateFormat),
-        issueDate: currentDate.format(dateFormat),
-        approvedDate: currentDate.format(dateFormat),
-        issueNoteDt: currentDate.format(dateFormat),
-        demandNoteDt: currentDate.format(dateFormat),
-      });
+      // setFormData({
+      //   crRegionalCenterCd: organizationDetails.id,
+      //   crRegionalCenterName: organizationDetails.organizationName,
+      //   crAddress: organizationDetails.locationAddr,
+      //   crZipcode: locationDetails.zipcode,
+      //   genName: userDetails.firstName + " " + userDetails.lastName,
+      //   userId: "string",
+      //   issueNoteNo: "string",
+      //   genDate: currentDate.format(dateFormat),
+      //   issueDate: currentDate.format(dateFormat),
+      //   approvedDate: currentDate.format(dateFormat),
+      //   issueNoteDt: currentDate.format(dateFormat),
+      //   demandNoteDt: currentDate.format(dateFormat),
+      // }
+      // );
+
+      setFormData(prev=>{
+        return{
+          ...prev,
+          crRegionalCenterCd: organizationDetails.id,
+          crRegionalCenterName: organizationDetails.organizationName,
+          crAddress: organizationDetails.locationAddr,
+          crZipcode: locationDetails.zipcode,
+          genName: userDetails.firstName + " " + userDetails.lastName,
+          userId: "string",
+          issueNoteNo: "string",
+          genDate: currentDate.format(dateFormat),
+          issueDate: currentDate.format(dateFormat),
+          approvedDate: currentDate.format(dateFormat),
+          issueNoteDt: currentDate.format(dateFormat),
+          demandNoteDt: currentDate.format(dateFormat),
+        }
+      })
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   const handleCeRccChange = async (value) => {
-    const url = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOrgMasterById"
+    const url = "/master/getOrgMasterById"
     const {data} = await axios.post(url, {id: value, userId: userCd}, apiHeader("POST", token))
 
     console.log("RESPONSE RCC: ", data)
@@ -722,7 +740,7 @@ const IssueNote = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveIssueNote";
+        "/saveIssueNote";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&

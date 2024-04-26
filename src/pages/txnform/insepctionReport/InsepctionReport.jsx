@@ -123,7 +123,7 @@ const InsepctionReport = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+        "/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       // setItemData(responseData);
@@ -136,7 +136,7 @@ const InsepctionReport = () => {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -149,11 +149,11 @@ const InsepctionReport = () => {
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
-        ceRegionalCenterCd: organizationDetails.location,
+        ceRegionalCenterCd: organizationDetails.id,
         ceRegionalCenterName: organizationDetails.organizationName,
         ceAddress: organizationDetails.locationAddr,
-        ceZipcode: "",
-        genName: userDetails.firstName,
+        ceZipcode: locationDetails.zipcode,
+        genName: userDetails.firstName + " " + userDetails.lastName,
         userId: "string",
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
@@ -170,7 +170,7 @@ const InsepctionReport = () => {
     console.log("VALUE: ", value)
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "IGP",
@@ -264,7 +264,7 @@ const InsepctionReport = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveInspectionReport";
+        "/saveInspectionReport";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       console.log("Received values:", values);
       if (

@@ -23,6 +23,9 @@ const { Option } = Select;
 const { Title } = Typography;
 
 const GoodsReceiveNoteForm = () => {
+  const [buttonVisible, setButtonVisible] = useState(false)
+  const [selectedOption, setSelectedOption] = useState("")
+  const formRef = useRef()
   const [Type, setType] = useState("IRP");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -132,13 +135,13 @@ const GoodsReceiveNoteForm = () => {
   const token = localStorage.getItem("token")
   const populateItemData = async () => {
     const itemMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
+      "/master/getItemMaster";
     const locatorMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster";
+      "/master/getLocatorMaster";
     const uomMasterUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster";
+      "/master/getUOMMaster";
     const ohqUrl =
-      "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/txns/getTxnSummary";
+      "/txns/getTxnSummary";
 
     try {
       const [itemMaster, locatorMaster, uomMaster] = await Promise.all(
@@ -172,7 +175,7 @@ const GoodsReceiveNoteForm = () => {
     const password = localStorage.getItem('password');
     try {
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+        "/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -189,7 +192,7 @@ const GoodsReceiveNoteForm = () => {
           crRegionalCenterName: organizationDetails.location,
           crAddress: organizationDetails.locationAddr,
           crZipcode: locationDetails.zipcode,
-          genName: userDetails.firstName,
+          genName: userDetails.firstName + " " + userDetails.lastName,
           // noaDate: currentDate.format(dateFormat),
           // dateOfDelivery: currentDate.format(dateFormat),
           userId: "string",
@@ -210,7 +213,7 @@ const GoodsReceiveNoteForm = () => {
           ceRegionalCenterName: organizationDetails.location,
           ceAddress: organizationDetails.locationAddr,
           ceZipcode: locationDetails.zipcode,
-          genName: userDetails.firstName,
+          genName: userDetails.firstName + " " + userDetails.lastName,
           noaDate: currentDate.format(dateFormat),
           dateOfDelivery: currentDate.format(dateFormat),
           userId: "string",
@@ -230,10 +233,116 @@ const GoodsReceiveNoteForm = () => {
     }
   };
 
-  console.log("Formata: ", formData)
   const userCd = localStorage.getItem("userCd")
 
   const handleReturnNoteNoChange = async (value) => {
+    try {
+      const subProcessDtlUrl =
+        "/getSubProcessDtls";
+      const ohqUrl =
+        "/master/getOHQ";
+
+      const subProcessRes = await axios.post(subProcessDtlUrl, {
+        processId: value,
+        processStage: Type==="IRP" ? "ISN" : "ACT",
+      }, apiHeader("POST", token));
+
+      const { data: subProcess, status, statusText } = subProcessRes;
+      const { responseData: subProcessData } = subProcess;
+      const { processData, itemList } = subProcessData;
+
+      if (status === 200 && statusText === "OK") {
+        try {
+          const locatorQuantityArr= await Promise.all(
+            itemList?.map(async (item) => {
+              const itemCode  = item.itemCode;
+
+              const ohqRes = await axios.post(ohqUrl, {
+                itemCode: itemCode,
+                userId: userCd,
+              }, apiHeader("POST", token));
+              const { data: ohqProcess } = ohqRes;
+              const { responseData: ohqData } = ohqProcess;
+              return {
+                itemCode: ohqData[0].itemCode,
+                qtyList: ohqData[0].qtyList,
+              };
+            })
+          );
+
+          const locatorQuantityObj = locatorQuantityArr.reduce((acc, item) => {
+            acc[item.itemCode] = item.qtyList;
+            return acc;
+          }, {});
+
+          setLocatorQuantity({ ...locatorQuantityObj });
+        } catch (error) {
+          console.log("Error: ", error);
+        }
+      }else{
+      }
+
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+
+        issueName: processData?.issueName,
+        approvedName: processData?.approvedName,
+        processId: processData?.processId,
+
+        crRegionalCenterCd: processData?.crRegionalCenterCd,
+        crRegionalCenterName: processData?.crRegionalCenterName,
+        crAddress: processData?.crAddress,
+        crZipcode: processData?.crZipcode,
+
+        ceRegionalCenterCd: processData?.ceRegionalCenterCd,
+        ceRegionalCenterName: processData?.ceRegionalCenterName,
+        ceAddress: processData?.ceAddress,
+        ceZipcode: processData?.ceZipcode,
+
+
+
+        consumerName: processData?.consumerName,
+        contactNo: processData?.contactNo,
+
+        termsCondition: processData?.termsCondition,
+        note: processData?.note,
+
+        supplierCode: processData?.supplierCd,
+        supplierName: processData?.supplierName,
+        // crAddress: processData?.crAddress,
+        noaDate:processData?.noaDate ? convertEpochToDateString(processData.noaDate) : "",
+        noa: processData?.noa ? processData.noa : "",
+        dateOfDelivery: processData?.dateOfDelivery,
+
+        items: itemList?.map((item) => ({
+          srNo: item?.sNo,
+          itemId: item?.itemId,
+          itemCode: item?.itemCode,
+          itemDesc: item?.itemDesc,
+          uom: parseInt(item?.uom),
+          quantity: item?.quantity,
+          remQuantity:item?.quantity,
+          noOfDays: item?.requiredDays,
+          remarks: item?.remarks,
+          conditionOfGoods: item?.conditionOfGoods,
+          budgetHeadProcurement: item?.budgetHeadProcurement,
+          locatorId: parseInt(item?.locatorId),
+          qtyList: [
+            {
+              locatorId: parseInt(item?.locatorId),
+              quantity: item?.quantity,
+            },
+          ],
+        })),
+      }));
+      // Handle response data as needed
+    } catch (error) {
+      console.error("Error fetching sub process details:", error);
+      // Handle error
+    }
+  };
+
+  const handleInwardGatePassNoChange = async (value) => {
     try {
       const subProcessDtlUrl =
         "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
@@ -242,7 +351,7 @@ const GoodsReceiveNoteForm = () => {
 
       const subProcessRes = await axios.post(subProcessDtlUrl, {
         processId: value,
-        processStage: Type==="IRP" ? "ISN" : "ACT",
+        processStage: "IGP",
       }, apiHeader("POST", token));
 
       const { data: subProcess, status, statusText } = subProcessRes;
@@ -261,7 +370,6 @@ const GoodsReceiveNoteForm = () => {
               }, apiHeader("POST", token));
               const { data: ohqProcess } = ohqRes;
               const { responseData: ohqData } = ohqProcess;
-              console.log("Qhq data: ", ohqData);
               return {
                 itemCode: ohqData[0].itemCode,
                 qtyList: ohqData[0].qtyList,
@@ -291,8 +399,15 @@ const GoodsReceiveNoteForm = () => {
 
         crRegionalCenterCd: processData?.crRegionalCenterCd,
         crRegionalCenterName: processData?.crRegionalCenterName,
-        // crAddress: processData?.address,
+        // crAddress: processData?.crAddress,
         crZipcode: processData?.crZipcode,
+
+        ceRegionalCenterCd: processData?.ceRegionalCenterCd,
+        ceRegionalCenterName: processData?.ceRegionalCenterName,
+        ceAddress: processData?.ceAddress,
+        ceZipcode: processData?.ceZipcode,
+
+
 
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
@@ -333,7 +448,7 @@ const GoodsReceiveNoteForm = () => {
       console.error("Error fetching sub process details:", error);
       // Handle error
     }
-  };
+  }
 
   console.log("FormData: ", formData.items);
 
@@ -416,7 +531,7 @@ const GoodsReceiveNoteForm = () => {
       });
 
       const apiUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveGRN";
+        "/saveGRN";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&
@@ -553,7 +668,10 @@ const GoodsReceiveNoteForm = () => {
     }
   };
 
-  console.log("FORM DATAA: ", formData)
+  const handleSelectChange = (value) => {
+    setSelectedOption(value);
+    console.log("VSEECT VALUE: ", value)
+  };
 
   return (
     <div className="goods-receive-note-form-container">
@@ -591,41 +709,25 @@ const GoodsReceiveNoteForm = () => {
         <Row gutter={24}>
           <Col span={8}>
             <Title strong level={2} underline type="danger">
-              {" "}
-              CONSIGNEE DETAIL :-
+              {
+                Type === "IRP" || Type === "IOP" ?
+                "CONSIGNOR DETAIL ;-" : "CONSIGNEE DETAIL :-"
+              }
+
             </Title>
 
-            <Form.Item label="REGIONAL CENTER CODE" name="crRegionalCenterCd">
-              <Input value={formData.crRegionalCenterCd} />
-              <div style={{ display: "none" }}>
-                {formData.crRegionalCenterCd}
-              </div>
-            </Form.Item>
-            <Form.Item
-              label="REGIONAL CENTER NAME "
-              name="crRegionalCenterName"
-            >
-              <Input value={formData.crRegionalCenterName} />
-              <div style={{ display: "none" }}>
-                {formData.crRegionalCenterCd}
-              </div>
-            </Form.Item>
-            <Form.Item label="ADDRESS :" name="crAddress">
-              <Input value={formData.crAddress} />
-              <div style={{ display: "none" }}>
-                {formData.crRegionalCenterCd}
-              </div>
-            </Form.Item>
-            <Form.Item label="ZIP CODE :" name="crZipcode">
-              <Input value={formData.crZipcode} />
-              <div style={{ display: "none" }}>
-                {formData.crRegionalCenterCd}
-              </div>
-            </Form.Item>
+            {/* for purchase order */}
+            <FormInputItem label="REGIONAL CENTER CODE :" value={Type==="IRP" || Type==="IOP" ? formData.crRegionalCenterCd : formData.ceRegionalCenterCd} readOnly={true}/>
+            <FormInputItem label="REGIONAL CENTER NAME :" value={Type==="IRP" || Type==="IOP" ? formData.crRegionalCenterName :formData.ceRegionalCenterName} readOnly={true} />
+            <FormInputItem label="ADDRESS :" value={Type==="IRP" || Type==="IOP" ? formData.crAddress : formData.ceAddress} readOnly={true} />
+            <FormInputItem label="ZIPCODE :" value={Type==="IRP" || Type==="IOP" ? formData.crZipcode : formData.ceZipcode} readOnly={true} />
           </Col>
           <Col span={8}>
             <Title strong underline level={2} type="danger">
-              CONSIGNOR DETAIL :-
+            {
+                Type === "IRP" || Type==="IOP" ?
+                "CONSIGNEE DETAIL :-" : "CONSIGNOR DETAIL :-"
+              }
             </Title>
 
             {Type === "PO" && (
@@ -685,7 +787,7 @@ const GoodsReceiveNoteForm = () => {
 
             {Type === "IOP" && (
               <>
-                <Form.Item
+                {/* <Form.Item
                   label="REGIONAL CENTER CODE"
                   name="crRegionalCenterCd"
                 >
@@ -714,7 +816,12 @@ const GoodsReceiveNoteForm = () => {
                   <Input
                     onChange={(e) => handleChange("crZipcode", e.target.value)}
                   />
-                </Form.Item>
+                </Form.Item> */}
+
+            <FormInputItem label="REGIONAL CENTER CODE :" value={formData.ceRegionalCenterCd} readOnly={true}/>
+            <FormInputItem label="REGIONAL CENTER NAME :" value={formData.ceRegionalCenterName} readOnly={true} />
+            <FormInputItem label="ADDRESS :" value={formData.ceAddress} readOnly={true} />
+            <FormInputItem label="ZIPCODE :" value={formData.ceZipcode} readOnly={true} />
               </>
             )}
           </Col>
@@ -732,12 +839,43 @@ const GoodsReceiveNoteForm = () => {
                 <Input />
               </Form.Item>
             )}
-            {Type === "IOP" && (
-              <Form.Item label="INWARD GATE PASS" name="inwardGatePass">
-                <Input />
+            {/* {Type === "IOP" && (
+              // <Form.Item label="INWARD GATE PASS" name="inwardGatePass">
+              //   <Input />
+              // </Form.Item>
+              <Form.Item label="ACCEPTANCE NOTE NO." name="acceptanceNoteNo">
+                <Input onChange={(e) => handleReturnNoteNoChange(e.target.value)} />
               </Form.Item>
-            )}
-            {(Type === "IOP" || Type === "PO") && (
+            )} */}
+
+            {Type === "IOP" && (
+              <>
+                <Form.Item label="SELECT TYPE" name="noteType">
+                  <Select onChange={handleSelectChange}>
+                    <Option value="acceptedItems">ACCEPTED ITEMS</Option>
+                    <Option value="rejectedItems">REJECTED ITEMS</Option>
+                  </Select>
+                </Form.Item>
+                {selectedOption === "acceptedItems" ? (
+                  <Form.Item label="ACCEPTANCE NOTE NO. :" name="acceptanceNoteNo">
+                    <Input onChange={(e) => handleReturnNoteNoChange(e.target.value)} />
+                  </Form.Item>
+                ) : (
+                  <Form.Item
+                    label="INWARD GATE PASS NO.  :"
+                    name="inwardGatePassNo"
+                  >
+                    <Input
+                      onChange={(e) =>
+                        handleInwardGatePassNoChange(e.target.value)
+                      }
+                    />
+                  </Form.Item>
+                )}
+              </>
+            )}  
+
+            {(Type === "PO") && (
               <>
                 <FormInputItem label="NOA NO. :" value={formData.noa} />
                 <FormInputItem label="NOA DATE" value={formData.noaDate} />
