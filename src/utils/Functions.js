@@ -252,7 +252,7 @@ export const convertArrayToObject = (array, _makeKey, valueKey ) => {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     };
 
-    // Apply temporary styles for PDF generation
+    // Apply temporary styles for PDF generations
     const originalStyles = window.getComputedStyle(input);
     input.style.transform = 'scale(0.7)'
     input.style.position = 'static';
