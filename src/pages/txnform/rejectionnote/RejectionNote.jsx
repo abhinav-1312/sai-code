@@ -122,7 +122,7 @@ const RejectionNote = () => {
   const fetchItemData = async () => {
     try {
       const apiUrl =
-        "/master/getItemMaster";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster";
       const response = await axios.get(apiUrl, apiHeader("GET", token));
       const { responseData } = response.data;
       setItemData(responseData);
@@ -135,7 +135,7 @@ const RejectionNote = () => {
       const userCd = localStorage.getItem("userCd")
       const password = localStorage.getItem("password")
       const apiUrl =
-        "/login/authenticate";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
       const response = await axios.post(apiUrl, {
         userCd,
         password,
@@ -152,7 +152,7 @@ const RejectionNote = () => {
         ceRegionalCenterName: organizationDetails.organizationName,
         ceAddress: organizationDetails.locationAddr,
         ceZipcode: locationDetails.zipcode,
-        genName: userDetails.firstName + " " + userDetails.lastName,
+        genName: userDetails.firstName,
         userId: "string",
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
@@ -168,7 +168,7 @@ const RejectionNote = () => {
   const handleInspectionNOChange = async (value) => {
     try {
       const apiUrl =
-        "/getSubProcessDtls";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
         processStage: "IRN",
@@ -268,7 +268,7 @@ const RejectionNote = () => {
       });
 
       const apiUrl =
-        "/saveRejectionNote";
+        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/saveRejectionNote";
       const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
       if (
         response.status === 200 &&

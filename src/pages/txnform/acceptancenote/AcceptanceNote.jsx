@@ -1,5 +1,5 @@
 // AcceptanceNote.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -22,15 +22,11 @@ const { Option } = Select;
 const { Title } = Typography;
 
 const AcceptanceNote = () => {
-  const [buttonVisible, setButtonVisible] = useState(false)
-  const formRef = useRef()
   const [Type, setType] = useState("PO");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [itemData, setItemData] = useState([]);
-  const [uomMaster, setUomMaster] = useState({});
-  const [locatorMaster, setLocatorMaster] = useState({});
   const [formData, setFormData] = useState({
     genDate: "",
     genName: "",
@@ -98,6 +94,10 @@ const AcceptanceNote = () => {
       updatedItems[index] = {
         ...updatedItems[index],
         [fieldName]: value === "" ? null : value,
+        uom: "string",
+        conditionOfGoods: "string", // Hard-coded data
+        budgetHeadProcurement: "string", // Hard-coded data
+        locatorId: "string", // Hard-coded data
       };
       return {
         ...prevValues,
@@ -207,7 +207,6 @@ const AcceptanceNote = () => {
           conditionOfGoods: item.conditionOfGoods,
           budgetHeadProcurement: item.budgetHeadProcurement,
           locatorId: item.locatorId,
-          acceptedQuantity: item.acceptedQuantity,
         })),
       }));
       // Handle response data as needed
@@ -216,23 +215,6 @@ const AcceptanceNote = () => {
       // Handle error
     }
   };
-
-  const removeItem = (index) => {
-    setFormData((prevValues) => {
-      const updatedItems = prevValues.items;
-      updatedItems.splice(index, 1);
-
-      const updatedItems1 = updatedItems.map((item, key) => {
-        return { ...item, srNo: key + 1 };
-      });
-
-      return {
-        ...prevValues,
-        items: updatedItems1,
-      };
-    });
-  };
-
   const onFinish = async (values) => {
     try {
       const formDataCopy = { ...formData };
@@ -289,13 +271,9 @@ const AcceptanceNote = () => {
         // Access the specific success message data if available
         const { processId, processType, subProcessId } =
           response.data.responseData;
-        setFormData((prev) => {
-          return {
-            ...prev,
-            acptRejNoteNo: processId,
-          };
+        setFormData({
+          acptRejNoteNo: processId,
         });
-        setButtonVisible(true)
         setSuccessMessage(
           `Acceptance Note : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -320,7 +298,7 @@ const AcceptanceNote = () => {
   };
 
   return (
-    <div className="goods-receive-note-form-container" ref={formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Acceptance Note</h1>
 
       <Form
@@ -352,7 +330,12 @@ const AcceptanceNote = () => {
             </Form.Item>
           </Col>
           <Col span={6} offset={12}>
-            <FormInputItem label="ACCEPTANCE NOTE NO." value={formData.acptRejNoteNo === "string" ? "not defined" : formData.acptRejNoteNo} />
+            <Form.Item label="ACCEPTANCE NOTE NO." name="acptRejNoteNo">
+              <Input
+                disabled
+                onChange={(e) => handleChange("acptRejNoteNo", e.target.value)}
+              />
+            </Form.Item>
           </Col>
         </Row>
 
@@ -419,18 +402,27 @@ const AcceptanceNote = () => {
 
             {Type === "PO" && (
               <>
-                <FormInputItem
-                  label="SUPPLIER CODE :"
-                  value={formData.supplierCd}
-                />
-                <FormInputItem
-                  label="SUPPLIER NAME :"
-                  value={formData.supplierName}
-                />
-                <FormInputItem
-                  label="ADDRESS :"
-                  value={formData.crAddress || "Not defined"}
-                />
+                <Form.Item label="SUPPLIER CODE :" name="supplierCode">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierCode", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="SUPPLIER NAME :" name="supplierName">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierName", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="ADDRESS:" name="supplierAddress">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierAddress", e.target.value)
+                    }
+                  />
+                </Form.Item>
               </>
             )}
 
@@ -505,7 +497,7 @@ const AcceptanceNote = () => {
         <Form.List name="itemDetails" initialValue={formData.items || [{}]}>
           {(fields, { add, remove }) => (
             <>
-              {/* <Form.Item style={{ textAlign: "right" }}>
+              <Form.Item style={{ textAlign: "right" }}>
                 <Button
                   type="dashed"
                   onClick={() => add()}

@@ -1,5 +1,5 @@
 // OutwardGatePass.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -36,31 +36,7 @@ const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Text, Title } = Typography;
 
-const convertEpochToDateString = (epochTime) => {
-  // Convert epoch time to milliseconds
-  let date = new Date(epochTime);
-
-  // Extract the day, month, and year from the Date object
-  let day = date.getDate();
-  let month = date.getMonth() + 1; // Month starts from 0
-  let year = date.getFullYear();
-
-  // Add leading zeros if needed
-  if (day < 10) {
-    day = '0' + day;
-  }
-  if (month < 10) {
-    month = '0' + month;
-  }
-
-  // Return the date string in DD/MM/YYYY format
-  return `${day}/${month}/${year}`;
-}
-
-
 const OutwardGatePass = () => {
-  const [buttonVisible, setButtonVisible] = useState(false)
-  const formRef = useRef()
   const [Type, setType] = useState("IRP");
   const [selectedOption, setSelectedOption] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,7 +73,7 @@ const OutwardGatePass = () => {
     dateOfDelivery: "",
     modeOfDelivery: "",
     challanNo: "",
-    supplierCd: "",
+    supplierCode: "",
     supplierName: "",
     noteType: "",
     rejectionNoteNo: "",
@@ -119,6 +95,8 @@ const OutwardGatePass = () => {
       // }
     ],
   });
+
+  console.log("FormData: ", formData);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -261,21 +239,21 @@ const OutwardGatePass = () => {
         crRegionalCenterCd: processData?.crRegionalCenterCd,
         crRegionalCenterName: processData?.crRegionalCenterName,
         crAddress: processData?.crAddress,
-        crZipcode: processData?.crZipcode,
+        crZipcode: processData.crZipcode,
 
         issueName: processData?.issueName,
         approvedName: processData?.approvedName,
-        
+        processId: processData?.processId,
+
         ceRegionalCenterCd: processData?.ceRegionalCenterCd,
         ceRegionalCenterName: processData?.ceRegionalCenterName,
         ceAddress: processData?.ceAddress,
         ceZipcode: processData?.ceZipcode,
-        consumerName: processData?.consumerName,
-        
-        processId: processData?.processId,
+
         termsCondition: processData?.termsCondition,
         note: processData?.note,
 
+        consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
 
         items: itemList.map((item) => ({
@@ -365,8 +343,6 @@ const OutwardGatePass = () => {
             gatePassNo: processId,
           };
         });
-
-        setButtonVisible(true)
         setSuccessMessage(
           `outward gate pass successfully! outward gate pass : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -484,7 +460,7 @@ const OutwardGatePass = () => {
   }
 
   const findColumnValue = (id, dataSource, sourceName) => {
-    const foundObject = dataSource.find((obj) => obj.id === parseInt(id));
+    const foundObject = dataSource.find((obj) => obj.id === id);
 
     if (sourceName === "locationMaster")
       return foundObject ? foundObject["locationName"] : "Undefined";
@@ -512,8 +488,10 @@ const OutwardGatePass = () => {
     });
   };
 
+  console.log("FOrm data: ", formData);
+
   return (
-    <div className="goods-receive-note-form-container" ref={formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Outward Gate Pass</h1>
 
       <Form
@@ -546,23 +524,19 @@ const OutwardGatePass = () => {
             </Form.Item>
           </Col>
           <Col span={6} offset={12}>
-            {/* <Form.Item label="OUTER GATE PASS NO." name="gatePassNo">
+            <Form.Item label="OUTER GATE PASS NO." name="gatePassNo">
               <Input
                 disabled
                 onChange={(e) => handleChange("gatePassNo", e.target.value)}
               />
-            </Form.Item> */}
-            <FormInputItem label="OUTER GATE PASS NO." value={formData.gatePassNo==="string" ? "not defined" : formData.gatePassNo} />
+            </Form.Item>
           </Col>
         </Row>
 
         <Row gutter={24}>
           <Col span={8}>
             <Title strong underline level={2} type="danger">
-              {
-                Type === "IRP" ?
-                "CONSIGNOR DETAIL ;-" : "CONSIGNEE DETAIL :-"
-              }
+              CONSIGNOR DETAIL :-
             </Title>
             <Form.Item label="REGIONAL CENTER CODE" name="crRegionalCenterCd">
               <Input value={formData.crRegionalCenterCd} readOnly />
@@ -592,17 +566,33 @@ const OutwardGatePass = () => {
           </Col>
           <Col span={8}>
             <Title strong level={2} underline type="danger">
-            {
-                Type === "IRP" ?
-                "CONSIGNEE DETAIL ;-" : "CONSIGNOR DETAIL :-"
-              }
+              {" "}
+              CONSIGNEE DETAIL :-
             </Title>
 
             {Type === "PO" && (
               <>
-                <FormInputItem label="SUPPLIER CODE :" value={formData.supplierCd} readOnly={true}/>
-                <FormInputItem label="SUPPLIER NAME :" value={formData.supplierName} readOnly={true}/>
-                <FormInputItem label="ADDRESS :" value={formData.ceAddress} readOnly={true}/>
+                <Form.Item label="SUPPLIER CODE :" name="supplierCode">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierCode", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="SUPPLIER NAME :" name="supplierName">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierName", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="ADDRESS:" name="supplierAddress">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierAddress", e.target.value)
+                    }
+                  />
+                </Form.Item>
               </>
             )}
 
@@ -699,7 +689,7 @@ const OutwardGatePass = () => {
               <Form.Item label="REJECTION NOTE NO.  :" name="rejectionNoteNo">
                 <Input
                   onChange={(e) =>
-                    handleReturnNoteNoChange(e.target.value)
+                    handleChange("rejectionNoteNo", e.target.value)
                   }
                 />
               </Form.Item>
@@ -725,7 +715,7 @@ const OutwardGatePass = () => {
                   >
                     <Input
                       onChange={(e) =>
-                        handleReturnNoteNoChange(e.target.value)
+                        handleChange("rejectionNoteNo", e.target.value)
                       }
                     />
                   </Form.Item>
@@ -734,9 +724,29 @@ const OutwardGatePass = () => {
             )}
             {(Type === "PO") && (
               <>
-                  <FormInputItem label="NOA NO :" value={formData.noa} />
-                  <FormInputItem label="NOA DATE :" value={formData.noaDate} />
-                  <FormInputItem label="DATE OF DELIVERY :" value={formData.dateOfDelivery} />
+                <Form.Item label="NOA NO." name="noaNo">
+                  <Input
+                    onChange={(e) => handleChange("noaNo", e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item label="NOA DATE" name="noaDate">
+                  <DatePicker
+                    format={dateFormat}
+                    style={{ width: "100%" }}
+                    onChange={(date, dateString) =>
+                      handleChange("noaDate", dateString)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="DATE OF DELIVERY" name="dateOfDelivery">
+                  <DatePicker
+                    format={dateFormat}
+                    style={{ width: "100%" }}
+                    onChange={(date, dateString) =>
+                      handleChange("dateOfDelivery", dateString)
+                    }
+                  />
+                </Form.Item>
               </>
             )}
 
@@ -753,10 +763,20 @@ const OutwardGatePass = () => {
         {(Type === "PO") && (
           <Row gutter={24}>
             <Col span={8}>
-            <FormInputItem label="CHALLAN / INVOICE NO. :" value={formData.challanNo} />
+              <Form.Item label=" CHALLAN / INVOICE NO. :" name="challanNo">
+                <Input
+                  onChange={(e) => handleChange("challanNo", e.target.value)}
+                />
+              </Form.Item>
             </Col>
             <Col span={8}>
-              <FormInputItem label="MODE OF DELIVERY :" value={formData.modeOfDelivery} />
+              <Form.Item label="MODE OF DELIVERY  :" name="modeOfDelivery">
+                <Input
+                  onChange={(e) =>
+                    handleChange("modeOfDelivery", e.target.value)
+                  }
+                />
+              </Form.Item>
             </Col>
           </Row>
         )}
@@ -816,23 +836,18 @@ const OutwardGatePass = () => {
                         />
                       </Form.Item>
 
-                      {
-                        Type === "IRP" &&
-                        
-                        <Form.Item label="LOCATOR DESCRIPITON">
+                      <Form.Item label="LOCATOR DESCRIPITON">
                         <Input
                           value={findColumnValue(
                             item.locatorId,
                             locatorMaster,
                             "locatorMaster"
-                            )}
-                            readOnly
-                            />
+                          )}
+                          readOnly
+                        />
                       </Form.Item>
-                          }
-                    
 
-                      <Form.Item label={Type === "IRP" ? "REQUIRED QUANTITY" : "QUANTITY"}>
+                      <Form.Item label="REQUIRED QUANTITY">
                         <Input
                           value={item.quantity}
                           onChange={(e) =>
@@ -850,9 +865,8 @@ const OutwardGatePass = () => {
                           onChange={(e) =>
                             itemHandleChange("noOfDays", e.target.value, key)
                           }
-                          />
+                        />
                       </Form.Item>
-                      }
 
                       <Form.Item label="REMARK">
                         <Input

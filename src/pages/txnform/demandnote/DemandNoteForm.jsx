@@ -1,22 +1,15 @@
 // DemandNoteForm.js
-import React, { useState, useEffect, useRef } from 'react';
-import html2pdf from 'html2pdf.js';
+import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { Form, Input, Button, Row, Col, DatePicker, AutoComplete, Select } from 'antd';
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import axios from 'axios';
 import moment from 'moment';
-import FormInputItem from '../../../components/FormInputItem';
-import FormDatePickerItem from '../../../components/FormDatePickerItem';
-import { printOrSaveAsPDF } from '../../../utils/Functions';
 const { TextArea } = Input;
 const dateFormat = 'DD/MM/YYYY';
 const { Option } = Select;
 
 const DemandNoteForm = () => {
-  const formRef = useRef()
   const [itemData, setItemData] = useState([]);
   const [formData, setFormData] = useState({
     regionalCenterCode: '',
@@ -111,6 +104,8 @@ const DemandNoteForm = () => {
           'Authorization': `Bearer ${token}`
         }
       });
+
+      console.log("Form data submit karke: ", formData)
       // Handle successful response here, if needed
     } catch (error) {
       console.error('There was a problem with the API call:', error);
@@ -118,112 +113,70 @@ const DemandNoteForm = () => {
     }
   };
 
-  const printQRCode = () => {
-    const doc = new jsPDF();
-    const qrCodeImgData = document
-      .getElementById('form')
-      .toDataURL('image/png');
-    doc.addImage(qrCodeImgData, 'PNG', 10, 10, 50, 50); // add the image to the PDF
-    doc.output('dataurlnewwindow');
-    doc.autoPrint();
-  };
-
-  const printForm = () => {
-    const formElement = document.querySelector('.goods-receive-note-form');
-
-    if (formElement) {
-      html2canvas(formElement)
-        .then(canvas => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF();
-          pdf.addImage(imgData, 'PNG', 0, 0);
-          pdf.save('form.pdf');
-        });
-    }
-
-  };
 
   return (
-    <div className="goods-receive-note-form-container" id="formContainer" ref={formRef} >
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Demand Note</h1>
 
       <Form onFinish={onFinish} className="goods-receive-note-form formInsideContainer" layout="vertical">
         <Row>
-          <Col span={6}>
-            <FormInputItem label="REGIONAL CENTER CODE :" value={formData.regionalCenterCode} />
+          <Col span={6} offset={18}>
+            <Form.Item label="DATE" name="date">
+              <DatePicker defaultValue={dayjs()} format={dateFormat} style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={6} >
+
           </Col>
           <Col span={6} offset={12}>
-            <FormDatePickerItem label="DEMAND NOTE DATE" defaultValue={dayjs()} />
-          </Col>
-        </Row>
-        <Row>
-          <Col span={6}>
-            <FormInputItem label="REGIONAL CENTER NAME :" value={formData.regionalCenterName} />
-          </Col>
-          <Col span={6} offset={12}>
-            <FormInputItem label="DEMAND NOTE NO. :" />
-          </Col>
-        </Row>
-        <Row>
-          <Col span={12}>
-            <FormInputItem label="ADDRESS :" value={formData.consignorAddress} />
-          </Col>
-          <Col span={8} offset={4}>
-            <FormInputItem label="CONSUMER NAME :" />
-          </Col>
-        </Row>
-        <Row>
-          <Col span={6}>
-            <FormInputItem label="ZIPCODE :" value={formData.consignorZipCode} />
-          </Col>
-          <Col span={8} offset={10}>
-            <FormInputItem label="CONTACT NO. :" />
+            <Form.Item label="DEMAND NOTE NO. :" name="grnNo">
+              <Input />
+            </Form.Item>
           </Col>
         </Row>
 
-
-        {/* <Row gutter={24}>
-          <Col span={8}> */}
-            {/* <Form.Item label="REGIONAL CENTER CODE" name="regionalCenterCode">
+        <Row gutter={24}>
+          <Col span={8}>
+            <Form.Item label="REGIONAL CENTER CODE" name="regionalCenterCode">
               <Input value={formData.regionalCenterCode} />
               <div style={{ display: 'none' }}>
                 {formData.regionalCenterCode}
               </div>
-            </Form.Item> */}
-            {/* <Form.Item label="REGIONAL CENTER NAME " name="regionalCenterNameConsignor">
+            </Form.Item>
+            <Form.Item label="REGIONAL CENTER NAME " name="regionalCenterNameConsignor">
               <Input value={formData.regionalCenterName} />
               <div style={{ display: 'none' }}>
                 {formData.regionalCenterCode}
               </div>
-            </Form.Item> */}
-            {/* <Form.Item label="ADDRESS :" name="consignorAddress">
+            </Form.Item>
+            <Form.Item label="ADDRESS :" name="consignorAddress">
               <Input value={formData.consignorAddress} />
               <div style={{ display: 'none' }}>
                 {formData.regionalCenterCode}
               </div>
 
-            </Form.Item> */}
-            {/* <Form.Item label="ZIP CODE :" name="consignorZipCode">
+            </Form.Item>
+            <Form.Item label="ZIP CODE :" name="consignorZipCode">
               <Input value={formData.consignorZipCode} />
               <div style={{ display: 'none' }}>
                 {formData.regionalCenterCode}
               </div>
-            </Form.Item> */}
-          {/* </Col>
+            </Form.Item>
+          </Col>
 
           <Col span={8}>
 
-          </Col> */}
+          </Col>
 
-          {/* <Col span={8}> */}
-            {/* <Form.Item label="CONSUMER NAME :" name="consumerName">
+          <Col span={8}>
+            <Form.Item label="CONSUMER NAME :" name="consumerName">
               <Input />
             </Form.Item>
             <Form.Item label="CONTACT NO. :" name="contactNo">
               <Input />
-            </Form.Item> */}
-          {/* </Col> */}
-        {/* </Row> */}
+            </Form.Item>
+          </Col>
+        </Row>
 
         {/* Item Details */}
         <h2>ITEM DETAILS</h2>

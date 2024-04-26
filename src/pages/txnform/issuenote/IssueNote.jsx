@@ -1,5 +1,5 @@
 // IssueNote.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -26,8 +26,6 @@ const { Title } = Typography;
 const { Search } = Input;
 
 const IssueNote = () => {
-  const [buttonVisible, setButtonVisible] = useState(false)
-  const formRef = useRef()
   const [Type, setType] = useState("IRP");
   const [form] = Form.useForm(); // Create form instance
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -127,11 +125,13 @@ const IssueNote = () => {
   const itemHandleChange = (fieldName, value, index) => {
 
     if(fieldName === 'quantity'){
+      console.log("fieldname quantity")
       // const formItemQuantity = formData.items[index]
       const {quantity: formItemQuantity, itemCode, locatorId:formDataLocId} = formData.items[index]
       const filteredItemObj = filteredData.find(obj => obj.itemMasterCd === itemCode && obj.qtyList.some(inObj=> inObj.locatorId === formDataLocId))
       const foundObj = filteredItemObj.qtyList.find(obj=> obj.locatorId === formDataLocId)
 
+      console.log("Filtred item obj", foundObj)
       if(value > foundObj.quantity){
         message.error(`Required quantity is greater than available quantity at Serial no: ${index+1}`)
         return
@@ -151,44 +151,13 @@ const IssueNote = () => {
     })
   };
 
-  // const mergeItemMasterAndOhq = (itemMasterArr, ohqArr) => {
-  //   const arr = itemMasterArr.map(item=>{
-  //     const itemCodeMatch = ohqArr.find(itemOhq=>itemOhq.itemCode === item.itemMasterCd)
-  //     if(itemCodeMatch){
-  //       const newQtyList = itemCodeMatch.qtyList.filter(obj=>obj.quantity !== 0)
-  //       if(newQtyList.length > 0)
-  //         return {...item, qtyList:newQtyList, locationId: itemCodeMatch.locationId, locationDesc: itemCodeMatch.locationName}
-  //       else return null
-  //     }
-  //     else return null
-
-      
-  //   })
-  //   return arr
-  // }
-
   const mergeItemMasterAndOhq = (itemMasterArr, ohqArr) => {
-    const arr = itemMasterArr.map(item => {
-        const itemCodeMatch = ohqArr.find(itemOhq => itemOhq.itemCode === item.itemMasterCd);
-        if (itemCodeMatch) {
-            const newQtyList = itemCodeMatch.qtyList.filter(obj => obj.quantity !== 0);
-            if (newQtyList.length > 0) {
-                return {
-                    ...item,
-                    qtyList: newQtyList,
-                    locationId: itemCodeMatch.locationId,
-                    locationDesc: itemCodeMatch.locationName
-                }; 
-            }
-        }
-        // Return undefined if no match found or newQtyList is empty
-        return undefined;
-    }).filter(Boolean); // Filter out undefined values
-    return arr;
-};
-
-
-
+    return itemMasterArr.map(item=>{
+      const itemCodeMatch = ohqArr.find(itemOhq=>itemOhq.itemCode === item.itemMasterCd)
+      if(itemCodeMatch)
+        return {...item, qtyList:itemCodeMatch.qtyList, locationId: itemCodeMatch.locationId, locationDesc: itemCodeMatch.locationName}
+    })
+  }
 
   const renderLocatorISN = (obj, rowRecord) => {
     return (
@@ -228,9 +197,6 @@ const IssueNote = () => {
     )
   }
 
-  console.log("ITEMDATA: ", data)
-  console.log("Filtereddata: ", filteredData)
-
   const tableColumns =  [
     { title: "S NO.", dataIndex: "id", key: "id", fixed: "left", width: 80 },
     {
@@ -246,7 +212,7 @@ const IssueNote = () => {
       key: "itemCode",
     },
     {
-      title: "UOM DESCRIPTION",
+      title: "UOM",
       dataIndex: "uomDtls",
       key: "uomDtls",
       render: (uomDtls) => uomDtls?.baseUom
@@ -389,7 +355,6 @@ const IssueNote = () => {
 
       
       const {responseData : itemMasterData} = itemMaster.data
-      console.log("Itemmasterdata: ", itemMasterData)
       // const {responseData : locatorMasterData} = locatorMaster.data
       // const {responseData : uomMasterData} = uomMaster.data
       const {responseData: ohqData} = ohq.data
@@ -463,6 +428,7 @@ const IssueNote = () => {
 
     // Check if the item is already selected
     const index = selectedItems.findIndex((item) => item.id === record.id && item.locatorId === subRecord.locatorId);
+    console.log("Index: ", index)
     if (index === -1) {
       setSelectedItems((prevItems) => [...prevItems, {...recordCopy, locatorId: subRecord.locatorId}]); // Update selected items state
     //   // add data to formData hook
@@ -528,138 +494,138 @@ const IssueNote = () => {
       return foundObject ? foundObject['uomName'] : 'Undefined';
   }
 
-  // const columns = [
-  //   { title: "S NO.", dataIndex: "id", key: "id", fixed: "left", width: 80 },
-  //   {
-  //     title: "ITEM CODE",
-  //     dataIndex: "itemMasterCd",
-  //     key: "itemCode",
-  //   },
-  //   {
-  //     title: "ITEM DESCRIPTION",
-  //     dataIndex: "itemName",
-  //     key: "itemMasterDesc",
-  //     render: (itemName) => itemNames[itemName]
-  //   },
-  //   { 
-  //     title: "UOM", 
-  //     dataIndex: "uomDesc", 
-  //     key: "uom", 
-  //   },
-  //   {
-  //     title: "QUANTITY ON HAND",
-  //     dataIndex: "quantity",
-  //     key: "quantity",
-  //   },
-  //   { 
-  //     title: "LOCATION",
-  //     dataIndex: "locationId",
-  //     key: "location",
-  //     render: (locationId) => locationMaster[locationId] 
-  //     // render: (locationId) => locationMaster[locationId] findColumnValue(locationId, locationMaster, "locationMaster")
-  //   },
-  //   {
-  //     title: "LOCATOR CODE",
-  //     dataIndex: "locatorId",
-  //     key: "locatorCode",
-  //   },
-  //   { title: "PRICE", dataIndex: "price", key: "price" },
-  //   { 
-  //     title: "VENDOR DETAIL", 
-  //     dataIndex: "vendorId", 
-  //     key: "vendorDetail",
-  //     render: (vendorId) => vendorMaster[vendorId]
-  //     // render: (vendorId) => findColumnValue(vendorId, vendorMaster, "vendorMaster")
+  const columns = [
+    { title: "S NO.", dataIndex: "id", key: "id", fixed: "left", width: 80 },
+    {
+      title: "ITEM CODE",
+      dataIndex: "itemMasterCd",
+      key: "itemCode",
+    },
+    {
+      title: "ITEM DESCRIPTION",
+      dataIndex: "itemName",
+      key: "itemMasterDesc",
+      render: (itemName) => itemNames[itemName]
+    },
+    { 
+      title: "UOM", 
+      dataIndex: "uomDesc", 
+      key: "uom", 
+    },
+    {
+      title: "QUANTITY ON HAND",
+      dataIndex: "quantity",
+      key: "quantity",
+    },
+    { 
+      title: "LOCATION",
+      dataIndex: "locationId",
+      key: "location",
+      render: (locationId) => locationMaster[locationId] 
+      // render: (locationId) => locationMaster[locationId] findColumnValue(locationId, locationMaster, "locationMaster")
+    },
+    {
+      title: "LOCATOR CODE",
+      dataIndex: "locatorId",
+      key: "locatorCode",
+    },
+    { title: "PRICE", dataIndex: "price", key: "price" },
+    { 
+      title: "VENDOR DETAIL", 
+      dataIndex: "vendorId", 
+      key: "vendorDetail",
+      render: (vendorId) => vendorMaster[vendorId]
+      // render: (vendorId) => findColumnValue(vendorId, vendorMaster, "vendorMaster")
 
-  //   },
-  //   { 
-  //     title: "CATEGORY", 
-  //     dataIndex: "category", 
-  //     key: "category",
-  //     render: (category) => categories[category]
+    },
+    { 
+      title: "CATEGORY", 
+      dataIndex: "category", 
+      key: "category",
+      render: (category) => categories[category]
 
-  //   },
-  //   { 
-  //     title: "SUB-CATEGORY", 
-  //     dataIndex: "subCategory", 
-  //     key: "subCategory",
-  //     render: (subCategory) => subCategories[subCategory]
-  //   },
-  //   { 
-  //     title: "Type", 
-  //     dataIndex: "type", 
-  //     key: "type", 
-  //     render: (type) => types[type]
-  //   },
-  //   { 
-  //     title: "Disciplines", 
-  //     dataIndex: "disciplines", 
-  //     key: "disciplines",
-  //     render: (disciplines) => allDisciplines[disciplines]
-  //   },
-  //   { 
-  //     title: "Brand", 
-  //     dataIndex: "brandId", 
-  //     key: "brand",
-  //     render: (brandId) => brands[brandId]
-  //   },
-  //   { 
-  //     title: "Size", 
-  //     dataIndex: "size", 
-  //     key: "size",
-  //     render: (size) => sizes[size]
-  //   },
-  //   { 
-  //     title: "Colour", 
-  //     dataIndex: "colorId", 
-  //     key: "colour",
-  //     render: (colorId) => colors[colorId]
-  //   },
-  //   {
-  //     title: "Usage Category",
-  //     dataIndex: "usageCategory",
-  //     key: "usageCategory",
-  //     render: (usageCategory) => usageCategories[usageCategory]
-  //   },
-  //   {
-  //     title: "MINIMUM STOCK LEVEL",
-  //     dataIndex: "minStockLevel",
-  //     key: "minStockLevel",
-  //   },
-  //   {
-  //     title: "MAXIMUM STOCK LEVEL",
-  //     dataIndex: "maxStockLevel",
-  //     key: "maxStockLevel",
-  //   },
-  //   { title: "RE ORDER POINT", dataIndex: "reOrderPoint", key: "reOrderPoint" },
-  //   { title: "STATUS", dataIndex: "status", key: "status" },
-  //   { title: "CREATE DATE", dataIndex: "endDate", key: "endDate" },
-  //   {
-  //     title: "Actions",
-  //     key: "actions",
-  //     fixed: "right",
-  //     render: (text, record) => (
-  //       <Button
-  //         // type={
-  //         //   selectedItems.some((item) => item.id === record.id)
-  //         //     ? "warning"
-  //         //     : "primary"
-  //         // }
-  //         onClick={() => handleSelectItem(record)}
-  //       >
-  //         {
-  //           selectedItems.some((item) => item.locatorId === record.locatorId)
-  //             ? "Deselect"
-  //             : "Select"
-  //         }
-  //       </Button>
-  //     ),
-  //   },
-  // ];
+    },
+    { 
+      title: "SUB-CATEGORY", 
+      dataIndex: "subCategory", 
+      key: "subCategory",
+      render: (subCategory) => subCategories[subCategory]
+    },
+    { 
+      title: "Type", 
+      dataIndex: "type", 
+      key: "type", 
+      render: (type) => types[type]
+    },
+    { 
+      title: "Disciplines", 
+      dataIndex: "disciplines", 
+      key: "disciplines",
+      render: (disciplines) => allDisciplines[disciplines]
+    },
+    { 
+      title: "Brand", 
+      dataIndex: "brandId", 
+      key: "brand",
+      render: (brandId) => brands[brandId]
+    },
+    { 
+      title: "Size", 
+      dataIndex: "size", 
+      key: "size",
+      render: (size) => sizes[size]
+    },
+    { 
+      title: "Colour", 
+      dataIndex: "colorId", 
+      key: "colour",
+      render: (colorId) => colors[colorId]
+    },
+    {
+      title: "Usage Category",
+      dataIndex: "usageCategory",
+      key: "usageCategory",
+      render: (usageCategory) => usageCategories[usageCategory]
+    },
+    {
+      title: "MINIMUM STOCK LEVEL",
+      dataIndex: "minStockLevel",
+      key: "minStockLevel",
+    },
+    {
+      title: "MAXIMUM STOCK LEVEL",
+      dataIndex: "maxStockLevel",
+      key: "maxStockLevel",
+    },
+    { title: "RE ORDER POINT", dataIndex: "reOrderPoint", key: "reOrderPoint" },
+    { title: "STATUS", dataIndex: "status", key: "status" },
+    { title: "CREATE DATE", dataIndex: "endDate", key: "endDate" },
+    {
+      title: "Actions",
+      key: "actions",
+      fixed: "right",
+      render: (text, record) => (
+        <Button
+          // type={
+          //   selectedItems.some((item) => item.id === record.id)
+          //     ? "warning"
+          //     : "primary"
+          // }
+          onClick={() => handleSelectItem(record)}
+        >
+          {
+            selectedItems.some((item) => item.locatorId === record.locatorId)
+              ? "Deselect"
+              : "Select"
+          }
+        </Button>
+      ),
+    },
+  ];
+
+  
 
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
     try {
       const apiUrl =
         "/login/authenticate";
@@ -670,6 +636,7 @@ const IssueNote = () => {
 
       const { responseData } = response.data;
       const { organizationDetails, userDetails, locationDetails } = responseData;
+      console.log("RESPONSE: ", responseData)
       // Get current date
       const currentDate = dayjs();
       // Update form data with fetched values
@@ -790,7 +757,6 @@ const IssueNote = () => {
             issueNoteNo: processId,
           }
         });
-        setButtonVisible(true)
         setSuccessMessage(
           `Issue note saved successfully! Issue Note No : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -815,6 +781,16 @@ const IssueNote = () => {
   };
 
   const removeItem = (index) => {
+    // setItemDetail(prevValues=>{
+    //   const updatedItems = prevValues
+    //   updatedItems.splice(index, 1)
+      
+    //   const updatedItems1 = updatedItems.map((item, key)=>{
+    //     return {...item, srNo: key+1}
+    //   })
+
+    //   return [...updatedItems1]
+    // })
     setFormData(prevValues=>{
       const updatedItems = prevValues.items
       updatedItems.splice(index, 1)
@@ -828,7 +804,7 @@ const IssueNote = () => {
   }
 
   return (
-    <div className="goods-receive-note-form-container" ref = {formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Issue Note</h1>
 
       <Form
@@ -1063,9 +1039,9 @@ const IssueNote = () => {
                           <Input value={item.uomDesc} />
                         </Form.Item>
 
-                        {/* <Form.Item label="LOCATOR DESCRIPITON">
+                        <Form.Item label="LOCATOR DESCRIPITON">
                           <Input value= {item.locatorDesc}readOnly />
-                        </Form.Item> */}
+                        </Form.Item>
 
                         <Form.Item label="REQUIRED QUANTITY">
                           <Input value={item.quantity} onChange={(e)=>itemHandleChange("quantity", e.target.value, key)} />
@@ -1217,7 +1193,11 @@ const IssueNote = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-          <Button disabled={!buttonVisible} onClick={()=> printOrSaveAsPDF(formRef)} type="primary" danger style={{ width: '200px', margin: 16, alignContent: 'end' }}>
+            <Button
+              type="primary"
+              disabled={formSubmitted ? false : true}
+              style={{ width: "200px", margin: 16 }}
+            >
               PRINT
             </Button>
           </Form.Item>
@@ -1232,6 +1212,11 @@ const IssueNote = () => {
         </Modal>
       </Form>
 
+      <Modal open={false} width={1200} >
+        <Table dataSource={filteredData} columns={tableColumns} scroll={{ x: "max-content" }} />
+      </Modal>
+
+      {/* <ItemDetailTable dataSource={filteredData} selectedItems={selectedItems} setSelectedItems={setSelectedItems} setFormData={setFormData} locationMaster={locationMaster} vendorMaster={vendorMaster} /> */}
     </div>
   );
 }

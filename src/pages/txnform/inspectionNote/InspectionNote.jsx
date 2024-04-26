@@ -1,5 +1,5 @@
 // InspectionNote.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -22,7 +22,7 @@ import FormInputItem from "../../../components/FormInputItem";
 import FormDatePickerItem from "../../../components/FormDatePickerItem";
 import { convertArrayToObject, printOrSaveAsPDF } from "../../../utils/Functions";
 
-const dateFormat = "DD/MM/YYYY";
+const dateFormat = "YYYY/MM/DD";
 const { Option } = Select;
 const { Title } = Typography;
 
@@ -34,8 +34,6 @@ const InspectionNote = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [uomMaster, setUomMaster] = useState({})
-  const [locatorMaster, setLocatorMaster] = useState({})
   const [itemData, setItemData] = useState([]);
   const [formData, setFormData] = useState({
     genDate: "",
@@ -70,21 +68,21 @@ const InspectionNote = () => {
     conditionOfGoods: "",
     userId: "",
     items: [
-      // {
-      //   srNo: 0,
-      //   itemCode: "",
-      //   itemDesc: "",
-      //   uom: "",
-      //   quantity: 0,
-      //   noOfDays: 0,
-      //   remarks: "",
-      //   conditionOfGoods: "",
-      //   budgetHeadProcurement: "",
-      //   locatorId: "",
-      //   inspectedQuantity: 0,
-      //   acceptedQuantity: 0,
-      //   rejectedQuantity: 0,
-      // },
+      {
+        srNo: 0,
+        itemCode: "",
+        itemDesc: "",
+        uom: "",
+        quantity: 0,
+        noOfDays: 0,
+        remarks: "",
+        conditionOfGoods: "",
+        budgetHeadProcurement: "",
+        locatorId: "",
+        inspectedQuantity: 0,
+        acceptedQuantity: 0,
+        rejectedQuantity: 0,
+      },
     ],
   });
 
@@ -109,6 +107,10 @@ const InspectionNote = () => {
       updatedItems[index] = {
         ...updatedItems[index],
         [fieldName]: value === "" ? null : value,
+        uom: "string",
+        conditionOfGoods: "string", // Hard-coded data
+        budgetHeadProcurement: "string", // Hard-coded data
+        locatorId: "string", // Hard-coded data
       };
       return {
         ...prevValues,
@@ -118,8 +120,7 @@ const InspectionNote = () => {
   };
 
   useEffect(() => {
-    // fetchItemData();
-    fetchUomLocatorMaster()
+    fetchItemData();
     fetchUserDetails();
   }, []);
 
@@ -168,8 +169,7 @@ const InspectionNote = () => {
       console.error("Error fetching data:", error);
     }
   };
-  
-  const handleInwardGatePassChange = async (_fieldName, value) => {
+  const handleInwardGatePassChange = async (value) => {
     try {
       const apiUrl =
         "/getSubProcessDtls";
@@ -179,13 +179,13 @@ const InspectionNote = () => {
       },  apiHeader("POST", token));
       const {responseData} = response.data;
       const { processData, itemList } = responseData;
+      console.log("API Response:", response.data);
       setFormData((prevFormData) => ({
         ...prevFormData,
 
         issueName: processData?.issueName,
         approvedName: processData?.approvedName,
         processId: processData?.processId,
-        inwardGatePass: processData?.processId,
 
         crRegionalCenterCd: processData?.crRegionalCenterCd,
         crRegionalCenterName: processData?.crRegionalCenterName,
@@ -199,29 +199,21 @@ const InspectionNote = () => {
 
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
-
         supplierCd: processData?.supplierCd,
         supplierName: processData?.supplierName,
         address: processData?.crAddress,
-
-        modeOfDelivery: processData?.modeOfDelivery,
-        challanNo: processData?.challanNo,
-        dateOfDeliveryDate: processData?.dateOfDelivery,
 
         items: itemList.map((item) => ({
           srNo: item?.sNo,
           itemCode: item?.itemCode,
           itemDesc: item?.itemDesc,
-          uom: parseInt(item?.uom),
-          // quantity: item?.quantity,
+          uom: item?.uom,
+          quantity: item?.quantity,
           noOfDays: item?.requiredDays,
           remarks: item?.remarks,
           conditionOfGoods: item?.conditionOfGoods,
           budgetHeadProcurement: item?.budgetHeadProcurement,
           locatorId: item?.locatorId,
-          inspectedQuantity: item?.quantity,
-          acceptedQuantity: 0,
-          rejectedQuantity: 0
         })),
       }));
       // Handle response data as needed
@@ -266,7 +258,6 @@ const InspectionNote = () => {
   }
 
   const onFinish = async (values) => {
-    
     try {
       const formDataCopy = { ...formData };
       const allFields = [
@@ -320,13 +311,9 @@ const InspectionNote = () => {
         // Access the specific success message data if available
         const { processId, processType, subProcessId } =
           response.data.responseData;
-        setFormData((prevValues) => {
-          return {
-            ...prevValues,
-            inspectionRptNo: processId,
-          }
+        setFormData({
+          inspectionRptNo: processId,
         });
-        setButtonVisible(true)
         setSuccessMessage(
           `Inspection Note : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -350,7 +337,7 @@ const InspectionNote = () => {
   };
 
   return (
-    <div className="goods-receive-note-form-container" ref={formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Inspection Note</h1>
       <Form
         onFinish={onFinish}
@@ -442,9 +429,117 @@ const InspectionNote = () => {
         <Form.List name="itemDetails" initialValue={formData.items || [{}]}>
           {(fields, { add, remove }) => (
             <>
-              {formData?.items?.length > 0 &&
-                formData.items.map((item, key) => {
-                  return (
+              <Form.Item style={{ textAlign: "right" }}>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  style={{ marginBottom: 8 }}
+                  icon={<PlusOutlined />}
+                >
+                  ADD ITEM
+                </Button>
+              </Form.Item>
+              {fields.map(({ key, name, ...restField }, index) => (
+                <div
+                  key={key}
+                  style={{
+                    marginBottom: 16,
+                    border: "1px solid #d9d9d9",
+                    padding: 16,
+                    borderRadius: 4,
+                  }}
+                >
+                  <Row gutter={24}>
+                    <Col span={6}>
+                      <Form.Item
+                        {...restField}
+                        label="S.NO."
+                        name={[name, "srNo"]}
+                      >
+                        <Input
+                          value={formData.items?.[index]?.srNo}
+                          onChange={(e) =>
+                            e.target &&
+                            itemHandleChange(`srNo`, e.target.value, index)
+                          }
+                        />
+                        <span style={{ display: "none" }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item
+                        {...restField}
+                        label="ITEM CODE"
+                        name={[name, "itemCode"]}
+                        initialValue={formData.items?.[index]?.itemCode}
+                      >
+                        <AutoComplete
+                          style={{ width: "100%" }}
+                          options={itemData.map((item) => ({
+                            value: item.itemMasterCd,
+                          }))}
+                          placeholder="Enter item code"
+                          filterOption={(inputValue, option) =>
+                            option.value
+                              .toUpperCase()
+                              .indexOf(inputValue.toUpperCase()) !== -1
+                          }
+                          value={formData.items?.[index]?.itemCode}
+                          onChange={(value) =>
+                            itemHandleChange(`itemCode`, value, index)
+                          }
+                        />
+                        <span style={{ display: "none" }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item
+                        {...restField}
+                        label="ITEM DESCRIPTION"
+                        name={[name, "itemDesc"]}
+                      >
+                        <AutoComplete
+                          style={{ width: "100%" }}
+                          options={itemData.map((item) => ({
+                            value: item.itemMasterDesc,
+                          }))}
+                          placeholder="Enter item description"
+                          filterOption={(inputValue, option) =>
+                            option.value
+                              .toUpperCase()
+                              .indexOf(inputValue.toUpperCase()) !== -1
+                          }
+                          onChange={(value) =>
+                            itemHandleChange(`itemDesc`, value, index)
+                          }
+                          value={formData.items?.[index]?.itemDesc}
+                        />
+                        <span style={{ display: "none" }}>{index + 1}</span>
+                      </Form.Item>
+                    </Col>
+                    <Col span={5}>
+                      <Form.Item
+                        {...restField}
+                        label="UOM"
+                        name={[name, "uom"]}
+                      >
+                        <AutoComplete
+                          style={{ width: "100%" }}
+                          options={itemData.map((item) => ({
+                            value: item.uom,
+                          }))}
+                          placeholder="Enter UOM"
+                          filterOption={(inputValue, option) =>
+                            option.value
+                              .toUpperCase()
+                              .indexOf(inputValue.toUpperCase()) !== -1
+                          }
+                          onChange={(value) =>
+                            itemHandleChange(`uom`, value, index)
+                          }
+                        />
+                      </Form.Item>
+                    </Col>
 
                     <div key={key} style={{ marginBottom: 16, border: '1px solid #d9d9d9', padding: 16, borderRadius: 4, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',gap:'20px' }}>
                       
@@ -478,7 +573,6 @@ const InspectionNote = () => {
                   );
                 })}
             </>
-
           )}
         </Form.List>
 

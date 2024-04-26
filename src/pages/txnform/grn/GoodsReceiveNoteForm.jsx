@@ -1,5 +1,5 @@
 // GoodsReceiveNoteForm.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -21,28 +21,6 @@ import { apiHeader, printOrSaveAsPDF } from "../../../utils/Functions";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Title } = Typography;
-
-
-const convertEpochToDateString = (epochTime) => {
-  // Convert epoch time to milliseconds
-  let date = new Date(epochTime);
-
-  // Extract the day, month, and year from the Date object
-  let day = date.getDate();
-  let month = date.getMonth() + 1; // Month starts from 0
-  let year = date.getFullYear();
-
-  // Add leading zeros if needed
-  if (day < 10) {
-    day = '0' + day;
-  }
-  if (month < 10) {
-    month = '0' + month;
-  }
-
-  // Return the date string in DD/MM/YYYY format
-  return `${day}/${month}/${year}`;
-}
 
 const GoodsReceiveNoteForm = () => {
   const [buttonVisible, setButtonVisible] = useState(false)
@@ -121,6 +99,9 @@ const GoodsReceiveNoteForm = () => {
     return clone;
   }
   
+  
+
+  console.log("Form data: ", formData.items)
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -131,10 +112,6 @@ const GoodsReceiveNoteForm = () => {
   };
 
   const handleChange = (fieldName, value) => {
-    if(fieldName === "processType"){
-      fetchUserDetails(value)
-      return;
-    }
     setFormData((prevValues) => ({
       ...prevValues,
       [fieldName]: value === "" ? null : value,
@@ -207,7 +184,6 @@ const GoodsReceiveNoteForm = () => {
       const { responseData } = response.data;
       const { organizationDetails } = responseData;
       const { userDetails } = responseData;
-      const {locationDetails} = responseData
       const currentDate = dayjs();
       // Update form data with fetched values
       if(processType === "IRP"){
@@ -384,9 +360,9 @@ const GoodsReceiveNoteForm = () => {
 
       if (status === 200 && statusText === "OK") {
         try {
-          const locatorQuantityArr= await Promise.all(
-            itemList?.map(async (item) => {
-              const itemCode  = item.itemCode;
+          const locatorQuantityArr = await Promise.all(
+            itemList.map(async (item) => {
+              const { itemCode } = item;
 
               const ohqRes = await axios.post(ohqUrl, {
                 itemCode: itemCode,
@@ -394,7 +370,6 @@ const GoodsReceiveNoteForm = () => {
               }, apiHeader("POST", token));
               const { data: ohqProcess } = ohqRes;
               const { responseData: ohqData } = ohqProcess;
-              console.log("OHQDATA: ", ohqData)
               return {
                 itemCode: ohqData[0].itemCode,
                 qtyList: ohqData[0].qtyList,
@@ -407,11 +382,12 @@ const GoodsReceiveNoteForm = () => {
             return acc;
           }, {});
 
+          console.log("Locator Quan arr", locatorQuantityObj);
+
           setLocatorQuantity({ ...locatorQuantityObj });
         } catch (error) {
           console.log("Error: ", error);
         }
-      }else{
       }
 
       setFormData((prevFormData) => ({
@@ -453,7 +429,7 @@ const GoodsReceiveNoteForm = () => {
           itemDesc: item?.itemDesc,
           uom: parseInt(item?.uom),
           quantity: item?.quantity,
-          remQuantity:item?.quantity,
+          remQuantity: item?.quantity,
           noOfDays: item?.requiredDays,
           remarks: item?.remarks,
           conditionOfGoods: item?.conditionOfGoods,
@@ -474,10 +450,13 @@ const GoodsReceiveNoteForm = () => {
     }
   }
 
+  console.log("FormData: ", formData.items);
+
   const onFinish = async (values) => {
+    console.log("Form data abve foud", formData)
     let found = false
     const tempFormData = deepClone(formData)
-    tempFormData.items?.forEach(item=>{
+    tempFormData.items.forEach(item=>{
       const {quantity, remQuantity} = item;
       if(quantity-remQuantity > 0){
         message.error("Please locate a locator to all quantity")
@@ -489,21 +468,22 @@ const GoodsReceiveNoteForm = () => {
     if(found) return
 
     const updatedForm = deepClone(formData);
-    const updatedItems = updatedForm.items?.map(item=>{
+    const updatedItems = updatedForm.items.map(item=>{
       const itemObj = item
       const {qtyList} = item
       delete itemObj.quantity
       delete itemObj.remQuantity
       delete itemObj.qtyList
 
-      const insideArray = qtyList?.map(qtyObj=>{
+      const insideArray = qtyList.map(qtyObj=>{
         return {...itemObj, quantity: qtyObj.quantity, locatorId: qtyObj.locatorId}
       })
 
       return insideArray
     })
     
-    const flatItemsArray = updatedItems?.flatMap(innerArray => innerArray);
+    const flatItemsArray = updatedItems.flatMap(innerArray => innerArray);
+    console.log("Form data above try: ", formData)
 
     try {
       const formDataCopy = { ...formData, items: flatItemsArray };
@@ -568,7 +548,6 @@ const GoodsReceiveNoteForm = () => {
             grnNo: processId,
           };
         });
-        setButtonVisible(true)
         setSuccessMessage(
           ` Goods Receive Note NO : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -576,16 +555,20 @@ const GoodsReceiveNoteForm = () => {
         message.success(
           `Goods Receive Note successfully! Process ID: ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
-
+        console.log("FOrm data onfinisg try: ",formData)
+        console.log("locatorMaster data onfinisg try: ",locatorMaster)
       } else {
         // Display a generic success message if specific data is not available
         message.error("Failed to Goods Receive Note. Please try again later.");
-
+        console.log("FOrm data onfinisg else: ",formData)
+        console.log("locatorMaster data onfinisg else: ",locatorMaster)
       }
       // Handle success response here
     } catch (error) {
       console.log("Error saving Goods Receive Note:", error);
       message.error("Failed to Goods Receive Note. Please try again later.");
+      console.log("FOrm data onfinisg catch: ",formData)
+      console.log("locatorMaster data onfinisg catch: ",locatorMaster)
     }
   };
 
@@ -627,7 +610,7 @@ const GoodsReceiveNoteForm = () => {
       const updatedItems = prevValues.items;
       updatedItems.splice(index, 1);
 
-      const updatedItems1 = updatedItems?.map((item, key) => {
+      const updatedItems1 = updatedItems.map((item, key) => {
         return { ...item, srNo: key + 1 };
       });
 
@@ -640,6 +623,7 @@ const GoodsReceiveNoteForm = () => {
 
   const handleLocatorChange = (fieldName, itemIndex, qtyListIndex, value) => {
     // if(quantity-remQuantity-prevVal + val)
+    console.log("ItemIndex: ", itemIndex, value);
     if (fieldName === "quantity") {
       const { remQuantity, quantity, qtyList } = formData.items[itemIndex];
       const val = value === "" ? 0 : parseInt(value);
@@ -670,6 +654,9 @@ const GoodsReceiveNoteForm = () => {
       }
     } else {
       setFormData((prevValues) => {
+        console.log("setForm data locatorId called");
+        console.log("Item array: ", prevValues.items, itemIndex, qtyListIndex)
+        console.log("Form data setForm", formData.items)
         const itemArray = [...prevValues.items];
         itemArray[itemIndex].qtyList[qtyListIndex].locatorId = parseInt(value);
 
@@ -687,7 +674,7 @@ const GoodsReceiveNoteForm = () => {
   };
 
   return (
-    <div className="goods-receive-note-form-container" ref={formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Goods Receive Note</h1>
 
       <Form
@@ -695,7 +682,6 @@ const GoodsReceiveNoteForm = () => {
         className="goods-receive-note-form"
         onValuesChange={handleValuesChange}
         layout="vertical"
-        initialValues={formData}
       >
         <Row>
           <Col span={6} offset={18}>
@@ -703,7 +689,7 @@ const GoodsReceiveNoteForm = () => {
           </Col>
           <Col span={6}>
             <Form.Item label="TYPE" name="type">
-              <Select onChange={(value) => handleChange("processType", value)}>
+              <Select onChange={(value) => handleChange("type", value)}>
                 <Option value="IRP">1. Issue/Return</Option>
                 <Option value="PO">2. Purchase Order</Option>
                 <Option value="IOP">3. Inter-Org Transaction</Option>
@@ -711,9 +697,12 @@ const GoodsReceiveNoteForm = () => {
             </Form.Item>
           </Col>
           <Col span={6} offset={12}>
-    
-
-            <FormInputItem label="GRN No." value={formData.grnNo === "string" ? "not defined" : formData.grnNo} />
+            <Form.Item label="GRN NO." name="grnNo">
+              <Input
+                disabled
+                onChange={(e) => handleChange("grnNo", e.target.value)}
+              />
+            </Form.Item>
           </Col>
         </Row>
 
@@ -742,11 +731,29 @@ const GoodsReceiveNoteForm = () => {
             </Title>
 
             {Type === "PO" && (
-              <> 
-              <FormInputItem label="SUPPLIER CODE :" value={formData.supplierCode} />
-              <FormInputItem label="SUPPLIER NAME :" value={formData.supplierName} />
-              <FormInputItem label="ADDRESS :" value={formData.crAddress || "Not defined"} />
-            </>
+              <>
+                <Form.Item label="SUPPLIER CODE :" name="supplierCode">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierCode", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="SUPPLIER NAME :" name="supplierName">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierName", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="ADDRESS:" name="supplierAddress">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierAddress", e.target.value)
+                    }
+                  />
+                </Form.Item>
+              </>
             )}
 
             {Type === "IRP" && (
@@ -829,7 +836,7 @@ const GoodsReceiveNoteForm = () => {
             )}
             {Type === "PO" && (
               <Form.Item label="ACCEPTANCE NOTE NO." name="acceptanceNoteNo">
-                <Input onChange={(e) => handleReturnNoteNoChange(e.target.value)} />
+                <Input />
               </Form.Item>
             )}
             {/* {Type === "IOP" && (
@@ -885,7 +892,13 @@ const GoodsReceiveNoteForm = () => {
             <>
               {formData.items?.length > 0 &&
                 formData.items.map((item, key) => {
+                  // console.log(
+                  //   "Item: ",
+                  //   item.itemCode,
+                  //   locatorQuantity[item.itemCode]
+                  // );
                   return (
+                    // <div className="xyz" style={{font:"150px", zIndex: "100"}}>xyz</div>
 
                     <div
                       key={key}
@@ -921,16 +934,14 @@ const GoodsReceiveNoteForm = () => {
                           )}
                         />
                       </Form.Item>
-                      
-                        <Form.Item label="RECEIVED QUANTITY">
+
+                      <Form.Item label="RECEIVED QUANTITY">
                         <Input value={item.quantity} readOnly />
                       </Form.Item>
 
-                      {/* <Form.Item label="BUDGET HEAD PROCUREMENT">
+                      <Form.Item label="BUDGET HEAD PROCUREMENT">
                         <Input value={item.budgetHeadProcurement} readOnly />
-                      </Form.Item> */}
-
-                      <FormInputItem label="BUDGET HEAD PROCUREMENT" name="budgetHeadProcurement" value={item.budgetHeadProcurement} onChange={(name, value)=> itemHandleChange("budgetHeadProcurement", value, key)} />
+                      </Form.Item>
 
                       <Form.Item
                         label="REMARK"
