@@ -1134,7 +1134,7 @@
 
 
 // InwardGatePass.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -1146,8 +1146,6 @@ import {
   Typography,
   message,
   Modal,
-  Popover,
-  Table
 } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -1167,15 +1165,10 @@ const InwardGatePass = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [itemData, setItemData] = useState([]);
-  const [searchValue, setSearchValue] = useState("")
-  const [data, setData] = useState([])
   const [uomMaster, setUomMaster] = useState([]);
-  const [filteredData, setFilteredData] = useState([])
-  const [tableOpen, setTableOpen] = useState(false)
   const [locatorMaster, setLocatorMaster] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([])
-  const [locationMaster, setLocationMaster] = useState([])
-  const [vendorMaster, setVendorMaster] = useState([])
+  // const [locationMaster, setLocationMaster] = useState([])
+  // const [vendorMaster, setVendorMaster] = useState([])
   const [formData, setFormData] = useState({
     genDate: "",
     genName: "",
@@ -1183,7 +1176,7 @@ const InwardGatePass = () => {
     issueName: "",
     approvedDate: "",
     approvedName: "",
-    processId: "string",
+    processId: "",
     type: "",
     gatePassDate: "",
     gatePassNo: "",
@@ -1207,18 +1200,18 @@ const InwardGatePass = () => {
     noteType: "",
     rejectionNoteNo: "",
     items: [
-      // {
-      //   srNo: 0,
-      //   itemCode: "",
-      //   itemDesc: "",
-      //   uom: "",
-      //   quantity: 0,
-      //   noOfDays: 0,
-      //   remarks: "",
-      //   conditionOfGoods: "",
-      //   budgetHeadProcurement: "",
-      //   locatorId: "",
-      // },
+      {
+        srNo: 0,
+        itemCode: "",
+        itemDesc: "",
+        uom: "",
+        quantity: 0,
+        noOfDays: 0,
+        remarks: "",
+        conditionOfGoods: "",
+        budgetHeadProcurement: "",
+        locatorId: "",
+      },
     ],
     userId: "",
     termsCondition: "",
@@ -1265,225 +1258,11 @@ const InwardGatePass = () => {
 
 
   const handleChange = (fieldName, value) => {
-    if(fieldName === "processType"){
-      console.log(fieldName, value)
-      fetchUserDetails(value)
-      return;
-    }
-    if(fieldName === "supplierCode"){
-      searchVendor(value)
-      return
-    }
-
     setFormData((prevValues) => ({
       ...prevValues,
       [fieldName]: value === "" ? null : value,
     }));
   };
-
-  const handleSelectItem = (record, subRecord) => {
-    setTableOpen(false);
-
-    const recordCopy = record // delete qtyList array from record
-
-    // Check if the item is already selected
-    const index = selectedItems.findIndex((item) => item.id === record.id && item.locatorId === subRecord.locatorId);
-    if (index === -1) {
-      setSelectedItems((prevItems) => [...prevItems, {...recordCopy, locatorId: subRecord.locatorId}]); // Update selected items state
-    //   // add data to formData hook
-    //   // setItemDetail((prevData) => {
-    //   //   const newItem = {
-    //   //     srNo: prevData.length ? prevData.length + 1 : 1,
-    //   //     itemCode: record.itemMasterCd,
-    //   //     itemId: record.id,
-    //   //     itemDesc: record.itemMasterDesc,
-    //   //     uom: record.uomId,
-    //   //     uomDesc : record.uomDtls.baseUom,
-    //   //     quantity: 1,
-    //   //     noOfDays: 1,
-    //   //     remarks: "",
-    //   //     conditionOfGoods: "",
-    //   //     budgetHeadProcurement: "",
-    //   //     qtyList: record.qtyList
-    //   //   };
-    //   //   const updatedItems = [...(prevData || []), newItem];
-    //   //   return [...updatedItems]
-    //   // });
-
-      setFormData(prevValues=>{
-        const newItem = {
-          srNo: prevValues.items?.length ? prevValues.items.length + 1 : 1,
-          itemCode: record.itemMasterCd,
-          itemId: record.id,
-          itemDesc: record.itemMasterDesc,
-          uom: record.uomId,
-          uomDesc: record.uomDtls.baseUom,
-          quantity: 1,
-          noOfDays: 1,
-          conditionOfGoods: "",
-          budgetHeadProcurement: "",
-          locatorId: subRecord.locatorId,
-          locatorDesc: subRecord.locatorDesc,
-          remarks: "",
-          // qtyList: record.qtyList
-        }
-
-        const updatedItems = [...(prevValues.items || []), newItem]
-        return {...prevValues, items: updatedItems}
-      })
-    } 
-    else {
-      // If item is already selected, deselect it
-      const updatedItems = [...selectedItems];
-      updatedItems.splice(index, 1);
-      setSelectedItems(updatedItems);
-    }
-  };
-
-  const renderLocatorISN = (obj, rowRecord) => {
-    return (
-      <Table 
-        dataSource={obj}
-        pagination={false}
-        columns={[
-          {
-            title: "LOCATOR DESCRIPTION",
-            dataIndex: "locatorDesc",
-            key: "locatorDesc"
-          },
-          {
-            title: "QUANTITY",
-            dataIndex: "quantity",
-            key: "quantity"
-          },
-          {
-            title: "ACTION",
-            fixed: "right",
-            render: (_, record) => (
-              <Button
-                    onClick={() => handleSelectItem(rowRecord, record)}
-                    type= {selectedItems?.some((item) => item.locatorId === record.locatorId && item.id === rowRecord.id) ? "default" : "primary"}
-                  >
-                    {
-                      selectedItems?.some((item) => item.locatorId === record.locatorId && item.id === rowRecord.id)
-                      ? "Deselect"
-                      : "Select"
-                    }
-                    
-                  </Button>
-            )
-          }
-        ]}
-      />
-    )
-  }
-
-  const tableColumns =  [
-    { title: "S NO.", dataIndex: "id", key: "id", fixed: "left", width: 80 },
-    {
-      title: "ITEM DESCRIPTION",
-      dataIndex: "itemMasterDesc",
-      key: "itemMasterDesc",
-      fixed: "left"
-      // render: (itemName) => itemNames[itemName],
-    },
-    {
-      title: "ITEM CODE",
-      dataIndex: "itemMasterCd",
-      key: "itemCode",
-    },
-    {
-      title: "UOM",
-      dataIndex: "uomDtls",
-      key: "uomDtls",
-      render: (uomDtls) => uomDtls.baseUom
-    },
-    {
-      title: "LOCATION",
-      dataIndex: "locationDesc",
-      key: "location"
-    },
-    // {
-    //   title: "LOCATOR CODE",
-    //   dataIndex: "locatorId",
-    //   key: "locatorCode",
-    // },
-    { title: "PRICE", dataIndex: "price", key: "price" },
-    // {
-    //   title: "VENDOR DETAIL",
-    //   dataIndex: "vendorId",
-    //   key: "vendorDetail",
-    //   render: (vendorId) => vendorMaster[vendorId],
-    //   // render: (vendorId) => findColumnValue(vendorId, vendorMaster, "vendorMaster")
-    // },
-    {
-      title: "CATEGORY",
-      dataIndex: "categoryDesc",
-      key: "category",
-      // render: (category) => categories[category],
-    },
-    {
-      title: "SUB-CATEGORY",
-      dataIndex: "subCategoryDesc",
-      key: "subCategory",
-      // render: (subCategory) => subCategories[subCategory],
-    },
-    {
-      title: "Type",
-      dataIndex: "typeDesc",
-      key: "type",
-      // render: (type) => types[type],
-    },
-    {
-      title: "Disciplines",
-      dataIndex: "disciplinesDesc",
-      key: "disciplines",
-      // render: (disciplines) => allDisciplines[disciplines],
-    },
-    {
-      title: "Brand",
-      dataIndex: "brandDesc",
-      key: "brand",
-      // render: (brandId) => brands[brandId],
-    },
-    {
-      title: "Size",
-      dataIndex: "sizeDesc",
-      key: "size",
-      // render: (size) => sizes[size],
-    },
-    {
-      title: "Colour",
-      dataIndex: "colorDesc",
-      key: "colour",
-      // render: (colorId) => colors[colorId],
-    },
-    {
-      title: "Usage Category",
-      dataIndex: "usageCategoryDesc",
-      key: "usageCategory",
-      // render: (usageCategory) => usageCategories[usageCategory],
-    },
-    {
-      title: "MINIMUM STOCK LEVEL",
-      dataIndex: "minStockLevel",
-      key: "minStockLevel",
-    },
-    {
-      title: "MAXIMUM STOCK LEVEL",
-      dataIndex: "maxStockLevel",
-      key: "maxStockLevel",
-    },
-    { title: "RE ORDER POINT", dataIndex: "reOrderPoint", key: "reOrderPoint" },
-    { title: "STATUS", dataIndex: "status", key: "status" },
-    { title: "CREATE DATE", dataIndex: "endDate", key: "endDate" },
-    {
-        title: "LOCATOR QUANTITY DETAILS",
-        dataIndex: "qtyList",
-        key: "qtyList",
-        render: (locatorQuantity, rowRecord) => renderLocatorISN(locatorQuantity, rowRecord)
-    },
-  ];
 
   const itemHandleChange = (fieldName, value, index) => {
     setFormData((prevValues) => {
@@ -1491,6 +1270,10 @@ const InwardGatePass = () => {
       updatedItems[index] = {
         ...updatedItems[index],
         [fieldName]: value === "" ? null : value,
+        // uom: "string",
+        // conditionOfGoods: "string", // Hard-coded data
+        // budgetHeadProcurement: "string", // Hard-coded data
+        // locatorId: "string", // Hard-coded data
       };
       return {
         ...prevValues,
@@ -1574,6 +1357,8 @@ const InwardGatePass = () => {
     const userCd = localStorage.getItem('userCd');
     const password = localStorage.getItem('password');
     try {
+      const userCd = localStorage.getItem("userCd")
+      const password = localStorage.getItem("password")
       const apiUrl =
         "/login/authenticate";
       const response = await axios.post(apiUrl, {
@@ -1584,7 +1369,7 @@ const InwardGatePass = () => {
       const { responseData } = response.data;
       const { organizationDetails } = responseData;
       const { userDetails } = responseData;
-      const {locationDetails} = responseData
+      console.log("Fetched data:", organizationDetails);
       const currentDate = dayjs();
       // Update form data with fetched values
       if(processType === "IRP" || processType === "IOP"){
@@ -1666,7 +1451,6 @@ const InwardGatePass = () => {
 
         termsCondition: processData?.termsCondition,
         note: processData?.note,
-        type: processData?.type,
 
         items: itemList.map((item) => ({
           srNo: item?.sNo,
@@ -1756,8 +1540,6 @@ const InwardGatePass = () => {
             gatePassNo: processId,
           };
         });
-
-        setButtonVisible(true)
         setSuccessMessage(
           `Inward gate pass successfully! Inward gate pass : ${processId}, Process Type: ${processType}, Sub Process ID: ${subProcessId}`
         );
@@ -1787,13 +1569,26 @@ const InwardGatePass = () => {
     setSelectedOption(value);
   };
 
+  const findColumnValue = (id, dataSource, sourceName) => {
+    const foundObject = dataSource.find((obj) => obj.id === id);
+
+    if (sourceName === "locationMaster")
+      return foundObject ? foundObject["locationName"] : "Undefined";
+    if (sourceName === "locatorMaster")
+      return foundObject ? foundObject["locatorDesc"] : "Undefined";
+    if (sourceName === "vendorMaster")
+      return foundObject ? foundObject["vendorName"] : "Undefined";
+    if (sourceName === "uomMaster")
+      return foundObject ? foundObject["uomName"] : "Undefined";
+  };
+
   const removeItem = (index) => {
     setFormData((prevValues) => {
       const updatedItems = prevValues.items;
       updatedItems.splice(index, 1);
 
       const updatedItems1 = updatedItems.map((item, key) => {
-        return { ...item, srNo: key+1 };
+        return { ...item, srNo: key };
       });
 
       return {
@@ -1839,7 +1634,7 @@ const InwardGatePass = () => {
   }
 
   return (
-    <div className="goods-receive-note-form-container" ref={formRef}>
+    <div className="goods-receive-note-form-container">
       <h1>Sports Authority of India - Inward Gate Pass</h1>
 
       <Form
@@ -1847,7 +1642,6 @@ const InwardGatePass = () => {
         className="goods-receive-note-form"
         onValuesChange={handleValuesChange}
         layout="vertical"
-        initialValues={{fieldName: formData}}
       >
         <Row>
           <Col span={6} offset={18}>
@@ -1873,14 +1667,12 @@ const InwardGatePass = () => {
             </Form.Item>
           </Col>
           <Col span={6} offset={12}>
-            {/* <Form.Item label="INWARD GATE PASS NO." name="gatePassDate">
+            <Form.Item label="INWARD GATE PASS NO." name="gatePassDate">
               <Input
                 disabled
                 onChange={(e) => handleChange("gatePassNo", e.target.value)}
               />
-            </Form.Item> */}
-
-            <FormInputItem label="INWARD GATE PASS NO." value={formData.gatePassNo ? formData.gatePassNo : ""} readOnly={true}/>
+            </Form.Item>
           </Col>
         </Row>
 
@@ -1910,9 +1702,27 @@ const InwardGatePass = () => {
 
             {Type === "PO" && (
               <>
-                <FormInputItem label="SUPPLIER CODE :" name="supplierCode" onChange={handleChange} />
-                <FormInputItem label="SUPPLIER NAME :" value={formData.supplierName} />
-                <FormInputItem label="ADDRESS :" value={formData.crAddress} readOnly={true} />
+                <Form.Item label="SUPPLIER CODE :" name="supplierCode">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierCode", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="SUPPLIER NAME :" name="supplierName">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierName", e.target.value)
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="ADDRESS:" name="supplierAddress">
+                  <Input
+                    onChange={(e) =>
+                      handleChange("supplierAddress", e.target.value)
+                    }
+                  />
+                </Form.Item>
               </>
             )}
 
@@ -1949,7 +1759,7 @@ const InwardGatePass = () => {
               <>
                 {/* <Form.Item
                   label="REGIONAL CENTER CODE"
-                  name="ceRegionalCenterCd"
+                  name="crRegionalCenterCd"
                 >
                   <Input
                     onChange={(e) =>
@@ -2062,33 +1872,6 @@ const InwardGatePass = () => {
         {/* Item Details */}
         <h2>ITEM DETAILS</h2>
 
-        {
-          Type === "PO" &&
-          <div style={{ width: "300px" }}>
-          <Popover
-            onClick={() => setTableOpen(true)}
-            content={
-              <Table pagination={{pageSize: 3}} dataSource={filteredData} columns={tableColumns} scroll={{ x: "max-content" }} style={{width: "600px", display: tableOpen? "block": "none"}}/>
-            }
-            title="Filtered Item Data"
-            trigger="click"
-            // open={true}
-            open={searchValue !== "" && filteredData.length > 0}
-            style={{ width: "200px" }}
-            placement="right"
-          >
-            <Input.Search
-              placeholder="Search Item Data"
-              allowClear
-              enterButton="Search"
-              size="large"
-              onSearch={(e)=>handleSearch(e.target?.value || "", data, setFilteredData, setSearchValue )}
-              onChange={(e)=>handleSearch(e.target?.value || "", data, setFilteredData, setSearchValue )}
-            />
-          </Popover>
-        </div>
-        }
-
         <Form.List name="items" initialValue={formData.items || [{}]}>
           {(fields, { add, remove }) => (
             <>
@@ -2124,18 +1907,26 @@ const InwardGatePass = () => {
 
                       <Form.Item label="UOM">
                         <Input
-                          value={item.uomDesc || uomMaster[item.uom]}
+                          value={findColumnValue(
+                            item.uom,
+                            uomMaster,
+                            "uomMaster"
+                          )}
                         />
                       </Form.Item>
 
                       <Form.Item label="LOCATOR DESCRIPITON">
                         <Input
-                          value={item.locatorDesc || locatorMaster[item.locatorId]}
+                          value={findColumnValue(
+                            item.locatorId,
+                            locatorMaster,
+                            "locatorMaster"
+                          )}
                           readOnly
                         />
                       </Form.Item>
 
-                      <Form.Item label="QUANTITY">
+                      <Form.Item label="REQUIRED QUANTITY">
                         <Input
                           value={item.quantity}
                           onChange={(e) =>
@@ -2152,9 +1943,8 @@ const InwardGatePass = () => {
                           onChange={(e) =>
                             itemHandleChange("noOfDays", e.target.value, key)
                           }
-                          />
+                        />
                       </Form.Item>
-                      }
 
                       <Form.Item label="REMARK">
                         <Input
@@ -2186,8 +1976,7 @@ const InwardGatePass = () => {
               <Input.TextArea
                 value={formData.termsCondition}
                 autoSize={{ minRows: 3, maxRows: 6 }}
-                readOnly = {Type === "PO" ? false : true}
-                onChange={(e) => handleChange("termsCondition", e.target.value)}
+                readOnly
               />
               <Input style={{ display: "none" }} />
             </Form.Item>

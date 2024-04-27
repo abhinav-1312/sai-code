@@ -10,8 +10,8 @@ export const columnName = {
     "type": "Type",
     "typeOfNote": "Note Type",
     "inspectionRptNo": "Inspection Report No.",
-    "acptRejNoteNo": "Acceptance Note No.",
-    "acptRejNoteDT": "Acceptance Note Date",
+    "acptRejNoteNo": "Accept Reject Note No.",
+    "acptRejNoteDT": "Accept Reject Note Date",
     "dateOfDelivery": "Date of Delivery",
     "ceRegionalCenterCd": "Consignee Regional Center Code",
     "ceRegionalCenterName": "Consignee Regional Center Name",
@@ -48,4 +48,9 @@ export const columnName = {
     "rejectionNoteNo": "Rejection Note No.",
     "termsCondition": "Terms and Condition",
     "dateOfInspection": "Date of Inspection"
+
+
+
+    
+
 }

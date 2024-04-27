@@ -240,81 +240,6 @@ const ItemsForm = ({
             <Input disabled />
           </Form.Item>
         </Col>
-
-        <Col span={8}>
-          <Form.Item
-            name="category"
-            label="Category"
-            rules={[{ required: true, message: "Please enter Category" }]}
-          >
-            <Select onChange={handleCategoryChange}>
-              {categories?.map((category, index) => {
-                return (
-                  <Option key={index} value={category.paramVal}>
-                    {category.paramDesc}
-                  </Option>
-                );
-              })}
-            </Select>
-          </Form.Item>
-        </Col>
-
-        <Col span={8}>
-          <Form.Item
-            name="subCategory"
-            label="Sub-Category"
-            rules={[{ required: true, message: "Please enter SUB-CATEGORY" }]}
-          >
-            <Select
-              disabled={!selectedCategory}
-              onChange={handleSubCategoryChange}
-            >
-              {subCategoryOptions?.map((option) => (
-                <Option key={option.key} value={option.key}>
-                  {option.value}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Col>
-
-        <Col span={8}>
-          <Form.Item
-            name="type"
-            label=" Type"
-            rules={[{ required: true, message: "Please enter Item Type" }]}
-          >
-            <Select disabled={!selectedSubCategory} onChange={handleTypeChange}>
-              {typeOptions?.map((option) => (
-                <Option key={option.key} value={option.key}>
-                  {option.value}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Col>
-
-        <Col span={8}>
-          <Form.Item
-            name="disciplines"
-            label="Disciplines"
-            rules={[{ required: true, message: "Please enter Disciplines" }]}
-          >
-            <Select
-              disabled={disciplinesDisabled}
-              onChange={handleDisciplineChange}
-            >
-              {disciplineOptions?.map((discipline) => (
-                <Option key={discipline.key} value={discipline.key}>
-                  {discipline.value}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Col>
-
-        
-
         <Col span={8}>
           <Form.Item
             name="itemMasterDesc"
@@ -332,34 +257,14 @@ const ItemsForm = ({
             </Select>
           </Form.Item>
         </Col>
-        {/* <Col span={8}>
+        <Col span={8}>
           <Form.Item
             name="uomId"
             label="UOM"
             rules={[{ required: true, message: "Please enter UOM" }]}
           >
             <Select>
-              {uoms?.map((uom, index) => {
-                return (
-                  <Option key={index} value={uom.id}>
-                    {uom.uomName}
-                  </Option>
-                );
-              })}
-            </Select>
-          </Form.Item>
-        </Col> */}
-      </Row>
-
-      <Row gutter={16}>
-      <Col span={8}>
-          <Form.Item
-            name="uomId"
-            label="UOM"
-            rules={[{ required: true, message: "Please enter UOM" }]}
-          >
-            <Select>
-              {uoms?.map((uom, index) => {
+              {uoms.map((uom, index) => {
                 return (
                   <Option key={index} value={uom.id}>
                     {uom.uomName}
@@ -387,7 +292,7 @@ const ItemsForm = ({
             rules={[{ required: true, message: "Please enter Location" }]}
           >
             <Select>
-              {locations?.map((location, index) => {
+              {locations.map((location, index) => {
                 return (
                   <Option key={index} value={location.id}>
                     {location.locationName}
@@ -397,35 +302,14 @@ const ItemsForm = ({
             </Select>
           </Form.Item>
         </Col>
-        {/* <Col span={8}>
+        <Col span={8}>
           <Form.Item
             name="locatorId"
             label="Locator Description"
             rules={[{ required: true, message: "Please enter Locator Code" }]}
           >
             <Select>
-              {locators?.map((locator, index) => {
-                return (
-                  <Option key={index} value={locator.id}>
-                    {locator.locatorDesc}
-                  </Option>
-                );
-              })}
-            </Select>
-          </Form.Item>
-        </Col> */}
-      </Row>
-
-      <Row gutter={16}>
-
-      <Col span={8}>
-          <Form.Item
-            name="locatorId"
-            label="Locator Desc."
-            rules={[{ required: true, message: "Please enter Locator Code" }]}
-          >
-            <Select>
-              {locators?.map((locator, index) => {
+              {locators.map((locator, index) => {
                 return (
                   <Option key={index} value={locator.id}>
                     {locator.locatorDesc}
@@ -453,7 +337,7 @@ const ItemsForm = ({
             ]}
           >
             <Select>
-              {vendors?.map((vendor, index) => {
+              {vendors.map((vendor, index) => {
                 return (
                   <Option key={index} value={vendor.id}>
                     {vendor.vendorName}
@@ -463,7 +347,7 @@ const ItemsForm = ({
             </Select>
           </Form.Item>
         </Col>
-        {/* <Col span={8}>
+        <Col span={8}>
           <Form.Item
             name="category"
             label="Category"
@@ -479,11 +363,11 @@ const ItemsForm = ({
               })}
             </Select>
           </Form.Item>
-        </Col> */}
+        </Col>
       </Row>
 
       <Row gutter={16}>
-        {/* <Col span={8}>
+        <Col span={8}>
           <Form.Item
             name="subCategory"
             label="SUB-CATEGORY"
@@ -500,23 +384,23 @@ const ItemsForm = ({
               ))}
             </Select>
           </Form.Item>
-        </Col> */}
-        {/* <Col span={8}>
+        </Col>
+        <Col span={8}>
           <Form.Item
             name="type"
             label=" Type"
             rules={[{ required: true, message: "Please enter Item Type" }]}
           >
             <Select disabled={!selectedSubCategory} onChange={handleTypeChange}>
-              {typeOptions?.map((option) => (
+              {typeOptions.map((option) => (
                 <Option key={option.key} value={option.key}>
                   {option.value}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-        </Col> */}
-        {/* <Col span={8}>
+        </Col>
+        <Col span={8}>
           <Form.Item
             name="disciplines"
             label="Disciplines"
@@ -533,7 +417,7 @@ const ItemsForm = ({
               ))}
             </Select>
           </Form.Item>
-        </Col> */}
+        </Col>
       </Row>
 
       <Row gutter={16}>
@@ -544,7 +428,7 @@ const ItemsForm = ({
             rules={[{ required: true, message: "Please enter Brand " }]}
           >
             <Select>
-              {brands?.map((brand, index) => {
+              {brands.map((brand, index) => {
                 return (
                   <Option key={index} value={brand.paramVal}>
                     {brand.paramDesc}
@@ -561,7 +445,7 @@ const ItemsForm = ({
             rules={[{ required: true, message: "Please enter Size" }]}
           >
             <Select>
-              {sizes?.map((size, index) => {
+              {sizes.map((size, index) => {
                 return (
                   <Option key={index} value={size.paramVal}>
                     {size.paramDesc}
@@ -578,7 +462,7 @@ const ItemsForm = ({
             rules={[{ required: true, message: "Please enter Colour" }]}
           >
             <Select>
-              {colors?.map((color, index) => {
+              {colors.map((color, index) => {
                 return (
                   <Option key={index} value={color.paramVal}>
                     {color.paramDesc}
@@ -594,7 +478,7 @@ const ItemsForm = ({
         <Col span={8}>
           <Form.Item
             name="minStockLevel"
-            label="Min. Stock Level"
+            label="Minimum Stock Level"
             rules={[
               { required: true, message: "Please enter Minimum Stock Level" },
             ]}
@@ -605,7 +489,7 @@ const ItemsForm = ({
         <Col span={8}>
           <Form.Item
             name="maxStockLevel"
-            label="Max. Stock Level"
+            label="Maximum Stock Level"
             rules={[
               { required: true, message: "Please enter Maximum Stock Level" },
             ]}
@@ -632,7 +516,7 @@ const ItemsForm = ({
             rules={[{ required: true, message: "Please enter Category" }]}
           >
             <Select>
-              {usageCategories?.map((usageCategory, index) => {
+              {usageCategories.map((usageCategory, index) => {
                 return (
                   <Option key={index} value={usageCategory.paramVal}>
                     {usageCategory.paramDesc}
