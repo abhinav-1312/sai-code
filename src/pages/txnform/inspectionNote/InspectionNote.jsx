@@ -170,7 +170,7 @@ const InspectionNote = () => {
   };
   
   const handleInwardGatePassChange = async (_fieldName, value) => {
-    try {
+    try{
       const apiUrl =
         "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
