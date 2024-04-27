@@ -503,7 +503,7 @@ const InspectionNote = () => {
                 />
               </Form>
             </div>
-            <div className="goods-receive-note-signature">
+            <div className="goods-receive-note-signature x">
               DATE & TIME :
               <DatePicker
                 defaultValue={dayjs()}
