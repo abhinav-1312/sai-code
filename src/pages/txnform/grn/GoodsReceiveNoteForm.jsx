@@ -234,7 +234,7 @@ const GoodsReceiveNoteForm = () => {
       else{
         setFormData({
           ceRegionalCenterCd: organizationDetails.id,
-          ceRegionalCenterName: organizationDetails.location,
+          ceRegionalCenterName: organizationDetails.organizationName,
           ceAddress: organizationDetails.locationAddr,
           ceZipcode: locationDetails.zipcode,
           genName: userDetails.firstName + " " + userDetails.lastName,

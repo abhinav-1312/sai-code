@@ -1588,10 +1588,9 @@ const InwardGatePass = () => {
       const currentDate = dayjs();
       // Update form data with fetched values
       if(processType === "IRP" || processType === "IOP"){
-        console.log("IF ME")
         setFormData({
           crRegionalCenterCd: organizationDetails.id,
-          crRegionalCenterName: organizationDetails.location,
+          crRegionalCenterName: organizationDetails.organizationName,
           crAddress: organizationDetails.locationAddr,
           crZipcode: locationDetails.zipcode,
           genName: userDetails.firstName + " " + userDetails.lastName,
@@ -1612,7 +1611,7 @@ const InwardGatePass = () => {
         console.log("ELKSE MNWW")
         setFormData({
           ceRegionalCenterCd: organizationDetails.id,
-          ceRegionalCenterName: organizationDetails.location,
+          ceRegionalCenterName: organizationDetails.organizationName,
           ceAddress: organizationDetails.locationAddr,
           ceZipcode: locationDetails.zipcode,
           genName: userDetails.firstName + " " + userDetails.lastName,
