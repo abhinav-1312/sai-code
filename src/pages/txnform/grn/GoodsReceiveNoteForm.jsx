@@ -213,7 +213,7 @@ const GoodsReceiveNoteForm = () => {
       if(processType === "IRP"){
         setFormData({
           crRegionalCenterCd: organizationDetails.id,
-          crRegionalCenterName: organizationDetails.location,
+          crRegionalCenterName: organizationDetails.organizationName,
           crAddress: organizationDetails.locationAddr,
           crZipcode: locationDetails.zipcode,
           genName: userDetails.firstName + " " + userDetails.lastName,
