@@ -212,6 +212,8 @@ const InsepctionReport = () => {
         modeOfDelivery: processData?.modeOfDelivery,
         challanNo: processData?.challanNo,
         dateOfDeliveryDate: processData?.dateOfDelivery,
+        note: processData?.note,
+        termsCondition: processData?.termsCondition,
 
         items: itemList.map((item) => ({
           srNo: item?.sNo,
@@ -494,9 +496,12 @@ const InsepctionReport = () => {
           </Col>
           <Col span={12}>
             <Form.Item label="NOTE" name="note">
-              <Input.TextArea
-                onChange={(e) => handleChange("note", e.target.value)}
-              />
+            <Input.TextArea
+                  value={formData.note}
+                  autoSize={{ minRows: 3, maxRows: 6 }}
+                  onChange={(e) => handleChange("note", e.target.value)}
+                />
+                <Input style={{ display: "none" }} />
             </Form.Item>
           </Col>
         </Row>
@@ -573,9 +578,9 @@ const InsepctionReport = () => {
                   NAME & SIGNATURE :
                   <Form>
                     <Input
-                      name="issueName"
+                      name="approvedName"
                       onChange={(e) =>
-                        handleChange("issueName", e.target.value)
+                        handleChange("approvedName", e.target.value)
                       }
                     />
                   </Form>
@@ -586,9 +591,9 @@ const InsepctionReport = () => {
                     defaultValue={dayjs()}
                     format={dateFormat}
                     style={{ width: "58%" }}
-                    name="issueDate"
+                    name="approvedDate"
                     onChange={(date, dateString) =>
-                      handleChange("issueDate", dateString)
+                      handleChange("approvedDate", dateString)
                     }
                   />
                 </div>

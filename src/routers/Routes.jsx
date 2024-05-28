@@ -1,5 +1,4 @@
-// routes.js
-import React, { useState } from "react";
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Organization from "../pages/organization/Organization";
 import Location from "../pages/location/Location";
@@ -29,10 +28,23 @@ import Itemdemandsearch from "../components/Itemdemandsearch";
 import OHQ from "../pages/ohq/ohq";
 import TransactionSummary from "../pages/transactionSummary/TransactionSummary";
 import TransactionDetail from "../pages/transactionSummary/TransactionDetail";
-import SignIn from "../auth/Login";
+import StockLedger from "../pages/stockLedger/StockLedger";
+import HqOhq from '../pages/hqRoutes/HqOhq'
+import HqTxnSummary from "../pages/hqRoutes/HqTxnSummary";
+import HqStockLedger from "../pages/hqRoutes/HqStockLedger";
+
 
 const RoutesComponent = () => {
   const userRole = localStorage.getItem("userRoles");
+
+  const headquarterRoutes = (
+    <>
+      <Route path = '/hqOhq' element={<HqOhq />} />
+      <Route path = '/hqTxnSummary' element={<HqTxnSummary />} />
+      <Route path = '/hqStockLedger' element={<HqStockLedger />} />
+      <Route path="/hqTxnSummary/:trnno" element={<TransactionDetail />} />
+    </>
+  )
 
   const superAdminRoutes = (
     <>
@@ -42,6 +54,7 @@ const RoutesComponent = () => {
       <Route path="/ohq" element={<OHQ />} />
       <Route path="/trnsummary" element={<TransactionSummary />} />
       <Route path="/trnsummary/:trnno" element={<TransactionDetail />} />
+      <Route path="/stockLedger" element={<StockLedger />} />
       <Route path="/locator" element={<Locator />} />
       <Route path="/department" element={<DepartmentPage />} />
       <Route path="/user" element={<User />} />
@@ -69,15 +82,12 @@ const RoutesComponent = () => {
 
   const adminRoutes = (
     <>
-      {/* <Route path="/sub-organization" element={<Organization />} /> */}
-      {/* <Route path="/location" element={<Location />} /> */}
       <Route path="/items" element={<Items />} />
       <Route path="/ohq" element={<OHQ />} />
       <Route path="/trnsummary" element={<TransactionSummary />} />
       <Route path="/trnsummary/:trnno" element={<TransactionDetail />} />
-      {/* <Route path="/locator" element={<Locator />} /> */}
+      <Route path="/stockLedger" element={<StockLedger />} />
       <Route path="/department" element={<DepartmentPage />} />
-      {/* <Route path="/user" element={<User />} /> */}
       <Route path="/employee" element={<Employee />} />
       <Route path="/tax" element={<Tax />} />
       <Route path="/transaction" element={<Transaction />} />
@@ -157,6 +167,7 @@ const RoutesComponent = () => {
 
   return (
     <Routes>
+      {userRole === "ssadmin" && headquarterRoutes}
       {userRole === "SuperAdmin" && superAdminRoutes}
       {userRole === "admin" && adminRoutes}
       {userRole === "InventoryManager" && inventoryManagerRoutes}

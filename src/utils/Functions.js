@@ -10,7 +10,6 @@ export const handleSearch = (searchText, itemData, setHook, setSearch=null) => {
   const filtered = itemData.filter((parentObject) =>
     recursiveSearch(parentObject, searchText)
   );
-  console.log("FILTEREDDDD: ", filtered)
   setHook([...filtered]);
 };
 
@@ -152,50 +151,6 @@ export const convertArrayToObject = (array, _makeKey, valueKey ) => {
  export  const printOrSaveAsPDF = async (formRef) => {
 
   // window.print()
-    // const input = formRef.current;
-    // if (input === null) {
-    //   return;
-    // }
-    // // Apply custom styles for Ant Design components to ensure proper rendering
-    // const styleSheet = document.createElement("style");
-    // styleSheet.type = "text/css";
-    // styleSheet.innerText = `
-    //   .ant-input {width: 100%;}`;
-    // document.head.appendChild(styleSheet);
-    // const options = {
-    //   margin: [5, 5],
-    //   filename: 'form.pdf',
-    //   image: { type: 'jpeg', quality: 0.98 },
-    //   html2canvas: { scale: 2 },
-    //   jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    // };
-    // // Apply temporary styles for PDF generation
-    // const originalStyles = window.getComputedStyle(input);
-    // // input.style.transform = 'scale(0.8)'
-    // input.style.transform = 'scaleY(0.7)'
-    // input.style.position = 'static';
-    // // input.style.transform = 'none';
-    // input.style.maxWidth = '100%';
-    // input.style.margin = '-16rem 0 0 0'; // Adjust the negative margin as needed to shift the content upward
-    // input.style.overflow = "hidden"
-
-    // html2pdf(input, options).then((pdf) => {
-    //   input.style.cssText = originalStyles.cssText;
-    //   const blob = pdf.output('bloburl');
-      
-    //   // Create a link element for downloading the PDF
-    //   const link = document.createElement('a');
-    //   link.href = blob;
-    //   link.download = options.filename;
-
-    //   // Trigger the download
-    //   document.body.appendChild(link);
-    //   link.click();
-
-    //   // Reset the styles after generating the PDF
-    //   input.style.cssText = originalStyles.cssText;
-    // });
-
     const input = formRef.current;
     if (input === null) {
       return;
@@ -204,61 +159,24 @@ export const convertArrayToObject = (array, _makeKey, valueKey ) => {
     const styleSheet = document.createElement("style");
     styleSheet.type = "text/css";
     styleSheet.innerText = `
-      .ant-input {
-        width: 100%;
-      }
-    `;
+      .ant-input {width: 100%;}`;
     document.head.appendChild(styleSheet);
-
-    // const options = {
-    //   margin: 5,
-    //   filename: 'form.pdf',
-    //   // html2canvas: { scale: 2},
-    // };
-
-    // const options = {
-    //   margin: 5,
-    //   filename: 'form.pdf',
-    //   image: { type: 'jpeg', quality: 0.98 },
-    //   html2canvas: { scale: 2 },
-    //   jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    // };
-
-
-    // // / Apply CSS transformation to scale down the content
-    // input.style.transform = 'scale(0.75)'; // Adjust the scale factor as needed
-
-    // html2pdf(input, options).then(() => {
-    //   input.style.transform = 'scale(1)';
-      // const blob = pdf.output('bloburl');
-      
-      // Create a link element for downloading the PDF
-      // const link = document.createElement('a');
-      // link.href = blob;
-      // link.download = options.filename;
-
-      // // Trigger the download
-      // document.body.appendChild(link);
-      // link.click();
-
-      // Reset the scale after generating the PDF
-    // });
-
     const options = {
-      margin: [2, 2],
+      margin: [5, 5],
       filename: 'form.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     };
-
-    // Apply temporary styles for PDF generations
+    // Apply temporary styles for PDF generation
     const originalStyles = window.getComputedStyle(input);
-    input.style.transform = 'scale(0.7)'
+    input.style.transform = 'scaleY(0.7)'
+    // input.style.transform = 'scaleY(0.7)'
     input.style.position = 'static';
     // input.style.transform = 'none';
     input.style.maxWidth = '100%';
-    input.style.marginTop = '-14rem'; // Adjust the negative margin as needed to shift the content upward
+    input.style.margin = '-14rem 0 0 0'; // Adjust the negative margin as needed to shift the content upward
+    input.style.overflow = "hidden"
 
     html2pdf(input, options).then((pdf) => {
       input.style.cssText = originalStyles.cssText;
@@ -275,7 +193,7 @@ export const convertArrayToObject = (array, _makeKey, valueKey ) => {
 
       // Reset the styles after generating the PDF
       input.style.cssText = originalStyles.cssText;
-      });
+    });
   };
 
   const token = localStorage.getItem("token")
@@ -292,10 +210,32 @@ export const convertArrayToObject = (array, _makeKey, valueKey ) => {
       const locatorObj = convertArrayToObject(locatorMasterData, "id", "locatorDesc")
       setUomHook({ ...uomObject });
       setLocatorHook({...locatorObj})
-      // return {uomObject, locatorObj}
     } catch (error) {
       console.log("Error fetching Uom master details.", error);
     }
+  };
+
+  export const daysDifference = (issueDate, receivingDate) => {
+    const issueDtparts = issueDate.split("/");
+    const receivingDtparts = issueDate.split("/");
+    const issueDay = parseInt(issueDtparts[0], 10);
+    const issueMonth = parseInt(issueDtparts[1], 10);
+    const issueYear = parseInt(issueDtparts[2], 10);
+    const receivingDay = parseInt(issueDtparts[0], 10);
+    const receivingMonth = parseInt(issueDtparts[1], 10);
+    const receivingYear = parseInt(issueDtparts[2], 10);
+    const issueDateMod = new Date(issueYear, issueMonth - 1, issueDay); // JavaScript months are 0-indexed
+    const receivingDateMod = new Date(receivingYear, receivingMonth - 1, receivingDay); // JavaScript months are 0-indexed
+    // constGet the current date
+    // const currentDate = new Date();
+
+    // constCalculate the difference in milliseconds
+    const differenceMs = Math.abs(receivingDateMod.getTime() - issueDateMod.getTime());
+
+    // constConvert the difference to days
+    const differenceDays = Math.floor(differenceMs / (1000 * 60 * 60 * 24));
+    // const difference_days = 1
+    return differenceDays;
   };
 
   export const convertEpochToDateString = (epochTime) => {
@@ -318,4 +258,11 @@ export const convertArrayToObject = (array, _makeKey, valueKey ) => {
     // Return the date string in DD/MM/YYYY format
     return `${day}/${month}/${year}`;
   }
+
   
+  export const generateColumn = (columnArray) => {
+    return columnArray.map(column=>({
+      title: column.title,
+      dataIndex: column.dataIndex
+    }))
+  }

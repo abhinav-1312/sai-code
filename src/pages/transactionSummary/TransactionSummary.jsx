@@ -12,7 +12,7 @@ import { apiHeader } from "../../utils/Functions";
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
 
-const TransactionSummary = () => {
+const TransactionSummary = ({orgId}) => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const txnType = {
@@ -50,19 +50,29 @@ const TransactionSummary = () => {
 
   const handleViewClick = (trnNo) => {
     const arr = [];
-    arr.push(trnNo);
+    if(orgId){
+      const trnOrgCombined = trnNo + "-" + orgId
+      arr.push(trnOrgCombined)
+    }
+    else{
+      arr.push(trnNo);
+    }
     for (const [key, value] of Object.entries(showTxn)) {
       if (value === true) {
         arr.push(key);
       }
     }
     const url = arr.join("_");
+    if(orgId){
+      navigate(`/hqTxnSummary/${url}`);
+    }
+    else{
+      navigate(`/trnsummary/${url}`);
+    }
     // console.log("URL: ", url)
-    navigate(`/trnsummary/${url}`);
   };
 
   const handlePrintClick = (trnNo) => {
-    console.log("View button called: ", trnNo);
   };
 
   const trnSumColumn = trnSummaryColumn(handleViewClick, handlePrintClick);
@@ -93,7 +103,6 @@ const TransactionSummary = () => {
     }
   };
 
-  console.log("Show txn: ", showTxn);
 
   const [itemData, setItemData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -113,9 +122,30 @@ const TransactionSummary = () => {
     }
   };
 
+  const populateHqData = async (orgId) => {
+    try {
+      const { data } = await axios.post(
+        "/txns/getTxnSummary",
+        { startDate: null, endDate: null, itemCode: null, txnType: null, orgId },
+        apiHeader("POST", token)
+      );
+      const { responseData } = data;
+      setFilteredData([...responseData]);
+    } catch (error) {
+      message.error("Error occured while fetching data. Please try again.");
+      console.log("Populate data error.", error);
+    }
+  }
+
   useEffect(() => {
-    populateData();
-  }, []);
+    console.log("Useffect called txn summary")
+    if(orgId){
+      populateHqData(orgId)
+    }
+    else{
+      populateData();
+    }
+  }, [orgId]);
 
   const handleSearch = async () => {
     try {
@@ -126,16 +156,24 @@ const TransactionSummary = () => {
       if (writingTxnType) {
         delete formDataCopy.itemCode;
       }
-      console.log("Form data copy: ", formDataCopy);
-
-      const { data } = await axios.post(
-        "/txns/getTxnSummary",
-        formDataCopy,
-        apiHeader("POST", token)
-      );
-      const { responseData } = data;
-      console.log("resposnedata: ", responseData);
-      setFilteredData([...responseData]);
+      if(orgId){
+        const { data } = await axios.post(
+          "/txns/getTxnSummary",
+          {...formDataCopy, orgId},
+          apiHeader("POST", token)
+        );
+        const { responseData } = data;
+        setFilteredData([...responseData]);
+      }
+      else{
+        const { data } = await axios.post(
+          "/txns/getTxnSummary",
+          formDataCopy,
+          apiHeader("POST", token)
+        );
+        const { responseData } = data;
+        setFilteredData([...responseData]);
+      }
     } catch (error) {
       message.error("Some error occured. Please try again.");
       console.log("Some error orrcured.", error);

@@ -153,7 +153,7 @@ const RejectionNote = () => {
         ceAddress: organizationDetails.locationAddr,
         ceZipcode: locationDetails.zipcode,
         genName: userDetails.firstName + " " + userDetails.lastName,
-        userId: "string",
+        userId: userCd,
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
         approvedDate: currentDate.format(dateFormat),
@@ -303,6 +303,8 @@ const RejectionNote = () => {
       message.error("Failed to submit Rejection note. ");
     }
   };
+
+  console.log("REJ FORM DATA: ", formData)
 
   const handleValuesChange = (_, allValues) => {
     setType(allValues.type);
@@ -720,7 +722,7 @@ const RejectionNote = () => {
                         </Form.Item>  */}
 
                         {
-                          Type !== "PO" && 
+                          Type !== "PO" && Type !== "IOP" && 
                           // <Form.Item label="LOCATOR DESCRIPTION">
                           //   <Input value={locatorMaster[item.locatorId]} />
                           // </Form.Item>
@@ -813,7 +815,7 @@ const RejectionNote = () => {
               />
             </div>
           </div>
-          {Type !== "PO" && (
+          {Type !== "PO" && Type !== "IOP" && (
             <div>
               <div className="goods-receive-note-signature">APPROVED BY</div>
               <div className="goods-receive-note-signature">
@@ -842,7 +844,7 @@ const RejectionNote = () => {
               </div>
             </div>
           )}
-          {Type !== "PO" && (
+          {Type !== "PO" && Type !== "IOP" && (
             <div>
               <div className="goods-receive-note-signature">RECEIVED BY</div>
               <div className="goods-receive-note-signature">

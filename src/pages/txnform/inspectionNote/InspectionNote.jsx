@@ -9,15 +9,13 @@ import {
   Row,
   Col,
   Typography,
-  AutoComplete,
   Modal,
   message,
 } from "antd";
-import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import { MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
 import { apiHeader } from "../../../utils/Functions";
-
 import FormInputItem from "../../../components/FormInputItem";
 import FormDatePickerItem from "../../../components/FormDatePickerItem";
 import { convertArrayToObject, printOrSaveAsPDF } from "../../../utils/Functions";
@@ -157,7 +155,7 @@ const InspectionNote = () => {
         ceAddress: organizationDetails.locationAddr,
         ceZipcode: locationDetails.zipcode,
         genName: userDetails.firstName + " " + userDetails.lastName,
-        userId: "string",
+        userId: userCd,
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
         approvedDate: currentDate.format(dateFormat),
@@ -175,7 +173,7 @@ const InspectionNote = () => {
         "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
-        processStage: "IGP",
+        processStage: Type === "PO" ? "IR" : "IGP",
       },  apiHeader("POST", token));
       const {responseData} = response.data;
       const { processData, itemList } = responseData;
@@ -388,7 +386,7 @@ const InspectionNote = () => {
 
         <Row gutter={24}>
           <Col span={8}>
-            <Title strong level={2} underline type="danger">
+            <Title strong level={3} underline type="danger">
               {Type === "PO" ? "CONSIGNEE DETAIL :-" : "CONSIGNOR DETAIL :-" }
             </Title>
 
@@ -399,7 +397,7 @@ const InspectionNote = () => {
 
           </Col>
           <Col span={8}>
-            <Title strong underline level={2} type="danger">
+            <Title strong underline level={3} type="danger">
             {Type === "PO" ? "CONSIGNOR DETAIL :-" : "CONSIGNEE DETAIL :-" }
             </Title>
             {Type === "PO" && (
@@ -424,14 +422,9 @@ const InspectionNote = () => {
 
 
             <FormInputItem label={Type === "PO" ? "MIS NO. :" : "Inward Gate Pass No. :"} name="inwardGatePass" onChange={handleInwardGatePassChange} />
-            {
-              Type === "PO" &&
-              <>
-                <FormInputItem label = "CHALLAN / INVOICE NO. :" value={formData.challanNo} readOnly={true} />
-                <FormInputItem label = "MODE OF DELIVERY :" value={formData.modeOfDelivery} readOnly={true} />
-                <FormInputItem label = "DATE OF DELIVERY :" value={formData.dateOfDeliveryDate} readOnly={true} />
-              </>
-            }
+            <FormInputItem label = "CHALLAN / INVOICE NO. :" value={formData.challanNo} readOnly={true} />
+            <FormInputItem label = "MODE OF DELIVERY :" value={formData.modeOfDelivery} readOnly={true} />
+            <FormInputItem label = "DATE OF DELIVERY :" value={formData.dateOfDeliveryDate} readOnly={true} />
             <FormDatePickerItem label="DATE OF INSPECTION :" name="dateOfInspectionDate" onChange={handleChange} />
             <FormInputItem label="TYPE OF INSPECTION :" name="typeOfInspection" onChange={handleChange} />
           </Col>
@@ -464,7 +457,7 @@ const InspectionNote = () => {
                         </Form.Item>
 
                         {
-                          Type !== "PO" && 
+                          Type !== "PO" && Type !== "IOP" && 
                           <FormInputItem label="LOCATOR DESCRPTION" value={locatorMaster[item.locatorId]} />
                         }
 
@@ -523,8 +516,8 @@ const InspectionNote = () => {
               NAME & SIGNATURE :
               <Form>
                 <Input
-                  name="issueName"
-                  onChange={(e) => handleChange("issueName", e.target.value)}
+                  name="approvedName"
+                  onChange={(e) => handleChange("approvedName", e.target.value)}
                 />
               </Form>
             </div>
@@ -534,7 +527,7 @@ const InspectionNote = () => {
                 defaultValue={dayjs()}
                 format={dateFormat}
                 style={{ width: "58%" }}
-                name="issueDate"
+                name="approveDate"
                 onChange={(date, dateString) =>
                   handleChange("issueDate", dateString)
                 }

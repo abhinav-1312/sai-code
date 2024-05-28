@@ -16,7 +16,7 @@ import {
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
-import { apiHeader, printOrSaveAsPDF } from "../../../utils/Functions";
+import { apiHeader, daysDifference, printOrSaveAsPDF } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
 const dateFormat = "DD/MM/YYYY";
 // import {FormInputItem} from "../../../components/FormInputItem";
@@ -84,6 +84,8 @@ const RetunNote = () => {
     ],
     userId: "",
   });
+
+  console.log("FormDataa return note: ", formData)
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -170,7 +172,7 @@ const RetunNote = () => {
         // address: organizationDetails.locationAddr,
         // zipcode: "131021",
         genName: userDetails.firstName + " " + userDetails.lastName,
-        userId: "string",
+        userId: userCd,
         genDate: currentDate.format(dateFormat),
         issueDate: currentDate.format(dateFormat),
         approvedDate: currentDate.format(dateFormat),
@@ -187,42 +189,84 @@ const RetunNote = () => {
         "/getSubProcessDtls";
       const response = await axios.post(apiUrl, {
         processId: value,
-        processStage: "ISN",
+        processStage: "IGP",
       }, apiHeader("POST", token));
       const responseData = response.data.responseData;
       const { processData, itemList } = responseData;
-      const issueNoteDt = processData?.issueNoteDt;
-      setFormData((prevFormData) => ({
-        ...prevFormData,
 
-         regionalCenterCd: processData?.crRegionalCenterCd,
-        regionalCenterName: processData?.crRegionalCenterName,
-        address: processData?.crAddress,
-        zipcode: processData?.crZipcode,
+      if(processData !== null){
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+  
+           regionalCenterCd: processData?.crRegionalCenterCd,
+          regionalCenterName: processData?.crRegionalCenterName,
+          address: processData?.crAddress,
+          zipcode: processData?.crZipcode,
+  
+          processId: processData?.processId,
+          issueNoteDt: processData?.issueNoteDt || processData?.issueDate,
+          consumerName: processData?.consumerName,
+          contactNo: processData?.contactNo,
+  
+          termsCondition: processData?.termsCondition,
+          note: processData?.note,
+  
+          items: itemList.map((item) => ({
+            srNo: item?.sNo,
+            id: item?.id || "Null",
+            itemId: item?.itemId,
+            itemCode: item?.itemCode,
+            itemDesc: item?.itemDesc,
+            uom: parseInt(item?.uom),
+            quantity: item?.quantity,
+            noOfDays: item?.requiredDays,
+            remarks: item?.remarks,
+            conditionOfGoods: item?.conditionOfGoods,
+            budgetHeadProcurement: item?.budgetHeadProcurement,
+            locatorId: item?.locatorId,
+          })),
+        }));
+      }
+      else{
+        const response = await axios.post(apiUrl, {
+          processId: value,
+          processStage: "ISN",
+        }, apiHeader("POST", token));
+        const responseData = response.data.responseData;
+        const { processData, itemList } = responseData;
 
-        processId: processData?.processId,
-        issueNoteDt: issueNoteDt,
-        consumerName: processData?.consumerName,
-        contactNo: processData?.contactNo,
-
-        termsCondition: processData?.termsCondition,
-        note: processData?.note,
-
-        items: itemList.map((item) => ({
-          srNo: item?.sNo,
-          id: item?.id || "Null",
-          itemId: item?.itemId,
-          itemCode: item?.itemCode,
-          itemDesc: item?.itemDesc,
-          uom: parseInt(item?.uom),
-          quantity: item?.quantity,
-          noOfDays: item?.requiredDays,
-          remarks: item?.remarks,
-          conditionOfGoods: item?.conditionOfGoods,
-          budgetHeadProcurement: item?.budgetHeadProcurement,
-          locatorId: item?.locatorId,
-        })),
-      }));
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+  
+           regionalCenterCd: processData?.crRegionalCenterCd,
+          regionalCenterName: processData?.crRegionalCenterName,
+          address: processData?.crAddress,
+          zipcode: processData?.crZipcode,
+  
+          processId: processData?.processId,
+          issueNoteDt: processData?.issueNoteDt || processData?.issueDate,
+          consumerName: processData?.consumerName,
+          contactNo: processData?.contactNo,
+  
+          termsCondition: processData?.termsCondition,
+          note: processData?.note,
+  
+          items: itemList.map((item) => ({
+            srNo: item?.sNo,
+            id: item?.id || "Null",
+            itemId: item?.itemId,
+            itemCode: item?.itemCode,
+            itemDesc: item?.itemDesc,
+            uom: parseInt(item?.uom),
+            quantity: item?.quantity,
+            noOfDays: item?.requiredDays,
+            remarks: item?.remarks,
+            conditionOfGoods: item?.conditionOfGoods,
+            budgetHeadProcurement: item?.budgetHeadProcurement,
+            locatorId: item?.locatorId,
+          })),
+        }));
+      }
       // Handle response data as needed
     } catch (error) {
       console.error("Error fetching sub process details:", error);
@@ -308,24 +352,24 @@ const RetunNote = () => {
     setType(allValues.type);
   };
 
-  const daysDifference = (issueDate) => {
-    const parts = issueDate.split("/");
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-    const givenDate = new Date(year, month - 1, day); // JavaScript months are 0-indexed
+  // const daysDifference = (issueDate) => {
+  //   const parts = issueDate.split("/");
+  //   const day = parseInt(parts[0], 10);
+  //   const month = parseInt(parts[1], 10);
+  //   const year = parseInt(parts[2], 10);
+  //   const givenDate = new Date(year, month - 1, day); // JavaScript months are 0-indexed
 
-    // constGet the current date
-    const currentDate = new Date();
+  //   // constGet the current date
+  //   const currentDate = new Date();
 
-    // constCalculate the difference in milliseconds
-    const differenceMs = Math.abs(currentDate.getTime() - givenDate.getTime());
+  //   // constCalculate the difference in milliseconds
+  //   const differenceMs = Math.abs(currentDate.getTime() - givenDate.getTime());
 
-    // constConvert the difference to days
-    const differenceDays = Math.floor(differenceMs / (1000 * 60 * 60 * 24));
-    // const difference_days = 1
-    return differenceDays;
-  };
+  //   // constConvert the difference to days
+  //   const differenceDays = Math.floor(differenceMs / (1000 * 60 * 60 * 24));
+  //   // const difference_days = 1
+  //   return differenceDays;
+  // };
 
   // const findUomName = (uomId) => {
   //   const foundObj = uomMaster.find((obj) => uomId === obj.id);
@@ -526,7 +570,7 @@ const RetunNote = () => {
                         <Input
                           value={
                             formData.issueNoteDt !== undefined
-                              ? daysDifference(formData.issueNoteDt)
+                              ? daysDifference(formData.issueNoteDt, formData.returnNoteDt)
                               : ""
                           }
                           onChange={(e) =>

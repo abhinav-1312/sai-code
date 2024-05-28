@@ -8,8 +8,8 @@ import userEvent from "@testing-library/user-event";
 import SAI_Logo from "./../assets/images/SAI_logo.svg";
 
 const SignIn = () => {
-  const [userCd, setUserCd] = useState("");
-  const [password, setPassword] = useState("");
+  // const [userCd, setUserCd] = useState("");
+  // const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState(null);
 
@@ -23,7 +23,6 @@ const SignIn = () => {
         }
       );
 
-      
       const { userCd, userType } = response.data.responseData.userDetails;
       const { token } = response.data.responseData;
       
@@ -37,6 +36,11 @@ const SignIn = () => {
       setIsLoggedIn(true);
       console.log(isLoggedIn);
 
+      if (userType === "01") {
+        const userRoles = "ssadmin";
+        localStorage.setItem("userRoles", userRoles);
+        localStorage.setItem("userType", "ssadmin");
+      }
       if (userType === "11") {
         const userRoles = "admin";
         localStorage.setItem("userRoles", userRoles);

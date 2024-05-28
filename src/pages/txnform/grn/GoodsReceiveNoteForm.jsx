@@ -219,7 +219,7 @@ const GoodsReceiveNoteForm = () => {
           genName: userDetails.firstName + " " + userDetails.lastName,
           // noaDate: currentDate.format(dateFormat),
           // dateOfDelivery: currentDate.format(dateFormat),
-          userId: "string",
+          userId: userCd,
           genDate: currentDate.format(dateFormat),
           issueDate: currentDate.format(dateFormat),
           approvedDate: currentDate.format(dateFormat),
@@ -240,7 +240,7 @@ const GoodsReceiveNoteForm = () => {
           genName: userDetails.firstName + " " + userDetails.lastName,
           noaDate: currentDate.format(dateFormat),
           dateOfDelivery: currentDate.format(dateFormat),
-          userId: "string",
+          userId: userCd,
           genDate: currentDate.format(dateFormat),
           issueDate: currentDate.format(dateFormat),
           approvedDate: currentDate.format(dateFormat),
@@ -266,16 +266,15 @@ const GoodsReceiveNoteForm = () => {
       const ohqUrl =
         "/master/getOHQ";
 
-      const subProcessRes = await axios.post(subProcessDtlUrl, {
+      const {data} = await axios.post(subProcessDtlUrl, {
         processId: value,
-        processStage: Type==="IRP" ? "ISN" : "ACT",
+        processStage: Type==="IRP" ? "RN" : "ACT",
       }, apiHeader("POST", token));
 
-      const { data: subProcess, status, statusText } = subProcessRes;
-      const { responseData: subProcessData } = subProcess;
-      const { processData, itemList } = subProcessData;
+      const {responseStatus, responseData} = data
+      const {processData, itemList} = responseData
 
-      if (status === 200 && statusText === "OK") {
+      if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
         try {
           const locatorQuantityArr= await Promise.all(
             itemList?.map(async (item) => {
@@ -313,10 +312,10 @@ const GoodsReceiveNoteForm = () => {
         approvedName: processData?.approvedName,
         processId: processData?.processId,
 
-        crRegionalCenterCd: processData?.crRegionalCenterCd,
-        crRegionalCenterName: processData?.crRegionalCenterName,
-        crAddress: processData?.crAddress,
-        crZipcode: processData?.crZipcode,
+        crRegionalCenterCd: processData?.crRegionalCenterCd || processData?.regionalCenterCd,
+        crRegionalCenterName: processData?.crRegionalCenterName || processData?.regionalCenterName,
+        crAddress: processData?.crAddress || processData?.address,
+        crZipcode: processData?.crZipcode || processData?.zipcode,
 
         ceRegionalCenterCd: processData?.ceRegionalCenterCd,
         ceRegionalCenterName: processData?.ceRegionalCenterName,
@@ -366,12 +365,14 @@ const GoodsReceiveNoteForm = () => {
     }
   };
 
+  console.log("FRMDATA: ", formData)
+
   const handleInwardGatePassNoChange = async (value) => {
     try {
       const subProcessDtlUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+        "/getSubProcessDtls";
       const ohqUrl =
-        "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getOHQ";
+        "/master/getOHQ";
 
       const subProcessRes = await axios.post(subProcessDtlUrl, {
         processId: value,
@@ -965,7 +966,7 @@ const GoodsReceiveNoteForm = () => {
                                       value
                                     )
                                   }
-                                  defaultValue={qtyObj.locatorId}
+                                  defaultValue={Type !== "IOP" ? qtyObj.locatorId : ""}
                                 >
                                   {locatorMaster ?
                                     locatorMaster.map(
