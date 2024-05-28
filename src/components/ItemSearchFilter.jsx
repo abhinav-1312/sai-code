@@ -1,47 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button, Table, Popover, message } from "antd";
 import { apiHeader } from "../utils/Functions";
-import axios from "axios";
+import { useSelector } from "react-redux";
 // import 'antd/dist/antd.css';
 
 const { Search } = Input;
 
 const ItemSearchFilter = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  // const [data, setData] = useState([]);
+  // const [filteredData, setFilteredData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const token = localStorage.getItem("token");
-  const populateItemData = async () => {
-    try{
-      const {data} = await axios.get("/master/getItemMaster", apiHeader("GET", token))
-      const {responseData} = data
-      setFilteredData(responseData)
-      setData(responseData)
-    }
-    catch(error){
-      console.log("Error fetching data.", error)
-      message.error("Error fetching data. Please try again.")
-    }
-  }
+  const {token} = useSelector(state => state.auth)
+
+  const {data} = useSelector(state => state.items)
+  const filteredData = data
 
   useEffect(() => {
     // Fetch data from the API
-    populateItemData()
+    // populateItemData()
   }, []);
 
   const handleSearch = (value) => {
     setSearchValue(value);
     // Filter data based on any field
-    const filtered = data.filter((item) => {
-      // Check if any field includes the search value
-      return Object.values(item).some((field) => {
-        if (typeof field === "string") {
-          return field.toLowerCase().includes(value.toLowerCase());
-        }
-        return false;
-      });
-    });
-    setFilteredData(filtered);
+    // const filtered = data?.filter((item) => {
+    //   // Check if any field includes the search value
+    //   return Object.values(item).some((field) => {
+    //     if (typeof field === "string") {
+    //       return field.toLowerCase().includes(value.toLowerCase());
+    //     }
+    //     return false;
+    //   });
+    // });
+    // setFilteredData(filtered);
   };
 
   const columns = [
@@ -115,7 +106,13 @@ const ItemSearchFilter = () => {
       <Popover
         content={
           <Table
-            dataSource={filteredData}
+            dataSource={data?.filter((item) =>
+                Object.values(item).some(
+                  (value) =>
+                    typeof value === "string" &&
+                    value.toLowerCase().includes(searchValue.toLowerCase())
+                )
+              )}
             columns={columns}
             pagination={false}
             scroll={{ x: "max-content" }}

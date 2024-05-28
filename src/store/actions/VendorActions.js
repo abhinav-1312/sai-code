@@ -1,5 +1,4 @@
 import axios from "axios";
-import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
 const token = localStorage.getItem("token");

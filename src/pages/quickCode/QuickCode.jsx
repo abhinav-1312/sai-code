@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button, Modal, Input } from 'antd';
 import QuickCodeTable from './QuickCodeTable';
 import QuickCodeForm from './QuickCodeForm';
+import SaveIndependentVariables from './SaveIndependentVariables';
 
 const initialQuickCodes = [
   // You can add initial data here if needed
@@ -46,7 +47,7 @@ const QuickCodePage = () => {
         </Button>
       </div>
       <QuickCodeTable
-        quickCodes={quickCodes.filter((quickCode) =>
+        quickCodes={quickCodes?.filter((quickCode) =>
           quickCode.configCode.toLowerCase().includes(searchText.toLowerCase())
         )}
         onEdit={handleEdit}
@@ -65,6 +66,8 @@ const QuickCodePage = () => {
       >
         <QuickCodeForm onSubmit={handleFormSubmit} initialValues={editingQuickCode} />
       </Modal>
+
+        <SaveIndependentVariables />
     </div>
   );
 };

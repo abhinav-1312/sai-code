@@ -2,35 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { apiHeader, convertArrayToObject, convertEpochToDateString } from '../../../utils/Functions'
 import DetailData from './DetailData'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 const RejNoteTable = ({data, type, itemList}) => {
 
-    const token = localStorage.getItem("token")
-    const [uomObj, setUomObj] = useState({})
+    const {token} = useSelector(state => state.auth);
 
-    const fetchUom = async () => {
-        // console.log("Fetch uom called")
-        const uomMasterUrl =
-            "/master/getUOMMaster";
-    
-        try{
-            const {data} = await axios.get(uomMasterUrl, apiHeader("GET", token))
-            const {responseData} = data
-            // console.log("Response data: ", responseData)
-            
-            const uomMod =  convertArrayToObject(responseData, "id", "uomName")
+    const uomData = useSelector(state => state.uoms.data)
+    const locatorData = useSelector(state => state.locators.data)
 
-            setUomObj({...uomMod})
-    
-        }
-        catch(error){
-            console.log("Error")
-        }
-    }
-
-    useEffect(()=>{
-        fetchUom()
-    }, [])
+    const uomObj = convertArrayToObject(uomData, "id", "uomName");
+    const locatorObj = convertArrayToObject(locatorData, "id", "locatorDesc")
 
     const itemDetails = [
         {

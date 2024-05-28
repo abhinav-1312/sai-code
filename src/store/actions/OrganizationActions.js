@@ -1,5 +1,4 @@
 import axios from "axios";
-import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
 const token = localStorage.getItem("token");
@@ -8,7 +7,7 @@ export const setOrganizations = (organizations) => ({
   payload: organizations,
 });
 
-export const fetchOrganizations = () => async (dispatch) => {
+const fetchOrganizations = () => async (dispatch) => {
   try {
     const {data} = await axios.get(`/master/getOrgMaster`, apiHeader("GET", token));
     dispatch(setOrganizations(data.responseData));

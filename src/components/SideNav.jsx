@@ -17,6 +17,8 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import RoutesComponent from "../routers/Routes";
+import StockLedger from "../pages/stockLedger/StockLedger";
+import { useSelector } from "react-redux";
 
 const { Content, Sider } = Layout;
 
@@ -166,8 +168,8 @@ const SideNav = () => {
     setCollapsed(!collapsed);
   };
 
-  const userRole = localStorage.getItem("userRoles");
-  const filteredMenuItems = menuItems.filter((item) => {
+  const {userRole} = useSelector(state => state.auth)
+  const filteredMenuItems = menuItems?.filter((item) => {
     switch (userRole) {
       case "SuperAdmin": 
         return (
@@ -212,6 +214,7 @@ const SideNav = () => {
         // Only show items accessible to inventory managers
         return (
           item.key !== "22" &&
+          item.key !== "4" &&
           item.key !== "23" &&
           item.key !== "24" &&
           item.key !== "2" &&
@@ -311,7 +314,7 @@ const SideNav = () => {
   );
 
   return (
-    <Layout>
+    <Layout style={{flex: 0}}>
       <Sider
         width={220}
         collapsible
@@ -328,7 +331,7 @@ const SideNav = () => {
           defaultSelectedKeys={["1"]}
           style={{ background: "#57cac3", color: "white" }}
         >
-          {filteredMenuItems.map((item) =>
+          {filteredMenuItems?.map((item) =>
             item.children ? (
               renderSubMenu(item)
             ) : (
@@ -339,7 +342,7 @@ const SideNav = () => {
           )}
         </Menu>
       </Sider>
-      <Layout style={{ padding: "0 24px 24px" }}>
+      {/* <Layout style={{ padding: "0 24px 24px" }}>
         <Breadcrumb style={{ margin: "16px 0" }}>
           <Breadcrumb.Item>Home</Breadcrumb.Item>
           <Breadcrumb.Item>List</Breadcrumb.Item>
@@ -348,9 +351,8 @@ const SideNav = () => {
         <Content
           style={{ padding: 24, margin: 0, minHeight: 280, background: "#fff" }}
         >
-          <RoutesComponent />
         </Content>
-      </Layout>
+      </Layout> */}
     </Layout>
   );
 };

@@ -1,24 +1,58 @@
-import {Table, Button} from "antd"
+import {Table} from "antd"
 import html2pdf from 'html2pdf.js';
 import axios from 'axios'
 
+const sanitizeText = (text) => {
+  return text.toString().toLowerCase().replace(/\s+/g, '');
+};
+
+
 export const handleSearch = (searchText, itemData, setHook, setSearch=null) => {
-  console.log("SEARCHTEXT: ", searchText)
-  console.log("ITEMDATA: ", itemData)
-  if(setSearch !== null)
-    setSearch(searchText)
-  const filtered = itemData.filter((parentObject) =>
-    recursiveSearch(parentObject, searchText)
-  );
-  setHook([...filtered]);
+  if(searchText !== null){
+      const sanitizedText = sanitizeText(searchText);
+      if(setSearch !== null)
+        setSearch(sanitizedText)
+      const filtered = itemData?.filter((parentObject) =>
+        recursiveSearch(parentObject, sanitizedText)
+    );
+    setHook([...filtered]);
+  }
 };
 
 export const apiHeader = (method, token) => {
   return {
-    method: method,
+    // method: method,
     headers: {
       "Content-Type": "application/json",
       'Authorization': `Bearer ${token}`
+    }
+  }
+}
+
+export const apiCall = async (method, url, token, payload=null) => {
+  const header = {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  }
+  if(method === "GET") {
+    try{
+      const {data} = await axios.get(url, header)
+      return data
+    }
+    catch(error){
+      console.log("Error occured.", error)
+      alert("Some error occured.")
+    }
+  }
+  else if(method === "POST"){
+    try{
+      const {data} = await axios.post(url, payload, header)
+      return data
+    }catch(error){
+      console.log("Error occured.", error)
+      alert("Some error occured.")
     }
   }
 }
@@ -30,6 +64,32 @@ export const apiHeader = (method, token) => {
 //   );
 //   setHook([...filtered]);
 // };
+
+// const recursiveSearch = (object, searchText) => {
+//   for (let key in object) {
+//     const value = object[key];
+//     if (typeof value === "object") {
+//       if (Array.isArray(value)) {
+//         for (let item of value) {
+//           if (recursiveSearch(item, searchText)) {
+//             return true;
+//           }
+//         }
+//       } else {
+//         if (recursiveSearch(value, searchText)) {
+//           return true;
+//         }
+//       }
+//     } else if (
+//       value &&
+//       value.toString().toLowerCase().includes(searchText.toLowerCase())
+//     ) {
+//       return true;
+//     }
+//   }
+//   return false;
+// };
+
 
 const recursiveSearch = (object, searchText) => {
   for (let key in object) {
@@ -48,13 +108,22 @@ const recursiveSearch = (object, searchText) => {
       }
     } else if (
       value &&
-      value.toString().toLowerCase().includes(searchText.toLowerCase())
+      sanitizeText(value).includes(searchText)
     ) {
       return true;
     }
   }
   return false;
 };
+
+export const convertToCurrency = (amount) => {
+  const formattedAmount = amount.toLocaleString('en-IN', {
+    style: 'currency',
+    currency: 'INR'
+  });
+  return formattedAmount
+}
+
 
 export const handleSelectItem = (
   valueObj,
@@ -134,7 +203,13 @@ export const renderLocatorOHQ = (obj) => {
             title: "QUANTITY",
             dataIndex: "quantity",
             key: "quantity"
-          }
+          },
+          {
+            title: "Total Value",
+            dataIndex: "totalValues",
+            key: "totalValue",
+            render: (value) => convertToCurrency(value)
+          },
         ]}
       />
     )

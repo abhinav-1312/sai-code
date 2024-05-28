@@ -16,47 +16,30 @@ import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import axios, { Axios } from "axios";
 import moment from "moment";
 import { apiHeader } from "../utils/Functions";
+import { useSelector } from "react-redux";
 const { TextArea } = Input;
 const { Search } = Input;
 
 const ItemDemandSearch = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  // const [data, setData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedItems, setSelectedItems] = useState([]); // State to hold selected item data
-  const token = localStorage.getItem("token");
-
-  const populateItemData = async () => {
-    try{
-      const {data} = await axios.get("/master/getItemMaster", apiHeader("GET", token))
-      const {responseData} = data
-      setFilteredData(responseData)
-      setData(responseData)
-    }
-    catch(error){
-      console.log("Error fetching data.", error)
-      message.error("Error fetching data. Please try again.")
-    }
-  }
-
-  useEffect(() => {
-    // Fetch data from the API
-    populateItemData()
-  }, []);
+  const {token} = useSelector(state => state.auth)
+  const {data} = useSelector(state => state.items)
 
   const handleSearch = (value) => {
     setSearchValue(value);
     // Filter data based on any field
-    const filtered = data.filter((item) => {
-      // Check if any field includes the search value
-      return Object.values(item).some((field) => {
-        if (typeof field === "string") {
-          return field.toLowerCase().includes(value.toLowerCase());
-        }
-        return false;
-      });
-    });
-    setFilteredData(filtered);
+    // const filtered = data?.filter((item) => {
+    //   // Check if any field includes the search value
+    //   return Object.values(item).some((field) => {
+    //     if (typeof field === "string") {
+    //       return field.toLowerCase().includes(value.toLowerCase());
+    //     }
+    //     return false;
+    //   });
+    // });
+    // setFilteredData(filtered);
   };
 
   const handleSelectItem = (record) => {
@@ -150,7 +133,13 @@ const ItemDemandSearch = () => {
         <Popover
           content={
             <Table
-              dataSource={filteredData}
+            dataSource={data?.filter((item) =>
+              Object.values(item).some(
+                (value) =>
+                  typeof value === "string" &&
+                  value.toLowerCase().includes(searchValue.toLowerCase())
+              )
+            )}
               columns={columns}
               pagination={false}
               scroll={{ x: "max-content" }}
@@ -159,7 +148,7 @@ const ItemDemandSearch = () => {
           }
           title="Filtered Item Data"
           trigger="click"
-          visible={searchValue !== "" && filteredData.length > 0}
+          // visible={searchValue !== "" && filteredData.length > 0}
           style={{ width: "200px" }}
           placement="right"
         >

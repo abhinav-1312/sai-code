@@ -2,36 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { apiHeader, convertArrayToObject } from '../../../utils/Functions';
 import axios from 'axios';
 import DetailData from './DetailData';
+import { useSelector } from 'react-redux';
 
 const IsnTable = ({type, data, itemList}) => {
-    const token = localStorage.getItem("token")
-    const [uomObj, setUomObj] = useState({})
-    const [locatorObj, setLocatorObj] = useState({})
+    const uomData = useSelector(state => state.uoms.data)
+    const locatorData = useSelector(state => state.locators.data)
 
-const fetchUomLocatorMaster = async (setUomHook, setLocatorHook) => {
-    try {
-      const uomMasterUrl =
-        "/master/getUOMMaster";
-      const locatorMasterUrl =
-        "/master/getLocatorMaster";
-      const [uomMaster, locatorMaster] = await Promise.all([axios.get(uomMasterUrl, apiHeader("GET", token)), axios.get(locatorMasterUrl, apiHeader("GET", token))]);
-      const { responseData: uomMasterData } = uomMaster.data;
-      const { responseData: locatorMasterData } = locatorMaster.data;
-      const uomMod = convertArrayToObject(uomMasterData, "id", "uomName");
-      const locatorMod = convertArrayToObject(locatorMasterData, "id", "locatorDesc")
-      setUomObj({ ...uomMod });
-      setLocatorObj({...locatorMod})
-    } catch (error) {
-      console.log("Error fetching Uom master details.", error);
-    }
-  };
-
-// const uomObj = fetchUom()
-console.log("UOM OBJ: ",uomObj)
-
-useEffect(()=>{
-    fetchUomLocatorMaster()
-}, [])
+    const uomObj = convertArrayToObject(uomData, "id", "uomName");
+    const locatorObj = convertArrayToObject(locatorData, "id", "locatorDesc")
 
  const orgConsignorDetails = [
     {

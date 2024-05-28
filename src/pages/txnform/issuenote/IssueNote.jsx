@@ -20,6 +20,7 @@ import axios from "axios";
 
 import { apiHeader, handleSearch, printOrSaveAsPDF } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
+import { useSelector } from "react-redux";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Title } = Typography;
@@ -317,9 +318,7 @@ const IssueNote = () => {
         render: (locatorQuantity, rowRecord) => renderLocatorISN(locatorQuantity, rowRecord)
     },
   ];
-
-  const token = localStorage.getItem("token")
-  const userCd = localStorage.getItem("userCd")
+  const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
   const populateItemData = async() => {
     const itemMasterUrl = "/master/getItemMaster"
     const ohqUrl = "/master/getOHQ"
@@ -411,18 +410,18 @@ const IssueNote = () => {
   };
 
   const fetchUserDetails = async () => {
-    const userCd = localStorage.getItem('userCd');
-    const password = localStorage.getItem('password');
-    try {
-      const apiUrl =
-        "/login/authenticate";
-      const response = await axios.post(apiUrl, {
-        userCd,
-        password
-      });
+    // const userCd = localStorage.getItem('userCd');
+    // const password = localStorage.getItem('password');
+    // try {
+    //   const apiUrl =
+    //     "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+    //   const response = await axios.post(apiUrl, {
+    //     userCd,
+    //     password
+    //   });
 
-      const { responseData } = response.data;
-      const { organizationDetails, userDetails, locationDetails } = responseData;
+      // const { responseData } = response.data;
+      // const { organizationDetails, userDetails, locationDetails } = responseData;
       // Get current date
       const currentDate = dayjs();
       setFormData(prev=>{
@@ -442,9 +441,9 @@ const IssueNote = () => {
           demandNoteDt: currentDate.format(dateFormat)
         }
       })
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+    // } catch (error) {
+    //   console.error("Error fetching data:", error);
+    // }
   };
 
   const handleCeRccChange = async (value) => {
@@ -672,21 +671,10 @@ const IssueNote = () => {
                 >
                   <Input value={formData?.ceRegionalCenterCd}
                     onChange={(e) =>
-                      // handleChange("ceRegionalCenterCd", e.target.value)
                       handleCeRccChange(e.target.value)
                     }
                   />
                 </Form.Item>
-                {/* <Form.Item
-                  label="REGIONAL CENTER NAME  :"
-                  name="ceRegionalCenterName"
-                >
-                  <Input value={formData?.ceRegionalCenterName}
-                    onChange={(e) =>
-                      handleChange("ceRegionalCenterName", e.target.value)
-                    }
-                  />
-                </Form.Item> */}
                 <FormInputItem label="REGIONAL CENTER NAME" value={formData.ceRegionalCenterName} />
                 <FormInputItem label="ADDRESS" value={formData.ceAddress} />
                 <FormInputItem label="ZIPCODE" value={formData.ceZipcode} />

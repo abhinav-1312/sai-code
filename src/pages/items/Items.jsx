@@ -10,43 +10,19 @@ import {
   allDisciplines,
   subCategories,
 } from "./KeyValueMapping";
-import { apiHeader } from "../../utils/Functions";
+import { apiHeader, convertArrayToObject, convertEpochToDateString } from "../../utils/Functions";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
-const apiRequest = async (url, method, requestData) => {
-  const token = localStorage.getItem("token");
-  const options = {
-    method: method,
-    headers: {
-      "Content-Type": "application/json",
-      'Authorization': `Bearer ${token}`,
-    },
-  };
 
-  if(method === "GET"){
-    try{
-      const {data} = await axios.get(url, apiHeader("GET", token))
-      const {responseData} = data
-      console.log("RESPONSE DATA: ", responseData)
-      return responseData
-    }
-    catch(error){
-      console.log("Error", error)
-    }
-  }
-  else{
-    try {
-  
-      const {data} = await axios.post(url, requestData, apiHeader("POST", token));
-      const {responseData} = data
-      return responseData;
-    } catch (error) {
-      console.error("Error: ", error);
-    }
-  }
-};
 
 const ItemsPage = () => {
+  const token = useSelector(state=> state.auth.token)
+  const itemData = useSelector(state => state.item.data)
+  const vendorData = useSelector(state => state.vendors.data)
+  const locationData = useSelector(state => state.locations.data)
+  const locatorData = useSelector(state => state.locators.data)
+  const uomData = useSelector(state => state.uoms.data)
   const [items, setItems] = useState([]);
   const [visible, setVisible] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -62,13 +38,35 @@ const ItemsPage = () => {
   const [usageCategories, setUsageCategories] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  const getUoms = async () => {
-    const uomResponse = await apiRequest(
-      "/master/getUOMMaster",
-      "GET"
-    );
+  const apiRequest = async (url, method, requestData) => {
+    const options = {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`,
+      },
+    };
+  
+    if (method === "POST") {
+      options["body"] = JSON.stringify(requestData);
+    }
+  
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data.responseData;
+    } catch (error) {
+      console.error("Error: ", error);
+    }
+  };
 
-    setUoms(uomResponse);
+  const getUoms = async () => {
+    // const uomResponse = await apiRequest(
+    //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getUOMMaster",
+    //   "GET"
+    // );
+
+    setUoms(uomData);
   };
   const getBrands = async () => {
     const brandsResponse = await apiRequest(
@@ -112,91 +110,55 @@ const ItemsPage = () => {
   };
 
   const getLocations = async () => {
-    const locationsResponse = await apiRequest(
-      "/master/getLocationMaster",
-      "GET"
-    );
-    setLocations(locationsResponse);
+    // const locationsResponse = await apiRequest(
+    //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMaster",
+    //   "GET"
+    // );
+    setLocations(locationData);
   };
 
   const getLocators = async () => {
-    const locatorsResponse = await apiRequest(
-      "/master/getLocatorMaster",
-      "GET"
-    );
-    setLocators(locatorsResponse);
+    // const locatorsResponse = await apiRequest(
+    //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocatorMaster",
+    //   "GET"
+    // );
+    setLocators(locatorData);
   };
 
   const getVendors = async () => {
-    const vendorsResponse = await apiRequest(
-      "/master/getVendorMaster",
-      "GET"
-    );
-    setVendors(vendorsResponse);
+    // const vendorsResponse = await apiRequest(
+    //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster",
+    //   "GET"
+    // );
+    setVendors(vendorData);
   };
 
-  const token = localStorage.getItem("token")
+  
 
   const getItems = async () => {
-    console.log("GETITEMS")
+    const itemMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getItemMaster"
+    const vendorMasterUrl = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getVendorMaster"
     try {
-      const {data} = await axios.get(
-        "/master/getItemMaster", apiHeader("GET", token)
-      );
 
-      const { responseData } = await data;
+      // const [itemMasterData, vendorMasterData] = await Promise.all([
+      //   axios.get(itemMasterUrl, apiHeader("GET", token)),
+      //   axios.get(vendorMasterUrl, apiHeader("GET", token)),
+      // ]);
 
-      const itemList = await Promise.all(
-        responseData.map(async (item) => {
-          // const uomResponse = await apiRequest(
-          //   "/master/getUOMMasterById",
-          //   "POST",
-          //   {
-          //     id: item.uomId,
-          //     userId: "string",
-          //   }
-          // );
+      // const itemData = itemMasterData.data.responseData;
+      // const vendorData = vendorMasterData.data.responseData;
 
-          // const locationResponse = await apiRequest(
-          //   "/master/getLocationMasterById",
-          //   "POST",
-          //   {
-          //     locationId: item.locationId,
-          //     userId: "string",
-          //   }
-          // );
-
-          // const locatorResponse = await apiRequest(
-          //   "/master/getLocatorMasterById",
-          //   "POST",
-          //   {
-          //     id: item.locatorId,
-          //     userId: "string",
-          //   }
-          // );
-
-          const vendorResponse = await apiRequest(
-            "/master/getVendorMasterById",
-            "POST",
-            {
-              id: item.vendorId,
-              userId: "string",
-            }
-          );
-
-          return {
-            key: item.id,
+      const vendorObj = convertArrayToObject(vendorData, "id", "vendorName")
+      
+      const itemList = itemData.map(item=>{
+        return{
+          key: item.id,
             id: item.id,
             itemCode: item.itemMasterCd,
             itemDescription: item.itemMasterDesc,
-            // uom: uomResponse?.uomName || "default UOM",
             uom: item.uomDtls.uomName,
-            // quantityOnHand: item.quantity,
-            // location: locationResponse?.locationName,
-            // locatorCode: locatorResponse?.locatorCd,
-            // locatorDesc: locatorResponse?.locatorDesc,
             price: item.price,
-            vendorDetail: vendorResponse.vendorName,
+            vendorDetail: vendorObj[parseInt(item.vendorId)],
             category: item.categoryDesc,
             subcategory: item.subCategoryDesc,
             type: item.typeDesc,
@@ -209,32 +171,33 @@ const ItemsPage = () => {
             minStockLevel: item.minStockLevel,
             maxStockLevel: item.maxStockLevel,
             status: item.status === "A" ? "Active" : "InActive",
-            endDate: new Date(item.endDate).toISOString().split("T")[0],
-          };
-        })
-      );
+            // endDate: new Date(item.endDate).toISOString().split("T")[0],
+            endDate: convertEpochToDateString(item.endDate)
+        }
+      })
+
 
       setItems(itemList);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  };  
 
   const init = () => {
-    getUoms();
-    getLocations();
-    getLocators();
-    getVendors();
-    getItems();
-    getBrands();
-    getSizes();
-    getColors();
-    getUsageCategories();
-    getCategories();
-  };
+    getItems()
+    getUoms()
+    getBrands()
+    getSizes()
+    getColors()
+    getUsageCategories()
+    getCategories()
+    getLocations()
+    getLocators()
+    getVendors()
+  }
 
   useEffect(() => {
-    init();
+    init()
   }, []);
 
   const getItem = async (id) => {
@@ -243,7 +206,7 @@ const ItemsPage = () => {
       "POST",
       {
         id: id,
-        userId: "12345",
+        userId: userCd,
       }
     );
     return itemResponse;
@@ -265,7 +228,7 @@ const ItemsPage = () => {
     setVisible(true);
   };
 
-  const userCd = localStorage.getItem("userCd")
+  const {userCd} = useSelector(state => state.auth)
   const handleDelete = async (itemId) => {
     // Implement delete logic here
     await apiRequest(
@@ -279,23 +242,8 @@ const ItemsPage = () => {
     getItems();
   };
 
-  const generate3DigitRandString = () => {
-    // Generate a random number between 0 and 999 (inclusive)
-    const randomNumber = Math.floor(Math.random() * 1000);
-
-    // Convert the random number to a string
-    let randomNumberString = randomNumber.toString();
-
-    // Pad the string with leading zeros if necessary
-    if (randomNumberString.length < 3) {
-      randomNumberString = randomNumberString.padStart(3, "0");
-    }
-
-    return randomNumberString;
-  };
 
   const handleFormSubmit = async (values) => {
-    const userCd = localStorage.getItem("userCd")
     setEditingItem(null);
     const tempItem = {
       ...values,
@@ -303,17 +251,11 @@ const ItemsPage = () => {
       uomId: Number(values.uomId),
       createUserId: userCd,
       endDate: values.endDate.format("DD/MM/YYYY"),
-      // itemName: itemNames[values.itemMasterDesc]
-      //   ? values.itemMasterDesc
-      //   : generate3DigitRandString(),
-      // itemMasterDesc: itemNames[values.itemMasterDesc] || values.itemMasterDesc,
     };
 
     if (!tempItem.itemMasterCd) {
       delete tempItem.itemMasterCd;
     }
-
-    console.log('Teimitem: ', tempItem)
 
     if (editingItem) {
       if (selectedId) {
@@ -365,7 +307,7 @@ const ItemsPage = () => {
         //   item.itemDescription.toLowerCase().includes(searchText.toLowerCase()) ||
         //   item.itemCode.toLowerCase().includes(searchText.toLowerCase())
         // )}
-        items={items.filter((item) =>
+        items={items?.filter((item) =>
           Object.values(item).some(
             (value) =>
               typeof value === "string" &&

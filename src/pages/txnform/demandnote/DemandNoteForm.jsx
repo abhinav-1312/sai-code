@@ -11,12 +11,15 @@ import moment from 'moment';
 import FormInputItem from '../../../components/FormInputItem';
 import FormDatePickerItem from '../../../components/FormDatePickerItem';
 import { printOrSaveAsPDF } from '../../../utils/Functions';
+import { useSelector } from 'react-redux';
 const { TextArea } = Input;
 const dateFormat = 'DD/MM/YYYY';
 const { Option } = Select;
 
 const DemandNoteForm = () => {
   const formRef = useRef()
+  const {token, userCd, userDetails, locationDetails} = useSelector(state => state.auth);
+  const organizationDetails = useSelector(state => state.auth.organizationDetails)
   const [itemData, setItemData] = useState([]);
   const [formData, setFormData] = useState({
     regionalCenterCode: '',
@@ -24,39 +27,27 @@ const DemandNoteForm = () => {
     consignorAddress: '',
     consignorZipCode: ''
   });
-  useEffect(() => {
-    // Fetch data from API to prefill form fields
-    // fetchItemData()
-    fetchData();
-  }, []);
 
-  const fetchItemData = async () => {
-    try {
-      const apiUrl = 'https://sai-services.azurewebsites.net/sai-inv-mgmt/master/getItemMaster';
-      const response = await axios.get(apiUrl);
-      const { responseData } = response.data;
-      setItemData(responseData)
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  useEffect(()=>{
+    fetchData()
+  },[])
 
   const fetchData = async () => {
-    console.log("Fetch data called")
-    try {
-      const userCd = localStorage.getItem("userCd")
-      const password = localStorage.getItem("password")
-      const apiUrl = '/login/authenticate';
-      const response = await axios.post(apiUrl, {
-        userCd,
-        password
-      });
+    // console.log("Fetch data called")
+    // try {
+    //   const userCd = localStorage.getItem("userCd")
+    //   const password = localStorage.getItem("password")
+    //   const apiUrl = 'https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate';
+    //   const response = await axios.post(apiUrl, {
+    //     userCd,
+    //     password
+    //   });
 
-      const { responseData } = response.data;
-      const { organizationDetails } = responseData;
-      const { userDetails } = responseData;
-      console.log('Fetched data:', responseData);
-      const {locationDetails} = responseData
+    //   const { responseData } = response.data;
+    //   const { organizationDetails } = responseData;
+    //   const { userDetails } = responseData;
+    //   console.log('Fetched data:', responseData);
+    //   const {locationDetails} = responseData
       // Update form data with fetched values
       setFormData({
         regionalCenterCode: organizationDetails.id,
@@ -67,12 +58,11 @@ const DemandNoteForm = () => {
         // lastName: userDetails.lastName
 
       });
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+    // } catch (error) {
+    //   console.error('Error fetching data:', error);
+    // }
   };
 
-  const token = localStorage.getItem("token")
 
   const onFinish = async (values) => {
     const apiUrl = '/saveDemand';

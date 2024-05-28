@@ -1,5 +1,4 @@
-// import { BASE_URL } from "../../utils/BaseUrl";
-import {BASE_URL} from "../../utils/BaseUrl"
+
 import {apiHeader} from "../../utils/Functions"
 import axios from "axios"
 
@@ -33,7 +32,7 @@ export const updateUser = (userId, values) => async (dispatch) => {
 
 // export const saveUser = (values) => async (dispatch) => {
 //   try {
-//     const createResponse = await fetch(`${BASE_URL}/saveUserMaster`, {
+//     const createResponse = await fetch(`/saveUserMaster`, {
 //       method: "POST",
 //       headers: {
 //         "Content-Type": "application/json",
