@@ -78,9 +78,8 @@ const Ohq = ({orgId, organization}) => {
       const { responseData } = data;
       const newArray = []
 
-      // const modData = []
-      responseData.map(item=>{
-        item.qtyList.map(obj=>{
+      responseData.forEach(item=>{
+        item.qtyList.forEach(obj=>{
           const objFound = newArray.find(tempItem => tempItem.locationId === obj.locationId && tempItem.itemCode === item.itemCode)
 
           if(objFound){
@@ -105,6 +104,16 @@ const Ohq = ({orgId, organization}) => {
       })
       setItemData([...newArray]);
       setFilteredData([...newArray]);
+
+      // calculate total value
+      let sum = 0
+      responseData.forEach(item => {
+        item.qtyList.forEach(loc => {
+          sum = sum + loc.totalValues
+        })
+      })
+
+      setTotVal(convertToCurrency(sum))
     }
     catch(error){
       console.log("Error", error)

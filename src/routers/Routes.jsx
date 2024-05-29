@@ -63,13 +63,13 @@ const RoutesComponent = () => {
   const superAdminRoutes = (
     <>
       <Route path="/sub-organization" element={<Organization />} />
-      <Route path="/location" element={<Location />} />
-      <Route path="/items" element={<Items />} />
       <Route path="/ohq" element={<OHQ />} />
+      <Route path="/stockLedger" element={<StockLedger />} />
       <Route path="/trnsummary" element={<TransactionSummary />} />
       <Route path="/trnsummary/:trnno" element={<TransactionDetail />} />
-      <Route path="/stockLedger" element={<StockLedger />} />
+      <Route path="/items" element={<Items />} />
       <Route path="/locator" element={<Locator />} />
+      <Route path="/location" element={<Location />} />
       <Route path="/department" element={<DepartmentPage />} />
       <Route path="/user" element={<User />} />
       <Route path="/employee" element={<Employee />} />
@@ -98,11 +98,11 @@ const RoutesComponent = () => {
     <>
       <Route path="/items" element={<Items />} />
       <Route path="/ohq" element={<OHQ />} />
+      <Route path="/stockLedger" element={<StockLedger />} />
       <Route path="/trnsummary" element={<TransactionSummary />} />
       <Route path="/trnsummary/:trnno" element={<TransactionDetail />} />
-      <Route path="/stockLedger" element={<StockLedger />} />
-      <Route path="/department" element={<DepartmentPage />} />
       <Route path="/employee" element={<Employee />} />
+      <Route path="/department" element={<DepartmentPage />} />
       <Route path="/tax" element={<Tax />} />
       <Route path="/transaction" element={<Transaction />} />
       <Route path="/uom" element={<UOM />} />
@@ -127,10 +127,10 @@ const RoutesComponent = () => {
   const inventoryManagerRoutes = (
     <>
       <Route path="/sub-organization" element={<Organization />} />
-      <Route path="/items" element={<Items />} />
       <Route path="/ohq" element={<OHQ />} />
       <Route path="/trnsummary" element={<TransactionSummary />} />
       <Route path="/trnsummary/:trnno" element={<TransactionDetail />} />
+      <Route path="/items" element={<Items />} />
       <Route path="/locator" element={<Locator />} />
       <Route path="/uom" element={<UOM />} />
       <Route path="/Vendor" element={<Vendor />} />

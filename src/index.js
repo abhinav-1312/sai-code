@@ -10,16 +10,14 @@ import { PersistGate } from "redux-persist/integration/react";
 import "antd/dist/reset.css";
 import axios from "axios";
 
-axios.defaults.baseURL = "https://sai-services.azurewebsites.net/sai-inv-mgmt"
+axios.defaults.baseURL = "https://sai-services.azurewebsites.net/sai-inv-mgmt";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <PersistGate persistor={persistor}>
-  <Provider store={toolkitStore}>
-      {/* <Provider store={store}> */}
-        <App />
-      {/* </Provider> */}
-  </Provider>
-    </PersistGate>
+  <PersistGate persistor={persistor}>
+    <Provider store={toolkitStore}>
+      <App />
+    </Provider>
+  </PersistGate>
 );
 
 // If you want to start measuring performance in your app, pass a function
