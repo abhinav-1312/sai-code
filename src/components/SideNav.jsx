@@ -139,7 +139,7 @@ const menuItems = [
   {
     key: "21",
     icon: <EnvironmentOutlined />,
-    label: "ItemDemandSearch",
+    label: "Item Demand Search",
     path: "/itemsearch",
   },
   {
@@ -193,6 +193,7 @@ const SideNav = () => {
       case "ssadmin" : 
         return (
           item.key !== "2" &&
+          item.key !== "25" &&
           item.key !== "1" &&
           item.key !== "14" &&
           item.key !== "15" &&

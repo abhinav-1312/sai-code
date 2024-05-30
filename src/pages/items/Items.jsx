@@ -387,8 +387,6 @@ const ItemsPage = () => {
   const {data: uomData} = useSelector(state => state.uoms)
   const {vendorObj} = useSelector(state => state.vendors)
 
-  console.log("Item data: ", itemData)
-
   const itemList = itemData?.map(item=>{
     return{
       key: item.id,
@@ -474,7 +472,6 @@ const ItemsPage = () => {
 
     setCategories(categoriesRespone.responseData);
   }, [token]);
-
 
   useEffect(() => {
     getBrands()
