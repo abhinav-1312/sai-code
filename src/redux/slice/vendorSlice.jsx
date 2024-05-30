@@ -1,14 +1,16 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import { apiCall } from '../../utils/Functions';
+import { apiCall, convertArrayToObject } from '../../utils/Functions';
 
 const vendorSlice = createSlice({
     name: "vendors",
     initialState: {
-        data: null
+        data: null,
+        vendorObj: null
     },
     reducers: {
         clearVendor(state, action){
             state.data = null
+            state.vendorObj = null
         }
     },
 
@@ -21,6 +23,7 @@ const vendorSlice = createSlice({
           .addCase(fetchVendors.fulfilled, (state, action) => {
             state.loading = false;
             state.data = action.payload
+            state.vendorObj = convertArrayToObject(action.payload)
           })
           .addCase(fetchVendors.rejected, (state, action) => {
             state.loading = false;
