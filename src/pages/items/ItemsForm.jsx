@@ -200,19 +200,11 @@ const ItemsForm = ({
         values = { ...values, itemName: null, itemMasterDesc: itemMasterDescCopy };
       }
       else{
-        const itemName= parseInt(combinedCodeAndDesc[0]);
+        const itemName= combinedCodeAndDesc[0];
         const itemMasterDesc = combinedCodeAndDesc[1];
         values = { ...values, itemName, itemMasterDesc };
       }
       onSubmit(values);
-    // }
-    // else{
-    //   values = {...values, itemMasterCd: null, itemMasterDesc: itemMasterDescCopy[0]}
-    //   onSubmit(values)
-    // }
-    console.log("ITemmaster desc: ", values.itemMasterDesc)
-    console.log("Values: ", values);
-    // form.resetFields();
   };
 
   // const handleInputChange = (value) => {
