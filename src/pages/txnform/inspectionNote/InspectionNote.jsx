@@ -201,7 +201,7 @@ const InspectionNote = () => {
         consumerName: processData?.consumerName,
         contactNo: processData?.contactNo,
 
-        supplierCd: processData?.supplierCode,
+        supplierCd: processData?.supplierCode || processData?.supplierCd,
         supplierName: processData?.supplierName,
         address: processData?.crAddress,
 

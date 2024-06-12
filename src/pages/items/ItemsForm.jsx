@@ -194,6 +194,7 @@ const ItemsForm = ({
 
   const onFinish = (values) => {
     const itemMasterDescCopy = values.itemMasterDesc[0]
+    console.log("ItemMasterdesc copyz: ", itemMasterDescCopy)
     // if(typeof(itemMasterDescCopy === "string")){
       const combinedCodeAndDesc = itemMasterDescCopy.split("$#")
       if(combinedCodeAndDesc.length === 1){
@@ -316,7 +317,17 @@ const ItemsForm = ({
               { required: true, message: "Please enter Item Description" },
             ]}
           >
-            <Select disabled={itemDescriptionDisabled} mode="tags">
+            <Select disabled={itemDescriptionDisabled}
+            showSearch
+            mode="tags"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option.children.toLowerCase().includes(input.toLowerCase())
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+            }
+            >
               {itemDescriptionOptions?.map((item) => (
                 <Option key={item.key} value={item.key+"$#"+item.value}>
                   {item.value}
@@ -351,7 +362,16 @@ const ItemsForm = ({
             label="UOM"
             rules={[{ required: true, message: "Please enter UOM" }]}
           >
-            <Select>
+            <Select
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option.children.toLowerCase().includes(input.toLowerCase())
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+            }
+            >
               {uoms?.map((uom, index) => {
                 return (
                   <Option key={index} value={uom.id}>
@@ -417,7 +437,16 @@ const ItemsForm = ({
             label="Locator Desc."
             rules={[{ required: true, message: "Please enter Locator Code" }]}
           >
-            <Select>
+            <Select
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option.children.toLowerCase().includes(input.toLowerCase())
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+            }
+            >
               {locators?.map((locator, index) => {
                 return (
                   <Option key={index} value={locator.id}>
@@ -445,7 +474,16 @@ const ItemsForm = ({
               { required: true, message: "Please enter Supplier Detail" },
             ]}
           >
-            <Select>
+            <Select
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+              filterSort={(optionA, optionB) =>
+                optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+              }
+            >
               {vendors?.map((vendor, index) => {
                 return (
                   <Option key={index} value={vendor.id}>
@@ -536,7 +574,16 @@ const ItemsForm = ({
             label="Brand"
             rules={[{ required: true, message: "Please enter Brand " }]}
           >
-            <Select>
+            <Select
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+              filterSort={(optionA, optionB) =>
+                optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+              }
+            >
               {brands?.map((brand, index) => {
                 return (
                   <Option key={index} value={brand.paramVal}>
@@ -553,7 +600,16 @@ const ItemsForm = ({
             label="Size "
             rules={[{ required: true, message: "Please enter Size" }]}
           >
-            <Select>
+            <Select
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+              filterSort={(optionA, optionB) =>
+                optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+              }
+            >
               {sizes?.map((size, index) => {
                 return (
                   <Option key={index} value={size.paramVal}>
@@ -570,7 +626,17 @@ const ItemsForm = ({
             label="Colour"
             rules={[{ required: true, message: "Please enter Colour" }]}
           >
-            <Select>
+            <Select
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+              filterSort={(optionA, optionB) =>
+                optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+              }
+    
+            >
               {colors?.map((color, index) => {
                 return (
                   <Option key={index} value={color.paramVal}>
