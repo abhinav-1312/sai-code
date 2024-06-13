@@ -574,12 +574,16 @@ const IssueNote = () => {
         setFormSubmitted(true);
         // fetchUserDetails()
       } else {
+        console.log("Else")
         // Display a generic success message if specific data is not available
-        message.error("Failed to save issue note. Please try again later.");
+        message.error("Failed to save issue note. Please try again later. ");
+        setDisableSubmitBtn(false)
       }
     } catch (error) {
+      console.log("Catch")
       console.error("Error saving issue note:", error);
       message.error("Failed to submit issue note. ");
+      setDisableSubmitBtn(false)
     }
   };
 
