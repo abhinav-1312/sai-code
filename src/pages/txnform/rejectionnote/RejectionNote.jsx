@@ -112,13 +112,13 @@ const RejectionNote = () => {
       };
     });
   };
+  const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
   useEffect(() => {
-    fetchUomLocatorMaster(setUomMaster, setLocatorMaster);
+    fetchUomLocatorMaster(setUomMaster, setLocatorMaster, token);
     fetchItemData();
     fetchUserDetails();
   }, []);
 
-  const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
 
   const fetchItemData = async () => {
     try {

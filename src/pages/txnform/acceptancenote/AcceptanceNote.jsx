@@ -107,12 +107,13 @@ const AcceptanceNote = () => {
     });
   };
 
+  const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
+
   useEffect(() => {
-    fetchUomLocatorMaster(setUomMaster, setLocatorMaster)
+    fetchUomLocatorMaster(setUomMaster, setLocatorMaster, token)
     fetchUserDetails();
   }, []);
 
-  const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
 
   const fetchUserDetails = async () => {
     // try {
@@ -222,6 +223,8 @@ const AcceptanceNote = () => {
       };
     });
   };
+
+  console.log("UOM Master: ", uomMaster)
 
   const onFinish = async (values) => {
     try {
@@ -489,7 +492,7 @@ const AcceptanceNote = () => {
                     <FormInputItem
                       label="UOM :"
                       key={key}
-                      value={uomMaster[item.uom]}
+                      value={uomMaster[parseInt(item.uom)]}
                     />
 
                     {Type !== "PO" && Type !== "IOP" && (

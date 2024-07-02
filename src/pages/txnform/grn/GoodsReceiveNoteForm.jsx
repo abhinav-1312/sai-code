@@ -271,7 +271,7 @@ const GoodsReceiveNoteForm = () => {
           conditionOfGoods: item?.conditionOfGoods,
           budgetHeadProcurement: item?.budgetHeadProcurement,
           locatorId: parseInt(item?.locatorId),
-          unitPrice: itemData.find(obj => obj.itemMasterCd === item.itemCode).price,
+          unitPrice: itemData.find(obj => obj.itemMasterCd === item.itemCode)?.price || null,
           qtyList: [
             {
               locatorId: parseInt(item?.locatorId),

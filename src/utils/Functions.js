@@ -209,8 +209,8 @@ export const printOrSaveAsPDF = async (formRef) => {
   });
 };
 
-const token = localStorage.getItem("token");
-export const fetchUomLocatorMaster = async (setUomHook, setLocatorHook) => {
+// const token = localStorage.getItem("token");
+export const fetchUomLocatorMaster = async (setUomHook, setLocatorHook, token=null) => {
   try {
     const uomMasterUrl = "/master/getUOMMaster";
     const locatorMasterUrl = "/master/getLocatorMaster";
