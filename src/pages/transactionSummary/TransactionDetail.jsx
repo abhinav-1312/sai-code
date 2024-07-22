@@ -71,12 +71,7 @@ const TransactionDetail = () => {
   }
 
   const handleNavigate = () => {
-    if(orgId){
-      navigate("/hqTxnSummary")
-    }
-    else{
-      navigate("/trnsummary")
-    }
+      navigate(-1)
   }
 
   const populateData = async () => {
@@ -110,6 +105,18 @@ const TransactionDetail = () => {
     setInspectionNoteData(inspectionNewRptData);
   };
 
+  const handleIsnPrint = () => {
+    navigate('/trans/issue', {
+      state: { isnData: isnData.data, itemList: isnData.itemList }, // Pass data as state
+    });
+  }
+
+  const handleOgpPrint = () => {
+    navigate('/trans/outward', {
+      state: {ogpData: ogpData.data, itemList: ogpData.itemList}
+    })
+  }
+
   useEffect(() => {
     if(orgId){
       populateHqData(orgId)
@@ -138,7 +145,13 @@ const TransactionDetail = () => {
 
       {objectFromArr["ISN"] && (
         <div>
+          <div style={{display: "flex", gap: "1rem", marginBottom: "0.5rem"}}>
           <h2>Issue Note</h2>
+          {
+            isnData?.data &&
+            <Button danger onClick = {handleIsnPrint}> Print </Button>
+          }
+          </div>
           {isnData?.data ? (
             <IsnTable
               type={isnData?.data?.type}
@@ -154,7 +167,13 @@ const TransactionDetail = () => {
 
       {objectFromArr["OGP"] && (
         <div>
+          <div style={{display: "flex", gap: "1rem", marginBottom: "0.5rem"}}>
           <h2>Outward Gate Pass</h2>
+          {
+            ogpData?.data &&
+            <Button danger onClick = {handleOgpPrint}> Print </Button>
+          }
+          </div>
           {ogpData?.data ? (
             <OgpTable
               type={ogpData?.data?.type}

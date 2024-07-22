@@ -1,5 +1,6 @@
 // DepartmentActions.js
-import axios from "axios";
+import { message } from "antd";
+import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
 
@@ -12,10 +13,11 @@ export const setDepartments = (departments) => ({
 
 export const fetchDepartments = () => async (dispatch) => {
   try {
-    const {data} = await axios.get(`/master/getDeptMaster`, apiHeader("GET", token));
-    const {responseData} = data;
+    const response = await fetch(`/getDeptMaster`, apiHeader("GET", token));
+    console.log("Response: ", response)
+    const data = await response.json();
 
-    dispatch(setDepartments(responseData));
+    dispatch(setDepartments(data.responseData));
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -24,15 +26,24 @@ export const fetchDepartments = () => async (dispatch) => {
 
 export const updateDepartment = (departmentId, values) => async (dispatch) => {
   try {
-    const {data} = await axios.post("/master/updateDeptMaster", {departmentId, ...values}, apiHeader("POST", token))
-    // console.log("UPDATE RESPONSE: ", updateResponse)
-    const {responseStatus} = data
-    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
-      alert('Department updated successfully')
+    const updateResponse = await fetch(`/updateDeptMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        departmentId,
+        ...values,
+      }),
+    });
+
+    if (updateResponse.ok) {
+      message.error('Department updated successfully')
       dispatch(fetchDepartments()); 
     } else {
-      alert('Update Failed')
-      console.error('Update failed:', data);
+      message.error('Update Failed')
+      console.error('Update failed:', updateResponse.statusText);
     }
   } catch (error) {
     console.error('Error:', error);
@@ -41,32 +52,47 @@ export const updateDepartment = (departmentId, values) => async (dispatch) => {
 
 export const saveDepartment = (values) => async (dispatch) => {
   try {
-    const {data} = await axios.post("/master/saveDeptMaster", {...values}, apiHeader("POST", token))
-    const {responseStatus} = data
-    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
-      alert('Department added successfully')
-      dispatch(fetchDepartments()); 
+    const createResponse = await fetch(`/saveDeptMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(values),
+    });
+
+    if (createResponse.ok) {
+      message.error('Department Added Successfully')
+      dispatch(fetchDepartments());
     } else {
-      alert('Update Failed')
-      console.error('Deparment addition failed:', data);
+      message.error('Department Added Failed')
+      console.error('Create failed:', createResponse.statusText);
     }
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
-const userCd = localStorage.getItem("userCd")
-
 export const deleteDepartment = (departmentId) => async (dispatch) => {
   try {
-    const {data} = await axios.post("/master/deleteDeptMaster", {userId: userCd, departmentId}, apiHeader("POST", token))
-    const {responseStatus} = data
-    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
-      alert('Department deleted successfully')
+    const deleteResponse = await fetch(`/deleteDeptMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        userId: 'string', 
+        departmentId,
+      }),
+    });
+
+    if (deleteResponse.ok) {
+      message.error('Department deleted successfully')
       dispatch(fetchDepartments()); 
     } else {
-      alert('Deletion Failed')
-      console.error('Deparment deletion failed:', data);
+      message.error('failed to delete department')
+      console.error('Delete failed:', deleteResponse.statusText);
     }
   } catch (error) {
     console.error('Error:', error);

@@ -79,15 +79,6 @@ const TransactionSummary = ({orgId}) => {
   const trnSumColumn = trnSummaryColumn(handleViewClick, handlePrintClick);
 
   const handleFormValueChange = (field, value) => {
-    // if(field === 'transactionType' || field === "processType"){
-    //   setFormData(prevValues => {
-    //     return {
-    //       ...prevValues,
-    //       [field]: value.value
-    //     }
-    //   })
-    //   return
-    // }
     setFormData((prevValues) => {
       return {
         ...prevValues,
@@ -116,7 +107,7 @@ const TransactionSummary = ({orgId}) => {
         apiHeader("POST", token)
       );
       const { responseData } = data;
-      setFilteredData([...responseData]);
+      setFilteredData([...responseData || []].reverse());
     } catch (error) {
       message.error("Error occured while fetching data. Please try again.");
       console.log("Populate data error.", error);
@@ -131,7 +122,7 @@ const TransactionSummary = ({orgId}) => {
         apiHeader("POST", token)
       );
       const { responseData } = data;
-      setFilteredData([...responseData]);
+      setFilteredData([...responseData || []].reverse());
     } catch (error) {
       message.error("Error occured while fetching data. Please try again.");
       console.log("Populate data error.", error);
@@ -164,7 +155,7 @@ const TransactionSummary = ({orgId}) => {
           apiHeader("POST", token)
         );
         const { responseData } = data;
-        setFilteredData([...responseData]);
+        setFilteredData([...responseData || []].reverse());
       }
       else{
         const { data } = await axios.post(
@@ -173,7 +164,7 @@ const TransactionSummary = ({orgId}) => {
           apiHeader("POST", token)
         );
         const { responseData } = data;
-        setFilteredData([...responseData]);
+        setFilteredData([...responseData || []].reverse());
       }
     } catch (error) {
       message.error("Some error occured. Please try again.");
@@ -194,6 +185,8 @@ const TransactionSummary = ({orgId}) => {
         return acc;
       }, {}),
     }));
+
+    window.location.reload()
   };
 
   const handleTxnTypeClick = () => {
@@ -244,7 +237,7 @@ const TransactionSummary = ({orgId}) => {
           }}
         >
           <div onClick={() => handleItemCdClick()}>
-            <Form.Item label="Item Code" name="itemCode">
+            <Form.Item label="Item Code">
               <Input
                 value={formData.itemCode}
                 onChange={(e) =>
@@ -271,7 +264,7 @@ const TransactionSummary = ({orgId}) => {
             </Form.Item>
           </div>
 
-          <Form.Item label="From Date" name="startDate">
+          <Form.Item label="From Date">
             <DatePicker
               format={dateFormat}
               style={{ width: "100%" }}
@@ -281,7 +274,7 @@ const TransactionSummary = ({orgId}) => {
             />
           </Form.Item>
 
-          <Form.Item label="To Date" name="endDate">
+          <Form.Item label="To Date">
             <DatePicker
               format={dateFormat}
               style={{ width: "100%" }}

@@ -7,12 +7,12 @@ import { useSelector } from 'react-redux'
 const RejNoteTable = ({data, type, itemList}) => {
 
     const {token} = useSelector(state => state.auth);
+    const {uomObj} = useSelector(state => state.uoms)
 
-    const uomData = useSelector(state => state.uoms.data)
-    const locatorData = useSelector(state => state.locators.data)
+if(!uomObj){
+    return <h3>Loading...</h3>
+}
 
-    const uomObj = convertArrayToObject(uomData, "id", "uomName");
-    const locatorObj = convertArrayToObject(locatorData, "id", "locatorDesc")
 
     const itemDetails = [
         {

@@ -1,14 +1,17 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import { apiCall } from '../../utils/Functions';
+import { apiCall, convertArrayToObject } from '../../utils/Functions';
+import { message } from 'antd';
 
 const locatorSlice = createSlice({
     name: "locators",
     initialState: {
-        data: null
+        data: null,
+        locatorObj: null
     },
     reducers: {
         clearLocator(state, action){
             state.data = null
+            state.locatorObj = null
         }
     },
 
@@ -21,6 +24,7 @@ const locatorSlice = createSlice({
           .addCase(fetchLocators.fulfilled, (state, action) => {
             state.loading = false;
             state.data = action.payload
+            state.locatorObj = convertArrayToObject(action.payload, "id", "locatorDesc")
           })
           .addCase(fetchLocators.rejected, (state, action) => {
             state.loading = false;
@@ -40,7 +44,7 @@ export const fetchLocators = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while fetching locator details.", error)
-            alert("Error occured while fetching locator details.")
+            message.error("Error occured while fetching locator details.")
         }
     }
 )
@@ -55,7 +59,7 @@ export const updateLocator = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while updating locator.", error)
-            alert("Error occured while updating locator.")
+            message.error("Error occured while updating locator.")
         }
     }
 )
@@ -69,7 +73,7 @@ export const saveLocator = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while adding locator.", error)
-            alert("Error occured while adding locator.")
+            message.error("Error occured while adding locator.")
         }
     }
 )
@@ -83,7 +87,7 @@ export const deleteLocator = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while deleting locator.", error)
-            alert("Error occured while deleting locator.")
+            message.error("Error occured while deleting locator.")
         }
     }
 )

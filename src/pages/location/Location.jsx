@@ -1,6 +1,6 @@
 // LocationPage.js
-import React, { useState } from "react";
-import { Button, Modal, Input } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Modal, Input, message } from "antd";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
   // fetchLocations,
@@ -24,7 +24,7 @@ const LocationPage = () => {
 
   const getLocation = async (id) => {
     // const itemResponse = await apiRequest(
-    //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/master/getLocationMasterById",
+    //   "/master/getLocationMasterById",
     //   "POST",
     //   {
     //     locationId: id,
@@ -33,10 +33,10 @@ const LocationPage = () => {
     // );
     try{
       const itemResponse = await apiCall("POST", "/master/getLocationMasterById", token, {locationId: id, userId: userCd})
-      return itemResponse.responseData;
+      return itemResponse.responseData || [];
     }catch(error){
       console.log("Error fetching location by id.", error)
-      alert("Error fetching location by id.")
+      message.error("Error fetching location by id.")
     }
   }
 
@@ -79,7 +79,7 @@ const LocationPage = () => {
       setEditingLocation(null); // Reset the editing location
     } catch (error) {
       console.error("Error:", error);
-      alert("Error occured while adding or saving location.")
+      message.error("Error occured while adding or saving location.")
     }
   };
 

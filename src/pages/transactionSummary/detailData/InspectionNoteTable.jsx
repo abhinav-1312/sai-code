@@ -10,14 +10,39 @@ import { useSelector } from "react-redux";
 
 const InspectionNoteTable = ({type, data, itemList}) => {
   const {token} = useSelector(state => state.auth);
+  const [uomObj, setUomObj] = useState({});
+  const [locatorObj, setLocatorObj] = useState({});
 
-  const uomData = useSelector(state => state.uoms.data)
-    const locatorData = useSelector(state => state.locators.data)
+  const fetchUom = async () => {
+    const uomMasterUrl =
+      "/master/getUOMMaster";
+    const locatorMasterUrl =
+      "/master/getLocatorMaster";
 
-    const uomObj = convertArrayToObject(uomData, "id", "uomName");
-    const locatorObj = convertArrayToObject(locatorData, "id", "locatorDesc")
+    try {
+      const [uomMaster, locatorMaster] = await Promise.all([
+        axios.get(uomMasterUrl, apiHeader("GET", token)),
+        axios.get(locatorMasterUrl, apiHeader("GET", token)),
+      ]);
+      const { responseData: uomMasterData } = uomMaster.data;
+      const { responseData: locatorMasterData } = locatorMaster.data;
+      const uomMod = convertArrayToObject(uomMasterData, "id", "uomName");
+      const locatorMod = convertArrayToObject(
+        locatorMasterData,
+        "id",
+        "locatorDesc"
+      );
 
+      setUomObj({ ...uomMod });
+      setLocatorObj({ ...locatorMod });
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
 
+  useEffect(() => {
+    fetchUom();
+  }, []);
   const orgConsignorDetails = [
     {
       title: "Consignor Regional Center Code",

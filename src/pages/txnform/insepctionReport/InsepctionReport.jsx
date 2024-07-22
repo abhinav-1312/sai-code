@@ -16,12 +16,13 @@ import {
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
-import { apiHeader, fetchUomLocatorMaster } from "../../../utils/Functions";
+import { apiHeader } from "../../../utils/Functions";
 import { convertArrayToObject, printOrSaveAsPDF } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
 import FormDatePickerItem from "../../../components/FormDatePickerItem";
 import FormDropdownItem from "../../../components/FormDropdownItem";
 import { useSelector } from "react-redux";
+import Loader from "../../../components/Loader";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Title } = Typography;
@@ -45,6 +46,7 @@ const InsepctionReport = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [uomMaster, setUomMaster] = useState({})
+  console.log("UOMMASTER: ", uomMaster)
   const [locatorMaster, setLocatorMaster] = useState({})
   const [formData, setFormData] = useState({
     genDate: "",
@@ -121,14 +123,13 @@ const InsepctionReport = () => {
         items: updatedItems,
       };
     });
-  };
+  }; 
 
-  const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
+  const { organizationDetails, locationDetails, userDetails, token } = useSelector(state => state.auth)
 
   useEffect(() => {
     fetchItemData();
     fetchUserDetails();
-    fetchUomLocatorMaster(setUomMaster, setLocatorMaster, token)
   }, []);
 
   const fetchItemData = async () => {
@@ -143,20 +144,6 @@ const InsepctionReport = () => {
     }
   };
   const fetchUserDetails = async () => {
-    // try {
-    //   const userCd = localStorage.getItem("userCd")
-    //   const password = localStorage.getItem("password")
-    //   const apiUrl =
-    //     "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
-    //   const response = await axios.post(apiUrl, {
-    //     userCd,
-    //     password,
-    //   });
-
-      // const { responseData } = response.data;
-      // const { organizationDetails } = responseData;
-      // const { userDetails } = responseData;
-      // const {locationDetails} = responseData
       const currentDate = dayjs();
       // Update form data with fetched values
       setFormData({
@@ -186,7 +173,7 @@ const InsepctionReport = () => {
         processId: value,
         processStage: "IGP",
       }, apiHeader("POST", token));
-      const responseData = response.data.responseData;
+      const responseData = response?.data?.responseData || {}; 
       const { processData, itemList } = responseData;
       console.log("API Response:", response.data);
       setFormData((prevFormData) => ({
@@ -215,7 +202,7 @@ const InsepctionReport = () => {
         note: processData?.note,
         termsCondition: processData?.termsCondition,
 
-        items: itemList.map((item) => ({
+        items: itemList?.map((item) => ({
           srNo: item?.sNo,
           itemCode: item?.itemCode,
           itemDesc: item?.itemDesc,
@@ -238,6 +225,18 @@ const InsepctionReport = () => {
   console.log("FOrmdata item: ", formData.items)
 
   const onFinish = async (values) => {
+    if(formData.processType === "PO"){
+      if(!formData.genName || !formData.approvedName){
+        message.error("Please fill all the fields.")
+        return
+      }
+    }
+    else{
+      if(!formData.issueName || !formData.genName){
+        message.error("Please fill all the fields.")
+        return
+      }
+    }
     try {
       const formDataCopy = { ...formData };
 
@@ -336,8 +335,13 @@ const InsepctionReport = () => {
       return {...prevValues, items: updatedItems1}
     })
   }
+  const { uomObj } = useSelector((state) => state.uoms);
 
-  console.log("Form data: ", formData)
+  if(!uomObj){
+    return (
+      <Loader />
+    )
+  }
 
   return (
     <div className="goods-receive-note-form-container" ref={formRef}> 
@@ -428,7 +432,7 @@ const InsepctionReport = () => {
                       <FormInputItem label="Serial No. :" value={item.srNo} readOnly={true}/>
                       <FormInputItem label="ITEM CODE :" value={item.itemCode} readOnly={true}/>
                       <FormInputItem label="ITEM DESCRIPTION :" value={item.itemDesc} readOnly={true}/>
-                      <FormInputItem label="UOM :" value={uomMaster[parseInt(item.uom)]} readOnly={true}/>
+                      <FormInputItem label="UOM :" value={uomObj[parseInt(item.uom)]} readOnly={true}/>
                       {/* <FormInputItem label="RECIEVED QUANTITY :" name="quantity" value={formData.items[key].quantity} onChange={(fieldName, value) => itemHandleChange("quantity", value, key)} />
                       <FormInputItem label="BUDGET HEAD PROCUREMENT :" name="budgetHeadProcurement" value={item.budgetHeadProcurement} onChange={(fieldName, value) => itemHandleChange("budgetHeadProcurement", value, key)}/> */}
 
@@ -450,7 +454,7 @@ const InsepctionReport = () => {
                         </Form.Item> */}
 
                         <Form.Item label="RECEIVED QUANTITY">
-                          <Input value={item.quantity} onChange={(e)=>itemHandleChange("quantity", e.target.value, key)} />
+                          <Input value={item.quantity} onChange={(e)=>itemHandleChange("quantity", e.target.value, key)} readOnly/>
                         </Form.Item>
 
                         {/* <Form.Item label="BUDGET HEAD PROCUREMENT">

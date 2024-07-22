@@ -1,14 +1,18 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import { apiCall } from '../../utils/Functions';
+import { BASE_URL } from '../../utils/BaseUrl';
+import { apiCall, convertArrayToObject } from '../../utils/Functions';
+import { message } from 'antd';
 
 const uomSlice = createSlice({
     name: "uoms",
     initialState: {
-        data: null
+        data: null,
+        uomObj: null
     },
     reducers: {
         clearUom(state, action){
             state.data = null
+            state.uomObj = null
         }
     },
 
@@ -21,6 +25,7 @@ const uomSlice = createSlice({
           .addCase(fetchUoms.fulfilled, (state, action) => {
             state.loading = false;
             state.data = action.payload
+            state.uomObj = convertArrayToObject(action.payload, "id", "uomName")
           })
           .addCase(fetchUoms.rejected, (state, action) => {
             state.loading = false;
@@ -40,7 +45,7 @@ export const fetchUoms = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while fetching UOM details.", error)
-            alert("Error occured while fetching UOM details.")
+            message.error("Error occured while fetching UOM details.")
         }
     }
 )
@@ -55,7 +60,7 @@ export const updateUom = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while updating UOM.", error)
-            alert("Error occured while updating UOM.")
+            message.error("Error occured while updating UOM.")
         }
     }
 )
@@ -69,7 +74,7 @@ export const saveUom = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while adding UOM.", error)
-            alert("Error occured while adding UOM.")
+            message.error("Error occured while adding UOM.")
         }
     }
 )
@@ -83,7 +88,7 @@ export const deleteUom = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while deleting UOM.", error)
-            alert("Error occured while deleting UOM.")
+            message.error("Error occured while deleting UOM.")
         }
     }
 )

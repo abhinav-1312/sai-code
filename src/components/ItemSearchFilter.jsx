@@ -7,17 +7,22 @@ import { useSelector } from "react-redux";
 const { Search } = Input;
 
 const ItemSearchFilter = () => {
-  // const [data, setData] = useState([]);
-  // const [filteredData, setFilteredData] = useState([]);
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const {token} = useSelector(state => state.auth)
 
-  const {data} = useSelector(state => state.items)
-  const filteredData = data
-
   useEffect(() => {
     // Fetch data from the API
-    // populateItemData()
+    fetch(
+      "/master/getItemMaster", apiHeader("GET", token)
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setData(data.responseData);
+        setFilteredData(data.responseData); // Initially set filtered data to all data
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const handleSearch = (value) => {
@@ -121,7 +126,7 @@ const ItemSearchFilter = () => {
         }
         title="Filtered Item Data"
         trigger="click"
-        visible={searchValue !== "" && filteredData.length > 0}
+        open={searchValue !== "" && filteredData.length > 0}
         style={{ width: "200px" }}
         placement="right"
       >

@@ -15,9 +15,11 @@ import {
 import { MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
-import { apiCall, apiHeader, convertEpochToDateString, fetchUomLocatorMaster, printOrSaveAsPDF } from "../../../utils/Functions";
+import { apiCall, apiHeader, convertEpochToDateString, printOrSaveAsPDF } from "../../../utils/Functions";
 import FormInputItem from "../../../components/FormInputItem";
 import { useSelector } from "react-redux";
+import { BASE_URL } from "../../../utils/BaseUrl";
+import Loader from "../../../components/Loader";
 const dateFormat = "DD/MM/YYYY";
 const { Option } = Select;
 const { Title } = Typography;
@@ -110,7 +112,6 @@ const AcceptanceNote = () => {
   const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
 
   useEffect(() => {
-    fetchUomLocatorMaster(setUomMaster, setLocatorMaster, token)
     fetchUserDetails();
   }, []);
 
@@ -120,7 +121,7 @@ const AcceptanceNote = () => {
       // const userCd = localStorage.getItem("userCd")
       // const password = localStorage.getItem("password")
       // const apiUrl =
-      //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+      //   "/login/authenticate";
       // const response = await axios.post(apiUrl, {
       //   userCd,
       //   password,
@@ -146,10 +147,12 @@ const AcceptanceNote = () => {
     // }
   };
 
+  const { uomObj } = useSelector((state) => state.uoms);
+
   const handleInspectionNOChange = async (value) => {
     try {
       // const apiUrl =
-      //   "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/getSubProcessDtls";
+      //   "/getSubProcessDtls";
       // const response = await axios.post(apiUrl, {
       //   processId: value,
       //   processStage: "IRN",
@@ -268,8 +271,10 @@ const AcceptanceNote = () => {
         }
       });
 
+      const apiUrl =
+      "/saveAcceptanceNote";
       // const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
-      const data = await apiCall("POST", '/saveAcceptanceNote', token, formDataCopy)
+      const data = await apiCall("POST", `/saveAcceptanceNote`, token, formDataCopy)
       const {responseData} = data
       if (
         data.responseStatus &&
@@ -307,6 +312,12 @@ const AcceptanceNote = () => {
   const handleValuesChange = (_, allValues) => {
     setType(allValues.type);
   };
+
+  if(!uomObj){
+    return (
+      <Loader />
+    )
+  }
 
   return (
     <div className="goods-receive-note-form-container" ref={formRef}>
@@ -492,7 +503,7 @@ const AcceptanceNote = () => {
                     <FormInputItem
                       label="UOM :"
                       key={key}
-                      value={uomMaster[parseInt(item.uom)]}
+                      value={uomObj[item?.uom]}
                     />
 
                     {Type !== "PO" && Type !== "IOP" && (

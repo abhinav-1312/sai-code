@@ -92,7 +92,7 @@ const menuItems = [
     label: "PURCHASE ORDER PROCESS",
     path: "/transaction",
     children: [
-      { key: "8.2", label: "Demand", path: "/trans/demand" },
+      // { key: "8.2", label: "Demand", path: "/trans/demand" },
       { key: "8.6", label: "Inward Gate Pass", path: "/trans/inward" },
       { key: "8.8", label: "MIS", path: "/trans/inspection" },
       { key: "8.11", label: "Inspection Note", path: "/trans/inspectionNote" },
@@ -194,7 +194,7 @@ const SideNav = () => {
         return (
           item.key !== "2" &&
           item.key !== "25" &&
-          item.key !== "1" &&
+          // item.key !== "1" &&
           item.key !== "14" &&
           item.key !== "15" &&
           item.key !== "25" &&

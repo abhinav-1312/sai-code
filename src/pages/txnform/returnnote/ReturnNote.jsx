@@ -156,7 +156,7 @@ const RetunNote = () => {
     //   const userCd = localStorage.getItem("userCd")
     //   const password = localStorage.getItem("password")
     //   const apiUrl =
-    //     "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+    //     "/login/authenticate";
     //   const response = await axios.post(apiUrl, {
     //     userCd,
     //     password,
@@ -275,6 +275,10 @@ const RetunNote = () => {
   };
 
   const onFinish = async (values) => {
+    if(!formData.genName || !formData.approvedName){
+      message.error("Please fill all the fields.")
+      return
+    }
     try {
       const formDataCopy = { ...formData };
 

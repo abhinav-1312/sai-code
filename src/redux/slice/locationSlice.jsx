@@ -1,14 +1,18 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import { apiCall } from '../../utils/Functions';
+import { BASE_URL } from '../../utils/BaseUrl';
+import { apiCall, convertArrayToObject } from '../../utils/Functions';
+import { message } from 'antd';
 
 const locationSlice = createSlice({
     name: "locations",
     initialState: {
-        data: null
+        data: null,
+        locationObj: null
     },
     reducers: {
         clearLocation(state, action){
             state.data = null
+            state.locationObj = null
         }
     },
 
@@ -21,6 +25,7 @@ const locationSlice = createSlice({
           .addCase(fetchLocations.fulfilled, (state, action) => {
             state.loading = false;
             state.data = action.payload
+            state.locationObj = convertArrayToObject(action.payload, "id", "locationName")
           })
           .addCase(fetchLocations.rejected, (state, action) => {
             state.loading = false;
@@ -40,7 +45,7 @@ export const fetchLocations = createAsyncThunk(
         }
         catch(error){
             console.log("Error occured while fetching location details.", error)
-            alert("Error occured while fetching location details.")
+            message.error("Error occured while fetching location details.")
         }
     }
 )
@@ -51,12 +56,12 @@ export const updateLocation = createAsyncThunk(
         try{
             const {token} = getState().auth
             await apiCall("POST", `/master/updateLocationMaster`, token, {locationId, ...values})
-            alert("Location updated succesfully.")
+            message.error("Location updated succesfully.")
             
         }
         catch(error){
             console.log("Error occured while updating location.", error)
-            alert("Error occured while updating location.")
+            message.error("Error occured while updating location.")
         }
     }
 )
@@ -66,12 +71,12 @@ export const saveLocation = createAsyncThunk(
         try{
             const {token} = getState().auth
             await apiCall("POST", `/master/saveLocationMaster`, token, {...values})
-            alert("Location saved succesfully.")
+            message.error("Location saved succesfully.")
             
         }
         catch(error){
             console.log("Error occured while adding location.", error)
-            alert("Error occured while adding location.")
+            message.error("Error occured while adding location.")
         }
     }
 )
@@ -81,11 +86,11 @@ export const deleteLocation = createAsyncThunk(
         try{
             const {token} = getState().auth
             await apiCall("POST", `/master/deleteLocationMaster`, token, {...formData})
-            alert("Location deleted succesfully.")
+            message.error("Location deleted succesfully.")
         }
         catch(error){
             console.log("Error occured while deleting location.", error)
-            alert("Error occured while deleting location.")
+            message.error("Error occured while deleting location.")
         }
     }
 )

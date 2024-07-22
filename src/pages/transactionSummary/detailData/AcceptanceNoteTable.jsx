@@ -6,10 +6,32 @@ import axios from 'axios'
 import { useSelector } from 'react-redux'
 
 const AcceptanceNoteTable = ({type, data, itemList}) => {
-    // const [uomObj, setUomObj] = useState({})
-    const uomData = useSelector(state => state.uoms.data)
-    const uomObj = convertArrayToObject(uomData, "id", "uomName")
+    const {token} = useSelector(state => state.auth);
+    const [uomObj, setUomObj] = useState({})
 
+    const fetchUom = async () => {
+        // console.log("Fetch uom called")
+        const uomMasterUrl =
+            "/master/getUOMMaster";
+    
+        try{
+            const {data} = await axios.get(uomMasterUrl, apiHeader("GET", token))
+            const {responseData} = data
+            // console.log("Response data: ", responseData)
+            
+            const uomMod =  convertArrayToObject(responseData, "id", "uomName")
+
+            setUomObj({...uomMod})
+    
+        }
+        catch(error){
+            console.log("Error")
+        }
+    }
+
+    useEffect(()=>{
+        fetchUom()
+    }, [])
     const orgConsignorDetails = [
         {
             title: "Consignor Regional Center Code",

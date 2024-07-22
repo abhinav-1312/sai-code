@@ -85,7 +85,7 @@ const ItemsForm = ({
             },
             apiHeader("POST", token)
           );
-          const data = response.data.responseData;
+          const data = response?.data?.responseData || [];
           // Assuming the response contains an array of subcategory options
           const subcategoryOptions = data.map((subcategory) => ({
             key: subcategory.subCategoryCode,
@@ -113,7 +113,7 @@ const ItemsForm = ({
             },
             apiHeader("POST", token)
           );
-          const data = response.data.responseData;
+          const data = response?.data?.responseData || [];
           const typeOptions = data.map((type) => ({
             key: type.typeCode,
             value: type.typeDesc,
@@ -141,7 +141,7 @@ const ItemsForm = ({
             },
             apiHeader("POST", token)
           );
-          const data = response.data.responseData;
+          const data = response?.data?.responseData || [];
           const disciplineOptions = data.map((discipline) => ({
             key: discipline.disciplineCode,
             value: discipline.disciplineName,
@@ -170,7 +170,7 @@ const ItemsForm = ({
             },
             apiHeader("POST", token)
           );
-          const data = response.data.responseData;
+          const data = response?.data?.responseData || [];
           const itemDescriptionOptions = data.map((itemDescription) => ({
             value: itemDescription.itemName,
             key: itemDescription.itemNameCode,
@@ -205,7 +205,16 @@ const ItemsForm = ({
         const itemMasterDesc = combinedCodeAndDesc[1];
         values = { ...values, itemName, itemMasterDesc };
       }
+      // console.log("VAlues after: ", values)
       onSubmit(values);
+    // }
+    // else{
+    //   values = {...values, itemMasterCd: null, itemMasterDesc: itemMasterDescCopy[0]}
+    //   onSubmit(values)
+    // }
+    // console.log("ITemmaster desc: ", values.itemMasterDesc)
+    // console.log("Values: ", values);
+    // form.resetFields();
   };
 
   // const handleInputChange = (value) => {

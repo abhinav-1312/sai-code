@@ -1,3 +1,14 @@
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5{
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -7,11 +18,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-*{
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
+
+
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -33,4 +41,348 @@ code {
 
 .ant-radio-button-wrapper-checked {
   color: red !important;
+}
+
+/* @media print { */
+  /* header { */
+    /* display: none !important;
+  }
+
+  aside {
+    display: none !important;
+  }
+
+  nav {
+    display: none !important;
+  } */
+
+  /* #formContainer {
+    transform : scaleY(0.2); 
+    margin: 0;
+    position: absolute !important;
+    top: -26rem !important  */
+    /* transform : scaleY(0.7); */
+    /* position : static; */
+    /* transform : none; */
+    /* max-width: 100%; */
+    /* margin-top : -12rem; */
+
+    /* Set dimensions to match A4 paper size */
+  /* width: 250mm; */
+  /* height: 297mm; */
+
+  /* Scale the div to fit within A4 dimensions */
+  /* transform-origin: top left;  Set the origin of the scaling */
+  /* transform: scale(0.7);  Adjust scale as needed */
+
+
+   /* }
+  .formInsideContainer {  */
+    
+      /* Scale the div to fit within A4 dimensions */
+     /* transform-origin: top left;  Set the origin of the scaling */
+      /*transform: scale(0.7); Adjust scale as needed */
+      /* page-break-inside: avoid; */
+ /* }  */
+/* } */
+
+.ant-form-item{
+  margin: 0 !important;
+}
+
+
+.a4-container {
+  margin: auto;
+  width: 100%;
+  max-width: 210mm; /* Maximum width to match the A4 width */
+  aspect-ratio: 210 / 297; /* Aspect ratio of A4 */
+  background: #e4f2f2;
+  border: 1px solid #ccc;
+  padding: 1.5rem;
+  transform: scaleX(1.2);
+}
+
+.a4-heading{
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.consignor-consignee-container{
+  /* padding: 1rem 0; */
+}
+
+.grid-2{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1rem 4rem;
+}
+
+.each-item-detail-container{
+  border: 1px solid black;
+  padding: 1rem;
+  position: relative;
+}
+
+.each-item-detail-container-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+.delete-button{
+  position: absolute;
+  top: 0;
+  right: 0
+}
+
+.terms-condition-container{
+  /* padding: 1rem 0; */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0 1rem;
+}
+
+.designations-container{
+  /* display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 4rem; */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.each-desg{
+  max-width: 11rem;
+  flex: 1 1 200px; 
+}
+
+.item-details-container{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem
+}
+
+.button-container{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+.each-desg{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem
+}
+
+@media print {
+  .a4-container{
+    transform: scaleX(1);
+  }
+  .button-container{
+    display: none;
+  }
+}
+
+.a4-subheading-container{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.heading-container{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.consignor-consignee-heading{
+  font-weight: bold;
+  color: #003566;
+}
+
+.consignor-container, .consignee-container, .other-container{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem
+}
+
+.other-details-2cols{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(1rem, 1fr));
+  gap: 0rem;
+}
+
+.dashboard-tabs{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(1rem, 1fr));
+  gap: 1rem;
+}
+
+.each-tab{
+  font-size: 1.2rem;
+  height: max-content;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.tab-fieldName{
+  font-weight: 500;
+}
+
+.tab-value{
+  font-weight: bold;
+}
+
+.slab-content{
+  background-color: #efefef;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filter-container{
+  border: 1px solid;
+  padding: .5rem;
+  border-radius: 5px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+#tab1{
+  background-color: #1ABC9C;
+}
+#tab2{
+  background-color: #2ECC71;
+}
+#tab3{
+  background-color:#3498DB;
+}
+#tab4{
+  background-color: #9B59B6;
+}
+
+.each-tab{
+  transition: all 0.2s ease-in;
+  position: relative;
+  color: white;
+}
+
+.active-slab{
+  transition: all 0.2 ease-in;
+  transform: scale(1.05) !important;
+  /* box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; */
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+}
+
+.each-tab:hover{
+  color: white !important;
+}
+
+.each-tab::after{
+  position: absolute;
+  content: "";
+  /* background-color: lightgray; */
+  width: 0;
+  height: 5px;
+  bottom: 0;
+  left: 0;
+  transition: width 0.3s ease; /* Transition width */
+}
+
+.each-tab.active-slab::after{
+  position: absolute;
+  background-color: rgb(85, 0, 255); 
+  content: "";
+  width: 100%;
+  left: 0;
+  height: 5px;
+  bottom: 0;
+}
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8); /* Adjust opacity (0.8) for translucency */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Ensure loader appears on top of other content */
+}
+
+.table-header-div{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-header-button{
+  border: 0;
+  padding: 0;
+  background-color: inherit;
+  transform: scale(2) rotateZ(0deg);
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+}
+
+.rotate-icon{
+  transform: scale(2) rotateZ(180deg) !important;
+}
+
+.ant-dropdown-trigger{
+  transform: scale(1.5);
+  color: white !important
+}
+
+.ant-dropdown-trigger > svg{
+  transform: scale(1.2);
+}
+
+.ant-dropdown-trigger.active, .ant-dropdown-trigger.active>*{
+  color:#E74C3C !important
+}
+
+.ant-table-column-sorter{
+  color: white !important;
+  margin: 0 0.5rem;
+  transform: scale(1.5);
+}
+
+.pur-sum{
+  display: flex;
+  gap: 1rem;
+  justify-content:flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pur-sum > * {
+  width: calc(25% - 20px); /* Adjust width as needed */
+  margin: 10px; /* Adjust margin between items */
+  word-wrap: break-word;
+}
+
+.sec-slab{
+  padding: 1rem;
+  border: 2px solid;
+  font-size: 1rem;
+  font-weight: bold;
+  /* width: max-content; */
+  margin: 1rem 0;
+  border-radius: 5px;
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }

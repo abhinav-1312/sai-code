@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiCall } from "../../utils/Functions";
+import { BASE_URL } from "../../utils/BaseUrl";
+import { message } from "antd";
 
 const itemSlice = createSlice({
     name: "item",
@@ -38,7 +40,7 @@ export const fetchItemData = createAsyncThunk(
             return responseData
         }catch(error){
             console.log("Error occured while fetching item data.", error)
-            alert("Error occured while fetching item data.")
+            message.error("Error occured while fetching item data.")
         }
     }
 )

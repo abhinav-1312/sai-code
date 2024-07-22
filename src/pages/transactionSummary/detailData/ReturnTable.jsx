@@ -6,13 +6,8 @@ import { useSelector } from 'react-redux'
 
 const ReturnTable = ({data, itemList}) => {
 
-    const {token} = useSelector(state => state.auth);
 
-    const uomData = useSelector(state => state.uoms.data)
-    const locatorData = useSelector(state => state.locators.data)
-
-    const uomObj = convertArrayToObject(uomData, "id", "uomName");
-    const locatorObj = convertArrayToObject(locatorData, "id", "locatorDesc")
+    const {uomObj} = useSelector(state => state.uoms)
     
  const orgConsignorDetails = [
     {
@@ -133,7 +128,7 @@ const itemDetails = [
         },
         {
             title: "Consignor Zipcode",
-            dataIndex: "approvedDate"
+            dataIndex: "zipcode"
         },
         ...consumerDetails
 

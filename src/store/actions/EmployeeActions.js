@@ -1,4 +1,5 @@
-import axios from "axios";
+import { message } from "antd";
+import { BASE_URL } from "../../utils/BaseUrl";
 import { apiHeader } from "../../utils/Functions";
 
 const token = localStorage.getItem("token")
@@ -10,9 +11,10 @@ export const setEmployees = (employees) => ({
 
 export const fetchEmployees = () => async (dispatch) => {
   try {
-    const {data} = await axios.get("/master/getEmpMaster", apiHeader("GET", token));
-    const {responseData} = data
-    dispatch(setEmployees(responseData));
+    const response = await fetch(`/getEmpMaster`, apiHeader("GET", token));
+    const data = await response.json();
+
+    dispatch(setEmployees(data.responseData));
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -20,14 +22,24 @@ export const fetchEmployees = () => async (dispatch) => {
 
 export const updateEmployee = (employeeId, values) => async (dispatch) => {
   try {
-    const {data} = await axios.post("/master/updateEmpMaster", {...values, employeeId}, apiHeader("POST", token))
-    const {responseStatus} = data
-    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
-      alert('Employee updated successfully')
+    const updateResponse = await fetch(`/updateEmpMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        employeeId,
+        ...values,
+      }),
+    });
+
+    if (updateResponse.ok) {
+      message.error('Employee updated successfully')
       dispatch(fetchEmployees()); 
     } else {
-      alert('Update Failed')
-      console.error('Update failed:', data);
+      message.error('Update Failed')
+      console.error('Update failed:', updateResponse.statusText);
     }
   } catch (error) {
     console.error('Error:', error);
@@ -36,16 +48,23 @@ export const updateEmployee = (employeeId, values) => async (dispatch) => {
 
 export const saveEmployee = (values) => async (dispatch) => {
   try {
-    const {data} = await axios.post("/master/saveEmpMaster", {...values}, apiHeader("POST", token))
+    const createResponse = await fetch(`/saveEmpMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${token}`
+      },
+      body: JSON.stringify(values),
+    });
 
-    const {responseStatus} = data
-    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
-      alert("Employee Added successfully")
-      dispatch(fetchEmployees()); 
-    } else {
-      alert("something went wrong")
-      console.error('Create failed:', data);
-    }
+    console.log("Created response: ", createResponse)
+    // if (createResponse.ok) {
+    //   message.error("Employee Added successfully")
+    //   dispatch(fetchEmployees()); 
+    // } else {
+    //   message.error("something went wrong")
+    //   console.error('Create failed:', createResponse.statusText);
+    // }
   } catch (error) {
     alert("something went wrong. Please try again.")
     console.error('Error:', error);
@@ -56,15 +75,24 @@ const userCd = localStorage.getItem("userCd")
 
 export const deleteEmployee = (employeeId) => async (dispatch) => {
   try {
-    const {data} = await axios.post("/master/deleteEmpMaster", {usrId: userCd, employeeId},  apiHeader("POST", token))
+    const deleteResponse = await fetch(`/deleteEmpMaster`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        userId: 'string', 
+        id: employeeId,
+      }),
+    });
 
-    const {responseStatus} = data
-    if (responseStatus.statusCode === 200 && responseStatus.message === "Success") {
-      alert("Employee deleted successfully")
+    if (deleteResponse.ok) {
+      message.error("Employee deleted successfully")
       dispatch(fetchEmployees());
     } else {
-      alert("Failed to delete employee")
-      console.error('Delete failed:', data);
+      message.error("Failed to delete employee")
+      console.error('Delete failed:', deleteResponse.statusText);
     }
   } catch (error) {
     console.error('Error:', error);

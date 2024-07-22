@@ -139,7 +139,7 @@ const InspectionNote = () => {
     //   // const userCd = localStorage.getItem("userCd")
     //   // const password = localStorage.getItem("password")
     //   const apiUrl =
-    //     "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+    //     "/login/authenticate";
     //   const response = await axios.post(apiUrl, {
     //     userCd,
     //     password,
@@ -427,8 +427,8 @@ const InspectionNote = () => {
             <FormInputItem label = "CHALLAN / INVOICE NO. :" value={formData.challanNo} readOnly={true} />
             <FormInputItem label = "MODE OF DELIVERY :" value={formData.modeOfDelivery} readOnly={true} />
             <FormInputItem label = "DATE OF DELIVERY :" value={formData.dateOfDeliveryDate} readOnly={true} />
-            <FormDatePickerItem label="DATE OF INSPECTION :" name="dateOfInspectionDate" onChange={handleChange} />
-            <FormInputItem label="TYPE OF INSPECTION :" name="typeOfInspection" onChange={handleChange} />
+            <FormDatePickerItem label="DATE OF INSPECTION :" name="dateOfInspectionDate" onChange={handleChange} value={formData.dateOfInspectionDate} />
+            <FormInputItem label="TYPE OF INSPECTION :" name="typeOfInspection" onChange={handleChange} value={formData.typeOfInspection}/>
           </Col>
         </Row>
 

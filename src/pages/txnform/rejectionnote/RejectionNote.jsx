@@ -32,8 +32,8 @@ const RejectionNote = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [itemData, setItemData] = useState([]);
-  const [uomMaster, setUomMaster] = useState({})
-  const [locatorMaster, setLocatorMaster] = useState({})
+  const {uomObj: uomMaster} = useSelector(state => state.uoms)
+  const {locatorObj: locatorMaster} = useSelector(state => state.locators)
   const [formData, setFormData] = useState({
     genDate: "",
     genName: "",
@@ -114,7 +114,6 @@ const RejectionNote = () => {
   };
   const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
   useEffect(() => {
-    fetchUomLocatorMaster(setUomMaster, setLocatorMaster, token);
     fetchItemData();
     fetchUserDetails();
   }, []);
@@ -136,7 +135,7 @@ const RejectionNote = () => {
     //   const userCd = localStorage.getItem("userCd")
     //   const password = localStorage.getItem("password")
     //   const apiUrl =
-    //     "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt/login/authenticate";
+    //     "/login/authenticate";
     //   const response = await axios.post(apiUrl, {
     //     userCd,
     //     password,
@@ -326,6 +325,12 @@ const RejectionNote = () => {
       };
     });
   };
+
+  if(!uomMaster || !locatorMaster){
+    return (
+      <h3>Loading. Please wait...</h3>
+    )
+  }
 
 
   return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Table } from "antd";
+import { Input, message, Table } from "antd";
 import axios from "axios";
 import { apiHeader, convertToCurrency, handleSearch, renderLocatorOHQ } from "../../utils/Functions";
 import { useSelector } from "react-redux";
@@ -20,12 +20,12 @@ const Ohq = ({orgId, organization}) => {
         apiHeader("POST", token)
       ); // sending itemCode 'null' gives all available data
       const { responseData } = data;
-      setItemData([...responseData]);
-      setFilteredData([...responseData]);
+      setItemData([...responseData] || []);
+      setFilteredData([...responseData] || []);
 
       // calculate total value
       let sum = 0
-      responseData.forEach(item => {
+      responseData?.forEach(item => {
         item.qtyList.forEach(loc => {
           sum = sum + loc.totalValues
         })
@@ -34,7 +34,7 @@ const Ohq = ({orgId, organization}) => {
       setTotVal(convertToCurrency(sum))
     }catch(error){
       console.log("Error", error)
-      alert("Error occured while fetching data. Please try again.")
+      message.error("Error occured while fetching data. Please try again.")
     }
   };
 
@@ -47,12 +47,12 @@ const Ohq = ({orgId, organization}) => {
         apiHeader("POST", token)
       ); // sending itemCode 'null' gives all available data
       const { responseData } = data;
-      setItemData([...responseData]);
-      setFilteredData([...responseData]);
+      setItemData([...responseData] || []);
+      setFilteredData([...responseData] || []);
 
       // calculate total value
       let sum = 0
-      responseData.forEach(item => {
+      responseData?.forEach(item => {
         item.qtyList.forEach(loc => {
           sum = sum + loc.totalValues
         })
@@ -62,7 +62,7 @@ const Ohq = ({orgId, organization}) => {
     }
     catch(error){
       console.log("Error", error)
-      alert("Error occured while fetching data. Please try again.")
+      message.error("Error occured while fetching data. Please try again.")
     }
   };
 
@@ -78,8 +78,9 @@ const Ohq = ({orgId, organization}) => {
       const { responseData } = data;
       const newArray = []
 
-      responseData.forEach(item=>{
-        item.qtyList.forEach(obj=>{
+      // const modData = []
+      responseData?.map(item=>{
+        item.qtyList.map(obj=>{
           const objFound = newArray.find(tempItem => tempItem.locationId === obj.locationId && tempItem.itemCode === item.itemCode)
 
           if(objFound){
@@ -107,7 +108,7 @@ const Ohq = ({orgId, organization}) => {
 
       // calculate total value
       let sum = 0
-      responseData.forEach(item => {
+      responseData?.forEach(item => {
         item.qtyList.forEach(loc => {
           sum = sum + loc.totalValues
         })
@@ -117,7 +118,7 @@ const Ohq = ({orgId, organization}) => {
     }
     catch(error){
       console.log("Error", error)
-      alert("Error occured while fetching data. Please try again.")
+      message.error("Error occured while fetching data. Please try again.")
     }
   }
 

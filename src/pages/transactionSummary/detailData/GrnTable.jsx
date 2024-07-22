@@ -7,16 +7,41 @@ import { useSelector } from 'react-redux'
 
 const GrnTable = ({type, data, itemList}) => {
     const {token} = useSelector(state => state.auth);
-    // const [uomObj, setUomObj] = useState({})
-    // const [locatorObj, setLocatorObj] = useState({})
+    const [uomObj, setUomObj] = useState({})
+    const [locatorObj, setLocatorObj] = useState({})
 
-    const uomData = useSelector(state => state.uoms.data)
-    const uomObj = convertArrayToObject(uomData, "id", "uomName")
+    const fetchUom = async () => {
+        // console.log("Fetch uom called")
+        const uomMasterUrl = "/master/getUOMMaster";
+        const locatorMasterUrl = "/master/getLocatorMaster";
+    
+        try{
+            // const {data}= await axios.get(uomMasterUrl, apiHeader("GET", token))
+            // const {responseData} = data
+            // console.log("Response data: ", responseData)
+            
+            // const uomMod =  convertArrayToObject(responseData, "id", "uomName")
 
+            // setUomObj({...uomMod})
 
-    const locatorData = useSelector(state => state.locators.data)
-    const locatorObj = convertArrayToObject(locatorData, "id", "locatorDesc")
+            const [uomMaster, locatorMaster] = await Promise.all([axios.get(uomMasterUrl, apiHeader("GET", token)), axios.get(locatorMasterUrl, apiHeader("GET", token))]);
+            const { responseData: uomMasterData } = uomMaster.data;
+            const { responseData: locatorMasterData } = locatorMaster.data;
+            const uomMod = convertArrayToObject(uomMasterData, "id", "uomName");
+            const locatorMod = convertArrayToObject(locatorMasterData, "id", "locatorDesc")
 
+            setUomObj({...uomMod})
+            setLocatorObj({...locatorMod})
+    
+        }
+        catch(error){
+            console.log("Error")
+        }
+    }
+
+    useEffect(()=>{
+        fetchUom()
+    }, [])
     const orgConsignorDetails = [
         {
             title: "Consignor Regional Center Code",
@@ -189,7 +214,7 @@ const GrnTable = ({type, data, itemList}) => {
         }
     ]
   return (
-    <DetailData dataColumn={type === "PO" ? [...dataColumn,...poExtraColumns, ] :(type === "IRP" ? [...dataColumn, ...consumerDetails, ...irpExtraColumn, ...orgConsignorDetails] : [...dataColumn, ...orgConsignorDetails, ...orgConsigneeDetails] )} itemListColumn={itemListColumn} data={data} itemList={itemList}/>
+    <DetailData dataColumn={type === "PO" ? [...dataColumn,...poExtraColumns, ] :(type === "IRP" ? [...dataColumn, ...consumerDetails, ...irpExtraColumn, ...orgConsignorDetails] : [...dataColumn, ...orgConsignorDetails, ...orgConsigneeDetails] )} itemListColumn={type === "PO" ? [...itemListColumn, {title: "Unit Price", dataIndex: "unitPrice"}] : {itemListColumn}} data={data} itemList={itemList}/>
   )
 }
 

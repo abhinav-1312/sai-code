@@ -214,14 +214,6 @@ const GoodsReceiveNoteForm = () => {
     try {
       const subProcessDtlUrl =
         "/getSubProcessDtls";
-      const ohqUrl =
-        "/master/getOHQ";
-
-
-      // const {data} = await axios.post(subProcessDtlUrl, {
-      //   processId: value,
-      //   processStage: Type==="IRP" ? "RN" : "ACT",
-      // }, apiHeader("POST", token));
 
       const data = await apiCall("POST", subProcessDtlUrl, token, {processId: value, processStage: Type === "IRP" ? "RN" : "ACT"})
 
@@ -271,7 +263,7 @@ const GoodsReceiveNoteForm = () => {
           conditionOfGoods: item?.conditionOfGoods,
           budgetHeadProcurement: item?.budgetHeadProcurement,
           locatorId: parseInt(item?.locatorId),
-          unitPrice: itemData.find(obj => obj.itemMasterCd === item.itemCode)?.price || null,
+          unitPrice: itemData.find(obj => obj.itemMasterCd === item.itemCode)?.price || 0,
           qtyList: [
             {
               locatorId: parseInt(item?.locatorId),
@@ -286,6 +278,7 @@ const GoodsReceiveNoteForm = () => {
     }
   };
 
+  console.log("Formdata: ", formData)
 
   console.log("Set form data: ", formData)
 
@@ -362,6 +355,10 @@ const GoodsReceiveNoteForm = () => {
   }
 
   const onFinish = async (values) => {
+    if(!formData.issueName || !formData.genName){
+      message.error("Please fill all the fields.")
+      return
+    }
     let found = false
     const tempFormData = deepClone(formData)
     tempFormData.items?.forEach(item=>{
@@ -429,6 +426,7 @@ const GoodsReceiveNoteForm = () => {
         "conditionOfGoods",
         "note",
         "items",
+        "unitPrice"
       ];
 
       allFields.forEach((field) => {
@@ -439,16 +437,13 @@ const GoodsReceiveNoteForm = () => {
 
       const apiUrl =
         "/saveGRN";
-      const response = await axios.post(apiUrl, formDataCopy, apiHeader("POST", token));
+      const {responseStatus, responseData} = await apiCall("POST", apiUrl, token, formDataCopy)
       if (
-        response.status === 200 &&
-        response.data &&
-        response.data.responseStatus &&
-        response.data.responseStatus.message === "Success"
+        responseStatus.statusCode === 200 &&
+        responseStatus.message === "Success"
       ) {
         // Access the specific success message data if available
-        const { processId, processType, subProcessId } =
-          response.data.responseData;
+        const { processId, processType, subProcessId } = responseData;
         setFormData((prevValues) => {
           return {
             ...prevValues,
@@ -572,6 +567,12 @@ const GoodsReceiveNoteForm = () => {
     setSelectedOption(value);
     console.log("VSEECT VALUE: ", value)
   };
+
+  if(!itemData) {
+    return (
+      <h2>Loading please wait ...</h2>
+    )
+  }
 
   return (
     <div className="goods-receive-note-form-container" ref={formRef}>
@@ -821,6 +822,11 @@ const GoodsReceiveNoteForm = () => {
                       {/* <Form.Item label="BUDGET HEAD PROCUREMENT">
                         <Input value={item.budgetHeadProcurement} readOnly />
                       </Form.Item> */}
+                      {
+                        formData.processType === "PO" && (
+                          <FormInputItem label="Unit Price" name="unitPrice" value={item.unitPrice} onChange={(fieldName, value) => itemHandleChange(fieldName, parseInt(value), key)} />
+                        )
+                      }
 
                       <FormInputItem label="BUDGET HEAD PROCUREMENT" name="budgetHeadProcurement" value={item.budgetHeadProcurement} onChange={(name, value)=> itemHandleChange("budgetHeadProcurement", value, key)} />
 
