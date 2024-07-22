@@ -45,8 +45,6 @@ const InsepctionReport = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [uomMaster, setUomMaster] = useState({})
-  console.log("UOMMASTER: ", uomMaster)
   const [locatorMaster, setLocatorMaster] = useState({})
   const [formData, setFormData] = useState({
     genDate: "",
@@ -175,7 +173,6 @@ const InsepctionReport = () => {
       }, apiHeader("POST", token));
       const responseData = response?.data?.responseData || {}; 
       const { processData, itemList } = responseData;
-      console.log("API Response:", response.data);
       setFormData((prevFormData) => ({
         ...prevFormData,
 
@@ -225,6 +222,7 @@ const InsepctionReport = () => {
 
   const onFinish = async (values) => {
     if(formData.processType === "PO" || formData.type === "PO"){
+      console.log("INSIDE: ", formData.genName, formData.approvedName)
       if(!formData.genName || !formData.approvedName){
         message.error("Please fill all the fields.")
         return
@@ -321,6 +319,8 @@ const InsepctionReport = () => {
   const handleValuesChange = (_, allValues) => {
     setType(allValues.type);
   };
+
+
 
   const removeItem = (index) => {
     setFormData(prevValues=>{
