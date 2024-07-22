@@ -55,7 +55,6 @@ const GoodsReceiveNoteForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const {data: locatorMaster} = useSelector(state => state.locators)
   const {data: uomMaster} = useSelector(state => state.uoms)
-  const {data: itemData} = useSelector(state => state.item)
   const [formData, setFormData] = useState({
     genDate: "",
     genName: "",
@@ -106,6 +105,8 @@ const GoodsReceiveNoteForm = () => {
   });
 
   const { organizationDetails, locationDetails, userDetails, token, userCd } = useSelector(state => state.auth)
+
+  const {data: itemData} = useSelector(state => state.item)
 
   const deepClone = (obj) => {
     if (obj === null || typeof obj !== 'object') {
@@ -279,8 +280,6 @@ const GoodsReceiveNoteForm = () => {
   };
 
   console.log("Formdata: ", formData)
-
-  console.log("Set form data: ", formData)
 
   const handleInwardGatePassNoChange = async (value) => {
     try {
@@ -813,11 +812,6 @@ const GoodsReceiveNoteForm = () => {
                         <Form.Item label="RECEIVED QUANTITY">
                         <Input value={item.quantity} readOnly />
                       </Form.Item>
-
-                      {
-                        (formData.processType === "PO" || formData.processType === "IOP") &&
-                        <FormInputItem label = "Unit Price" value={item.unitPrice} readOnly={true} />
-                      }
 
                       {/* <Form.Item label="BUDGET HEAD PROCUREMENT">
                         <Input value={item.budgetHeadProcurement} readOnly />

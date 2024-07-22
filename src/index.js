@@ -12,7 +12,7 @@ import axios from "axios";
 
 axios.defaults.baseURL = "https://sai-services.azurewebsites.net/sai-inv-mgmt";
 const root = ReactDOM.createRoot(document.getElementById("root"));
-axios.defaults.baseURL = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt"
+// axios.defaults.baseURL = "https://uat-sai-app.azurewebsites.net/sai-inv-mgmt"
 root.render(
   <PersistGate persistor={persistor}>
     <Provider store={toolkitStore}>
