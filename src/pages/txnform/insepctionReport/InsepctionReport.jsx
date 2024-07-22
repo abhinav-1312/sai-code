@@ -180,7 +180,7 @@ const InsepctionReport = () => {
         ...prevFormData,
 
         issueName: processData?.issueName,
-        approvedName: processData?.approvedName,
+        // approvedName: processData?.approvedName,
         processId: processData?.processId,
         inwardGatePass: processData?.processId,
 
@@ -222,10 +222,9 @@ const InsepctionReport = () => {
     }
 
   };
-  console.log("FOrmdata item: ", formData.items)
 
   const onFinish = async (values) => {
-    if(formData.processType === "PO"){
+    if(formData.processType === "PO" || formData.type === "PO"){
       if(!formData.genName || !formData.approvedName){
         message.error("Please fill all the fields.")
         return

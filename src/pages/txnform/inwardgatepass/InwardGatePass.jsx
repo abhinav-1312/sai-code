@@ -357,7 +357,7 @@ const InwardGatePass = () => {
   };
 
   const onFinish = async (values) => {
-    if(formData.processType === "IOP"){
+    if(formData.processType === "IOP" || formData.type === "IOP"){
       if(!formData.issueName || !formData.genName){
         message.error("Please fill all the fields.")
         return
