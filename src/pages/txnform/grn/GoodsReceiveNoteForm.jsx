@@ -645,7 +645,7 @@ const GoodsReceiveNoteForm = () => {
 
             {Type === "PO" && (
               <> 
-              <FormInputItem label="SUPPLIER CODE :" value={formData.supplierCode} />
+              <FormInputItem label="SUPPLIER CODE :" value={formData.supplierCode} onChange={handleChange} name='supplierCode' />
               <FormInputItem label="SUPPLIER NAME :" value={formData.supplierName} />
               <FormInputItem label="ADDRESS :" value={formData.crAddress || "Not defined"} />
             </>
