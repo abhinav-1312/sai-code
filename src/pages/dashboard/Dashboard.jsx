@@ -6,9 +6,10 @@ import InvValSlab from "./InvValSlab";
 import PurchaseSummarySlab from "./PurchaseSummarySlab";
 import { apiCall, convertToCurrency, sortAlphabetically } from "../../utils/Functions";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOhq } from "../../redux/slice/ohqSlice";
+import Faq from "./faq/Faq";
+import SopManual from "./sopManual/SopManual";
 import Loader from '../../components/Loader'
-import axios from "axios";
+
 import _ from "lodash"
 
 const currentDate = new Date(); 
@@ -284,6 +285,14 @@ const Dashboard = (props) => {
           <span className="tab-fieldName">Purchasing Summary</span>
           <span className="tab-value">{summaryData.count} <span style={{fontSize: "0.8rem", fontWeight: "normal"}}>for selected dates</span></span>
         </Button>
+        <Button className={`each-tab ${activeTab === "tab5" ? "active-slab" : ""}`} id="tab5" onClick={() => setActiveTab("tab5")}>
+          <span className="tab-fieldName">SOP & Manual</span>
+          {/* <span className="tab-value">{summaryData.count} <span style={{fontSize: "0.8rem", fontWeight: "normal"}}>for selected dates</span></span> */}
+        </Button>
+        <Button className={`each-tab ${activeTab === "tab6" ? "active-slab" : ""}`} id="tab6" onClick={() => setActiveTab("tab6")}>
+          <span className="tab-fieldName">FAQ</span>
+          {/* <span className="tab-value">{summaryData.count} <span style={{fontSize: "0.8rem", fontWeight: "normal"}}>for selected dates</span></span> */}
+        </Button>
       </div>
 
       {
@@ -304,6 +313,16 @@ const Dashboard = (props) => {
       {
         activeTab === "tab4" && (
             <PurchaseSummarySlab filters = {summaryDataFilters} setFilters = {setSummaryDataFilters} handleSumSearch={handlePurchaseSearch} allData={summaryData.allData} orgId={orgId} isHeadquarter={props.orgId? true : false} />
+        )
+      }
+      {
+        activeTab === "tab5" && (
+          <SopManual />
+        )
+      }
+      {
+        activeTab === "tab6" && (
+          <Faq />
         )
       }
     </div>
