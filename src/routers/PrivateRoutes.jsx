@@ -10,6 +10,7 @@ import { fetchVendors } from '../redux/slice/vendorSlice'
 import { fetchOrganizations } from '../redux/slice/organizationSlice'
 import { fetchUoms } from '../redux/slice/uomSlice'
 import { fetchItemData } from '../redux/slice/itemSlice'
+import { fetchOrgMaster } from '../redux/slice/orgMasterSlice'
 
 const PrivateRoutes = () => {
     const isLoggedIn = useSelector(state => state.auth.token !== null)
@@ -17,15 +18,16 @@ const PrivateRoutes = () => {
     const dispatch = useDispatch()
 
     const populateReduxStore = async () => {
-      await dispatch(fetchDepartments()).unwrap()
-      await dispatch(fetchEmployees()).unwrap()
-      await dispatch(fetchLocations()).unwrap()
-      await dispatch(fetchLocators()).unwrap()
-      await dispatch(fetchUsers()).unwrap()
-      await dispatch(fetchVendors()).unwrap()
-      await dispatch(fetchOrganizations()).unwrap()
-      await dispatch(fetchUoms()).unwrap()
-      await dispatch(fetchItemData()).unwrap()
+      dispatch(fetchDepartments())
+      dispatch(fetchEmployees())
+      dispatch(fetchLocations())
+      dispatch(fetchLocators())
+      dispatch(fetchUsers())
+      dispatch(fetchVendors())
+      dispatch(fetchOrganizations())
+      dispatch(fetchUoms())
+      dispatch(fetchItemData())
+      dispatch(fetchOrgMaster())
     }
 
     useEffect(() => {

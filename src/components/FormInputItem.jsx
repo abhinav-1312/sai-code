@@ -7,10 +7,10 @@ const FormInputItem = ({label, name, value, onChange, readOnly, disabled, classN
       onChange(name, e.target.value)
   }
   return (
-    <Form.Item label={label} className={className}
+    <Form.Item label={label} className="font-medium"
       rules = {rules}
     >
-      <Input value={value} onChange={handleChange} readOnly={readOnly} disabled={disabled} placeholder={placeholder}/>
+      <Input value={value} onChange={handleChange} readOnly={readOnly} disabled={disabled} placeholder={placeholder} className='font-medium banner'/>
     </Form.Item>
   )
 }

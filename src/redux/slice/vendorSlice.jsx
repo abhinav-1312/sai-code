@@ -12,7 +12,6 @@ const vendorSlice = createSlice({
     reducers: {
         clearVendor(state, action){
             state.data = null
-            state.vendorObj = null
         }
     },
 

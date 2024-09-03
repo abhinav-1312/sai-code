@@ -9,11 +9,13 @@ import {SearchOutlined, RightOutlined} from '@ant-design/icons'
 import Highlighter from 'react-highlight-words';
 import _ from 'lodash'
 import { useNavigate } from 'react-router-dom'
+import { processStage, processType } from '../../utils/KeyValueMapping'
 const { Option } = Select;
 
 
 const PurchaseSummarySlab = ({filters, setFilters, populateSummaryData, allData, handleSumSearch, orgId, isHeadquarter}) => {
     const {token} = useSelector(state => state.auth)
+    const {orgMasterObj} = useSelector(state => state.orgMaster)
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -254,11 +256,13 @@ const PurchaseSummarySlab = ({filters, setFilters, populateSummaryData, allData,
       },
       {
         title: "Process Type",
-        dataIndex: "processType"
+        dataIndex: "processType",
+        render: (value) => processType[value]
       },
       {
         title: "Transaction Name",
-        dataIndex: "processStage"
+        dataIndex: "processStage",
+        render: (value) => processStage[value]
       },
       {
         title: "Transaction Value",
