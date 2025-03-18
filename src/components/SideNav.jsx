@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout, Menu, Breadcrumb } from "antd";
 import {
   HomeOutlined,
@@ -187,29 +187,30 @@ let menuItems = [
 const SideNav = () => {
   const [collapsed, setCollapsed] = useState(false);
 
+  const [menuItemsState, setMenuItemsState] = useState([]);
+
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
   };
 
   const {userRole, userCd} = useSelector(state => state.auth)
 
-  if(userCd === "Du01SuperAdmin" || userCd === "991"){
-    console.log("Insideeeeeeeeeeeeeeee")
-    menuItems = [...menuItems, 
-      {
-        key: "25",
-        icon: <EnterOutlined />,
-        label: "Correction Process",
-        path: "/transaction",
-        children: [
-          { key: "25.1", label: "Issue Note", path: "/crn/issueNote" },
-          { key: "25.3", label: "GRN", path: "/crn/grn" },
-        ]
+  // if(userCd === "Du01SuperAdmin" || userCd === "991"){
+  //   menuItems = [...menuItems, 
+  //     {
+  //       key: "25",
+  //       icon: <EnterOutlined />,
+  //       label: "Correction Process",
+  //       path: "/transaction",
+  //       children: [
+  //         { key: "25.1", label: "Issue Note", path: "/crn/issueNote" },
+  //         { key: "25.3", label: "GRN", path: "/crn/grn" },
+  //       ]
     
-      }
-    ]
-  }
-  const filteredMenuItems = menuItems?.filter((item) => {
+  //     }
+  //   ]
+  // }
+  const filteredMenuItems = menuItemsState?.filter((item) => {
     switch (userRole) {
       case "SuperAdmin": 
         return (
@@ -357,6 +358,27 @@ const SideNav = () => {
       ))}
     </Menu.SubMenu>
   );
+
+  useEffect(() => {
+    const menuItemsUpdated = menuItems.filter(item => item.label !== "Correction Process");
+    if(userCd === "Du01SuperAdmin" || userCd === "991"){
+      menuItemsUpdated.push(
+        {
+          key: "25",
+          icon: <EnterOutlined />,
+          label: "Correction Process",
+          path: "/transaction",
+          children: [
+            { key: "25.1", label: "Issue Note", path: "/crn/issueNote" },
+            { key: "25.3", label: "GRN", path: "/crn/grn" },
+          ]
+      
+        }
+
+      )
+    }
+    setMenuItemsState(menuItemsUpdated)
+  }, [userCd])
 
   return (
     // <Layout>
