@@ -34,7 +34,7 @@ const siderStyle = {
   scrollbarColor: 'unset',
 };
 
-const menuItems = [
+let menuItems = [
   { key: "1", icon: <HomeOutlined />, label: "Dashboard", path: "/" },
   {
     key: "13",
@@ -170,18 +170,19 @@ const menuItems = [
     label: "Transaction Summary",
     path: "/hqTxnSummary",
   },
-  {
-    key: "25",
-    icon: <EnterOutlined />,
-    label: "Correction Process",
-    path: "/transaction",
-    children: [
-      { key: "25.1", label: "Issue Note", path: "/crn/issueNote" },
-      { key: "25.3", label: "GRN", path: "/crn/grn" },
-    ]
+  // {
+  //   key: "25",
+  //   icon: <EnterOutlined />,
+  //   label: "Correction Process",
+  //   path: "/transaction",
+  //   children: [
+  //     { key: "25.1", label: "Issue Note", path: "/crn/issueNote" },
+  //     { key: "25.3", label: "GRN", path: "/crn/grn" },
+  //   ]
 
-  }
+  // }
 ];
+
 
 const SideNav = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -190,7 +191,24 @@ const SideNav = () => {
     setCollapsed(!collapsed);
   };
 
-  const {userRole} = useSelector(state => state.auth)
+  const {userRole, userCd} = useSelector(state => state.auth)
+
+  if(userCd === "Du01SuperAdmin" || userCd === "991"){
+    console.log("Insideeeeeeeeeeeeeeee")
+    menuItems = [...menuItems, 
+      {
+        key: "25",
+        icon: <EnterOutlined />,
+        label: "Correction Process",
+        path: "/transaction",
+        children: [
+          { key: "25.1", label: "Issue Note", path: "/crn/issueNote" },
+          { key: "25.3", label: "GRN", path: "/crn/grn" },
+        ]
+    
+      }
+    ]
+  }
   const filteredMenuItems = menuItems?.filter((item) => {
     switch (userRole) {
       case "SuperAdmin": 
