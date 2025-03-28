@@ -129,6 +129,7 @@ const RoutesComponent = () => {
       <Route path="/ohq" element={<OHQ />} />
       <Route path="/trnsummary" element={<TransactionSummary />} />
       <Route path="/trnsummary/:trnno" element={<TransactionDetail />} />
+      <Route path="/stockLedger" element={<StockLedger />} />
       <Route path="/locator" element={<Locator />} />
       <Route path="/uom" element={<UOM />} />
       <Route path="/Vendor" element={<Vendor />} />

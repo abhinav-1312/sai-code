@@ -1,16 +1,30 @@
 // UOMForm.js
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input, Button, Row, Col, DatePicker } from 'antd';
 import moment from 'moment';
+import InputDatePickerCombo from '../../components/InputDatePickerCombo';
+import FormDatePickerItem from '../../components/FormDatePickerItem';
+import { useSelector } from 'react-redux';
+import { convertEpochToDateString } from '../../utils/Functions';
 
 const UOMForm = ({ onSubmit, initialValues }) => {
+
+  console.log("Initital values: ", initialValues)
   const [form] = Form.useForm();
 
+  const {userCd} = useSelector((state) => state.auth);
+
+  const [endDate, setEndDate] = useState(null);
+
+  const handleChange = (field, dateString) => {
+    setEndDate(dateString);
+  }
+  
   const onFinish = (values) => {
     const formattedValues = {
       ...values,
-      endDate: values.endDate ? moment(values.endDate).format('DD/MM/YYYY') : null,
-      userId: '123457',
+      userId: userCd,
+      endDate: endDate
     };
     onSubmit(formattedValues);
     form.resetFields();
@@ -48,9 +62,10 @@ const UOMForm = ({ onSubmit, initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item name="endDate" label="End Date">
+          {/* <Form.Item name="endDate" label="End Date">
             <DatePicker />
-          </Form.Item>
+          </Form.Item> */}
+          <FormDatePickerItem label="End Date" name="endDate" onChange={handleChange} defaultValue={convertEpochToDateString(initialValues?.endDate || null)}/>
         </Col>
       </Row>
 

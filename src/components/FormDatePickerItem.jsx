@@ -65,12 +65,15 @@ const FormDatePickerItem = ({
   const handleDateChange = (date) => {
     if (date) {
       if (dayjs.isDayjs(date)) {
-        onChange(name, date.format(dateFormat));
+        if(onChange)
+          onChange(name, date.format(dateFormat));
       } else {
-        onChange(name, null);
+        if(onChange)
+          onChange(name, null);
       }
     } else {
-      onChange(name, null);
+      if(onChange)
+        onChange(name, null);
     }
   };
 
