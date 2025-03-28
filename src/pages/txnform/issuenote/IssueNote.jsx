@@ -54,6 +54,8 @@ const IssueNote = () => {
     [itemData, ohqData]
   );
 
+  console.log("DATA: ", data)
+
   const [printBtnEnabled, setPrintBtnEnabled] = useState(false);
   const [submitBtnEnabled, setSubmitBtnEnabled] = useState(true);
   const [draftBtnEnabled, setDraftBtnEnabled] = useState(true);
@@ -276,7 +278,13 @@ const IssueNote = () => {
               : txnData?.data?.type === "PO"
               ? "Purchase Order"
               : "Inter Org Transfer",
-          items: txnData?.itemList,
+          items: txnData?.itemList.map(item => {
+            const price = data.filter(obj =>  obj.itemMasterCd === item.itemCode)?.price;
+            return {
+              ...item, 
+              totalValue: item.quantity*price
+            }
+          }),
         });
   
         setDraftBtnEnabled(false);

@@ -194,7 +194,7 @@ const SideNav = () => {
   };
 
   const {userRole, userCd} = useSelector(state => state.auth)
-
+  console.log("USERROLE: ", userRole)
   // if(userCd === "Du01SuperAdmin" || userCd === "991"){
   //   menuItems = [...menuItems, 
   //     {
@@ -268,7 +268,8 @@ const SideNav = () => {
           item.key !== "10" &&
           // item.key !== "11" &&
           item.key !== "12" &&
-          item.key !== "20" &&
+          // item.key !== "20" &&
+          item.key !== "23" &&
           item.key !== "21"
         ); // Hide these menus
       case "QualityManager":
