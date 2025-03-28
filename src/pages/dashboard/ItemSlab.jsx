@@ -10,12 +10,10 @@ const { Search } = Input;
 
 const ItemSlab = ({allData, itemDescDropdownList, subCategoryDropdownList, countOrgWise, orgId}) => {
   const [filteredData, setFilteredData] = useState();
-  const {orgMasterObj} = useSelector(state => state.organizations)
+  const {orgMasterObj} = useSelector(state => state?.organizations || {})
   const [filteredInfo, setFilteredInfo] = useState({});
   const [searchText, setSearchText] = useState("");
-
-  console.log("FilteredData: ", filteredData)
-
+ 
   const columns = [
     {
       title: "Item Code",
@@ -58,7 +56,7 @@ const ItemSlab = ({allData, itemDescDropdownList, subCategoryDropdownList, count
     {
       title: 'Organization Name',
       dataIndex: 'orgId',
-      render: (value) => orgMasterObj[value]
+      render: (value) => orgMasterObj ? orgMasterObj[value] : "---"
     }
   ];
 

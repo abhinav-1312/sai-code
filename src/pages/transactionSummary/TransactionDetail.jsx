@@ -433,7 +433,6 @@ const style = {
 const TransactionDetail = () => {
   const navigate = useNavigate();
   const {state} = useLocation();
-  console.log("STAE: ", state)
   const { trnno: url } = useParams();
   const urlArr = url.split("_");
   const trnOrgIdCombined = urlArr[0].split("-");
@@ -469,6 +468,7 @@ const TransactionDetail = () => {
   });
 
   const populateData = async (orgId) => {
+    console.log("STATE", state)
     const {itemCode, processId, processStage} = state;
     const { data } = await axios.post(
       "/txns/getTxnDtls",

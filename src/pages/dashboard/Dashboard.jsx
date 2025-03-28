@@ -133,9 +133,9 @@ const Dashboard = (props) => {
 
       {
         activeTab === "tab1" && (
-          <ItemSlab countOrgWise={itemSlabData?.countOrgWise} count = {itemSlabData?.count} allData = {itemSlabData?.allData} itemDescDropdownList={itemSlabData?.itemDescDropdownList} subCategoryDropdownList={itemSlabData?.subCategoryDropdownList || []} orgId={orgId} />
+          <ItemSlab countOrgWise={itemSlabData?.countOrgWise} count = {itemSlabData?.count} allData = {itemSlabData?.allData || []} itemDescDropdownList={itemSlabData?.itemDescDropdownList || []} subCategoryDropdownList={itemSlabData?.subCategoryDropdownList || []} orgId={orgId || null} />
         )
-      }
+      } 
       {
         activeTab === "tab2" && (
             <TransactionSlab allData = {txnSlabData?.allData} orgId={orgId} setTxnSlabData={setTxnSlabData} countOrgWise={txnSlabData?.countOrgWise}/>

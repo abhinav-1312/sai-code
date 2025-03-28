@@ -54,8 +54,6 @@ const IssueNote = () => {
     [itemData, ohqData]
   );
 
-  console.log("DATA: ", data)
-
   const [printBtnEnabled, setPrintBtnEnabled] = useState(false);
   const [submitBtnEnabled, setSubmitBtnEnabled] = useState(true);
   const [draftBtnEnabled, setDraftBtnEnabled] = useState(true);
@@ -279,10 +277,13 @@ const IssueNote = () => {
               ? "Purchase Order"
               : "Inter Org Transfer",
           items: txnData?.itemList.map(item => {
-            const price = data.filter(obj =>  obj.itemMasterCd === item.itemCode)?.price;
+            console.log("DATA MAP: ", data)
+            const price = data.find(obj =>  obj.itemMasterCd === item.itemCode);
+            console.log("PRICE: ", price , item.quantity)
+            // console.log("TOTVAL: ", parseFloat(item.quantity) * parseFloat(price?.price))
             return {
               ...item, 
-              totalValue: item.quantity*price
+              totalValue: parseFloat(item.quantity) * parseFloat(price?.price)
             }
           }),
         });
@@ -292,7 +293,7 @@ const IssueNote = () => {
         setPrintBtnEnabled(true);
         setIsTxnData(true);
       }
-    }, [location.state]);
+    }, [location.state, data]);
 
     const handleIsnQuantityChange = (fieldName, value, index) => {
       const {itemCode} = formData.items[index];
@@ -319,6 +320,7 @@ const IssueNote = () => {
     }, []);
 
   useEffect(() => {
+    console.log("FORMDQATA UPDATED: ", formData)
     if (formBodyRef.current) formBodyRef.current.updateField(formData);
   }, [formData]);
 

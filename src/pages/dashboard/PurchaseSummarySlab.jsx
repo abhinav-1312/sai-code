@@ -54,6 +54,11 @@ const PurchaseSummarySlab = ({filters, setFilters, allData, handleSumSearch, isH
     useEffect(() => {
       populateCategory()
     }, [populateCategory])
+    useEffect(() => {
+      if(filters.startDate && filters.endDate){
+        handleSumSearch()
+      }
+    }, [])
 
     
   useEffect(() => {
@@ -96,7 +101,7 @@ const PurchaseSummarySlab = ({filters, setFilters, allData, handleSumSearch, isH
       navigate(`/hqTxnSummary/${id}-${orgID}_GRN`);
     }
     else{
-      navigate(`/trnsummary/${id}_GRN`);
+      navigate(`/trnsummary/${id}_GRN`, {state: {processStage: "GRN", orgId: orgID, processType, processId: id, itemCode: filters.itemCode}});
     }
   }
 
