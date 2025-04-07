@@ -48,7 +48,7 @@ export const apiCall = async (method, url, token, payload=null) => {
     }
     catch(error){
       message.error("Some error occured.")
-      console.log("Error: ", error)
+      
     }
   }
   else if(method === "POST"){
@@ -57,7 +57,7 @@ export const apiCall = async (method, url, token, payload=null) => {
       return data
     }catch(error){
       message.error("Some error occured.")
-      console.log("Error: ", error)
+      
     }
   }
 }

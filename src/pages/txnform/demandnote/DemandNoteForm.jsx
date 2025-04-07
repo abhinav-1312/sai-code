@@ -27,7 +27,7 @@ const DemandNoteForm = () => {
     consignorAddress: "",
     consignorZipCode: "",
   });
-  console.log(":FORMDATA: ", formData)
+  
 
   const fetchData = useCallback(async () => {
     setFormData({

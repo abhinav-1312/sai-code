@@ -97,7 +97,6 @@ const PurchaseSummarySlab = ({filters, setFilters, allData, handleSumSearch, isH
 
   const handleViewClick = (id, orgID) => {
     if(isHeadquarter){
-
       navigate(`/hqTxnSummary/${id}-${orgID}_GRN`);
     }
     else{

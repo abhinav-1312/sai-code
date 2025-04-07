@@ -73,14 +73,14 @@ export const login = createAsyncThunk(
         try {
             const url = "/login/authenticate"
             const {data} = await axios.post(url, formData)
-              console.log("DATAA234: ", data)
+              
               const { userCd, userType } = data?.responseData?.userDetails;
               const { token } = data?.responseData;
               const { organizationDetails, locationDetails, userDetails } = data?.responseData;
               const userRole = userRoleMap[userType]
               return {userCd, userRole, token, organizationDetails, locationDetails, userDetails}
         }catch(error){
-          console.log("ERROR: ", error)
+          
             message.error("Invalid credentials. Please try again.")
             return rejectWithValue("")
         }

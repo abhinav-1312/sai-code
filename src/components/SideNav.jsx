@@ -194,7 +194,7 @@ const SideNav = () => {
   };
 
   const {userRole, userCd} = useSelector(state => state.auth)
-  console.log("USERROLE: ", userRole)
+  
   // if(userCd === "Du01SuperAdmin" || userCd === "991"){
   //   menuItems = [...menuItems, 
   //     {

@@ -46,7 +46,7 @@ const StockLedger = ({orgId}) => {
     }
     catch(error){
       message.error("Some error occured. Please try again")
-      console.log("Error: ", error)
+      
     }
   };
 
@@ -67,7 +67,7 @@ const StockLedger = ({orgId}) => {
     }
     catch(error){
       message.error("Some error occured. Please try again")
-      console.log("Error: ", error)
+      
     }
   }
 

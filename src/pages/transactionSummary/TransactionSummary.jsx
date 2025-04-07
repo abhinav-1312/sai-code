@@ -163,7 +163,7 @@ const TransactionSummary = ({ orgId }) => {
     }
   }; 
   
-  console.log('SELECTED TXN TPE: ', selectedItemCode)
+  
 
   const handlePrintClick = (trnNo) => {};
 
@@ -199,7 +199,7 @@ const TransactionSummary = ({ orgId }) => {
   const [finalCsvData, setFinalCsvData] = useState([]);
 
   const populateData = useCallback(async (startDate=null, endDate=null, itemCode=null, txnType=null) => {
-    console.log("POPULATE DATA");
+    ;
     try {
       const { responseData } = await apiCall(
         "POST",
@@ -229,7 +229,7 @@ const TransactionSummary = ({ orgId }) => {
       generateCsvForTxnDtls(txnDtlsData);
     } catch (error) {
       message.error("Error occured while fetching data. Please try again.");
-      console.log("Error: ", error);
+      ;
     }
   }, [orgId, token]);
 
@@ -283,7 +283,7 @@ const TransactionSummary = ({ orgId }) => {
       localStorage.setItem("txnSummaryFilter", JSON.stringify({itemCode, txnType, startDate, endDate}));
     } catch (error) {
       message.error("Some error occurred. Please try again.");
-      console.log("Error: ", error);
+      ;
     }
   };
   const generateCsvForTxnDtls = (txnDtlsData) => {
@@ -594,7 +594,7 @@ useEffect(() => {
   const filter = JSON.parse(localStorage.getItem("txnSummaryFilter"));
   const startDate = filter?.startDate
   const endDate = filter?.endDate
-  console.log("Filter: ", filter);
+  ;
   if (filter) {
     // Convert string dates to Day.js objects if they exist
     if (filter.startDate) {
@@ -614,7 +614,7 @@ useEffect(() => {
   form.setFieldsValue(filter);
   setSelectedItemCode(filter?.itemCode);
   setSelectedTxnType(filter?.txnType);
-  console.log("SET CALLED");
+  ;
 }, [form, populateData]);
 
   return (

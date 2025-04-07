@@ -468,7 +468,7 @@ const TransactionDetail = () => {
   });
 
   const populateData = async (orgId) => {
-    console.log("STATE", state)
+    
     const {itemCode, processId, processStage} = state;
     const { data } = await axios.post(
       "/txns/getTxnDtls",

@@ -9,7 +9,7 @@ import { convertEpochToDateString } from '../../utils/Functions';
 
 const UOMForm = ({ onSubmit, initialValues }) => {
 
-  console.log("Initital values: ", initialValues)
+  
   const [form] = Form.useForm();
 
   const {userCd} = useSelector((state) => state.auth);

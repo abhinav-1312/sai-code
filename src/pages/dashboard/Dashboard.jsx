@@ -93,7 +93,7 @@ const Dashboard = (props) => {
       setLoadings(false)
     }
 
-    console.log("Itemslabdata: ", itemSlabData)
+    
 
 
     useEffect(()=>{

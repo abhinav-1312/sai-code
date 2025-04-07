@@ -277,10 +277,10 @@ const IssueNote = () => {
               ? "Purchase Order"
               : "Inter Org Transfer",
           items: txnData?.itemList.map(item => {
-            console.log("DATA MAP: ", data)
+            
             const price = data.find(obj =>  obj.itemMasterCd === item.itemCode);
-            console.log("PRICE: ", price , item.quantity)
-            // console.log("TOTVAL: ", parseFloat(item.quantity) * parseFloat(price?.price))
+            
+            //  * parseFloat(price?.price))
             return {
               ...item, 
               totalValue: parseFloat(item.quantity) * parseFloat(price?.price)
@@ -320,7 +320,7 @@ const IssueNote = () => {
     }, []);
 
   useEffect(() => {
-    console.log("FORMDQATA UPDATED: ", formData)
+    
     if (formBodyRef.current) formBodyRef.current.updateField(formData);
   }, [formData]);
 
