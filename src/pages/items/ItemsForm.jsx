@@ -288,14 +288,19 @@ const ItemsForm = ({
           // Number(uomId) !== Number(values.uomId) ||
           usageCategory !== values.usageCategory
         ) {
+          console.log("CATEGPRY: ", category, values.category)
+          console.log("SUB CATEGPRY: ", subCategory, values.subCategory)
+          console.log("TYPE: ", type, values.type)
+          console.log("DISCIPLINE: ", disciplines, values.disciplines)
+          console.log("USAGE CATEGORY: ", usageCategory, values.usageCategory)
           message.error("Variables input for the item name doesnt match. Please correct and submit again.")
           setItemDepVar({
-            uomVal:  uomId,
-            categoryVal: category,
-            subCategoryVal : subCategory,
-            typeVal: type,
-            disciplineVal: disciplines,
-            usageCatgeoryVal: usageCategory,
+            uomVal:  values.uomId,
+            categoryVal: values.category,
+            subCategoryVal : values.subCategory,
+            typeVal: values.type,
+            disciplineVal: values.disciplines,
+            usageCatgeoryVal: values.usageCategory,
             uomDesc,
             categoryDesc,
             subCategoryDesc,
