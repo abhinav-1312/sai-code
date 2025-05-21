@@ -137,6 +137,10 @@ const StockLedger = ({orgId}) => {
       dataIndex: "processId",
     },
     {
+      title: "Transaction Date",
+      dataIndex: "txnDate",
+    },
+    {
       title: "Item Code",
       dataIndex: "itemMasterCd",
     },
