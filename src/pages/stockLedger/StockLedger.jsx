@@ -205,8 +205,8 @@ const StockLedger = ({orgId}) => {
 
     const csvContent = [ ['Opening Stock', ledger.initQuantity],
     ['Closing Stock', ledger.finalQuantity],
-      ['Transaction ID', 'Item Code', 'Item Description', "Previous Quantity", "Post Quantity", "Process Stage", "Location Description", "Locator Description"], // Header row
-      ...ledger.txns.map(item => [item.processId, item.itemMasterCd, item.itemMasterDesc, item.preQuantity, item.postQuantity, item.processStage, location[item.locationId], locator[item.locatorId]]) // Data rows
+      ['Transaction ID', "Transaction Date", 'Item Code', 'Item Description', "Previous Quantity", "Post Quantity", "Process Stage", "Location Description", "Locator Description"], // Header row
+      ...ledger.txns.map(item => [item.processId, item.txnDate, item.itemMasterCd, item.itemMasterDesc, item.preQuantity, item.postQuantity, item.processStage, location[item.locationId], locator[item.locatorId]]) // Data rows
     ];
 
     setCsvData(csvContent)
