@@ -36,6 +36,7 @@ const vendorSlice = createSlice({
 export const fetchVendors = createAsyncThunk(
     'vendors/fetchVendors',
     async (_, {getState}) => {
+        console.log("FETCH CALLED")
         try{
             const {token} = getState().auth
             const {responseData} = await apiCall("GET", `/master/getVendorMaster`, token)

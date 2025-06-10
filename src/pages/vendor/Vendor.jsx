@@ -38,9 +38,12 @@ const VendorPage = () => {
         await dispatch(
           updateVendor({ vendorId: editingVendor.id, values })
         ).unwrap();
+        message.success("Vendor updated successfully.");
       } else {
         await dispatch(saveVendor(values)).unwrap();
+        message.success("Vendor saved successfully.");
       }
+      dispatch(fetchVendors());
       setVisible(false);
       setEditingVendor(null);
     } catch (error) {

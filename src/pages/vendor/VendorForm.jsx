@@ -1,11 +1,13 @@
 // VendorForm.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input, Button, Select, Row, Col } from 'antd';
 
 const { Option } = Select;
 
 const VendorForm = ({ onSubmit, initialValues }) => {
   const [form] = Form.useForm();
+
+
 
   const onFinish = (values) => {
     const formattedValues = {
@@ -15,6 +17,10 @@ const VendorForm = ({ onSubmit, initialValues }) => {
     onSubmit(formattedValues);
     form.resetFields();
   };
+
+  useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [initialValues, form]);
 
   return (
     <Form form={form} onFinish={onFinish} initialValues={initialValues} layout="vertical">
@@ -93,8 +99,8 @@ const VendorForm = ({ onSubmit, initialValues }) => {
         </Col>
       </Row>
 
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
+      <Form.Item style={{display: "flex", justifyContent: "end"}}>
+        <Button type="primary" htmlType="submit" style={{marginTop: "1rem"}}>
           Submit
         </Button>
       </Form.Item>

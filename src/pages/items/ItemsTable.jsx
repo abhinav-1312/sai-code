@@ -73,14 +73,14 @@ const ItemsTable = ({ items, onEdit, onDelete }) => {
       fixed: "right",
       render: (_, record) => (
         <Space>
-          {/* <Button
+          <Button
             type="primary"
             className="saitheme-btn"
             onClick={() => onEdit(record)}
-            disabled
+            // disabled
           >
             Edit
-          </Button> */}
+          </Button>
           <Popconfirm
             title="Delete the item"
             description="Are you sure to delete this item?"
