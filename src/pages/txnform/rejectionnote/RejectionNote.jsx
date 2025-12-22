@@ -143,6 +143,7 @@ const RejectionNote = () => {
         {
           processId: value,
           processStage: "IRN",
+          noteType: "REJECTION"
         },
         apiHeader("POST", token)
       );
@@ -183,7 +184,7 @@ const RejectionNote = () => {
           itemDesc: item.itemDesc,
           uom: item?.uom,
           uomDesc: uomObj[parseInt(item?.uom)],
-          quantity: item.rejectedQuantity,
+          quantity: item.quantity,
           noOfDays: item.requiredDays,
           remarks: item.remarks,
           conditionOfGoods: item.conditionOfGoods,

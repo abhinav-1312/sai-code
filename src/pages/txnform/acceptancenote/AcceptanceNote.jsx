@@ -254,6 +254,7 @@ const AcceptanceNote = () => {
       const data = await apiCall("POST", `/getSubProcessDtls`, token, {
         processId: value,
         processStage: "IRN",
+        noteType: "ACCEPTANCE"
       });
       const { responseData } = data;
       const { processData, itemList } = responseData;
@@ -292,14 +293,14 @@ const AcceptanceNote = () => {
           itemDesc: item.itemDesc,
           uom: item?.uom,
           uomDesc: uomObj[parseInt(item.uom)],
-          quantity: item.acceptedQuantity,
+          quantity: item.quantity,
           inspectedQuantity: item.inspectedQuantity,
           noOfDays: item.requiredDays,
           remarks: item.remarks,
           conditionOfGoods: item.conditionOfGoods,
           budgetHeadProcurement: item.budgetHeadProcurement,
           locatorId: item.locatorId,
-          acceptedQuantity: item.acceptedQuantity || item.rejectedQuantity,
+          acceptedQuantity: item.acceptedQuantity,
         })),
       }));
       // Handle response data as needed
